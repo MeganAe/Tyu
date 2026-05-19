@@ -2,7 +2,19 @@
 // Alert Bukavu — Config Frontend
 // ================================
 
-const API = '';
+const CLOUDINARY_CLOUD_NAME = 'duxhbgs3d';
+const CLOUDINARY_UPLOAD_PRESET = 'alertbukavu_unsigned';
+
+async function uploadImage(file, folder = 'alertbukavu') {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  formData.append('folder', folder);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: formData });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error?.message || 'Erreur upload image');
+  return data.secure_url;
+}
 
 // ---- Auth ----
 const AB = {
@@ -12,14 +24,14 @@ const AB = {
   getUser: () => { try { return JSON.parse(localStorage.getItem('ab_user')); } catch { return null; } },
 
   logout: async () => {
-    const r = await showConfirm('Déconnexion ?', '', 'Oui, me déconnecter');
+    const r = await showConfirm('Déconnexion', 'Voulez-vous vraiment vous déconnecter ?', 'Oui, déconnecter');
     if (r.isConfirmed) { localStorage.clear(); window.location.href = 'login.html'; }
   },
 
   requireAuth: () => {
     const token = localStorage.getItem('ab_token');
     if (!token) { window.location.href = 'login.html'; return null; }
-    return JSON.parse(localStorage.getItem('ab_user'));
+    return JSON.parse(localStorage.getItem('ab_user') || 'null');
   },
 
   redirectIfAuth: () => {
@@ -54,8 +66,6 @@ const CATEGORIES = {
   eau:        { label: 'Eau',         icon: 'water_drop',         color: '#840015', bg: '#ffdad8' },
   routes:     { label: 'Routes',      icon: 'traffic',            color: '#FF9F43', bg: '#FFF5EC' },
   sante:      { label: 'Santé',       icon: 'medical_services',   color: '#00C48C', bg: '#E6FAF5' },
-  incendie:   { label: 'Incendie',    icon: 'local_fire_department', color: '#FF3D71', bg: '#FFF0F5' },
-  inondation: { label: 'Inondation',  icon: 'water',              color: '#2471A3', bg: '#E0F7FA' },
   meteo:      { label: 'Météo',       icon: 'thunderstorm',       color: '#761f24', bg: '#ffdad8' },
   autre:      { label: 'Autre',       icon: 'more_horiz',         color: '#5b403e', bg: '#f0eded' }
 };
@@ -89,28 +99,34 @@ function genererAvatar(nom, taille = 40) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}">
     <circle cx="${taille/2}" cy="${taille/2}" r="${taille/2}" fill="${couleur}"/>
     <text x="${taille/2}" y="${taille/2 + taille*0.14}" text-anchor="middle" fill="white"
-      font-family="Inter,sans-serif" font-weight="800" font-size="${taille*0.38}">${initiales}</text>
+      font-family="Plus Jakarta Sans,Inter,sans-serif" font-weight="800" font-size="${taille*0.38}">${initiales}</text>
   </svg>`;
   return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
 }
 
-// ---- SweetAlert2 helpers ----
+function getPhotoUrl(userData, taille = 40) {
+  if (userData && userData.photoUrl) return userData.photoUrl;
+  return genererAvatar(userData?.nom || userData?.username || 'U', taille);
+}
+
+function validerUsername(u) { return /^[a-zA-Z0-9_]{3,20}$/.test(u); }
+
+function normaliserTelephone(digits) {
+  const clean = String(digits).replace(/\D/g, '');
+  return '+243' + clean;
+}
+
+// ---- SweetAlert2 ----
 const Toast = Swal.mixin({
   toast: true, position: 'bottom',
   showConfirmButton: false, timer: 3500, timerProgressBar: true,
   customClass: { popup: 'swal-toast-custom' }
 });
 
-function showToast(msg, type = 'success') {
-  Toast.fire({ icon: type, title: msg });
-}
+function showToast(msg, type = 'success') { Toast.fire({ icon: type, title: msg }); }
 
 function showConfirm(title, text, confirmText = 'Confirmer', icon = 'question') {
-  return Swal.fire({
-    title, text, icon, showCancelButton: true,
-    confirmButtonColor: '#840015', cancelButtonColor: '#906f6d',
-    confirmButtonText: confirmText, cancelButtonText: 'Annuler'
-  });
+  return Swal.fire({ title, text, icon, showCancelButton: true, confirmButtonColor: '#840015', cancelButtonColor: '#906f6d', confirmButtonText: confirmText, cancelButtonText: 'Annuler' });
 }
 
 function showAlert(title, text, icon = 'info') {

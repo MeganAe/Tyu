@@ -1,133 +1,191 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AlertBukavu — Inscription</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css"/>
-<style>
-  body { min-height:100dvh;display:flex;align-items:center;justify-content:center;position:relative;overflow-y:auto;background:#1c1b1b;padding:60px 0 40px; }
-  .input-wrap { position:relative;margin-bottom:12px; }
-  .input-ico { position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-family:'Material Symbols Outlined';font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24; }
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AlertBukavu — Inscription</title>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>html,body{min-height:100%;margin:0}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}</style>
 </head>
-<body>
+<body class="auth-page">
 
-<div style="position:absolute;inset:0;z-index:0;">
-  <img src="https://images.unsplash.com/photo-1580746738099-b2d61a5a0c1e?w=800&q=80" alt="Bukavu" style="width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(.6);position:fixed;"/>
-  <div style="position:fixed;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.3),transparent,rgba(0,0,0,.5));"></div>
-</div>
-
-<main style="position:relative;z-index:10;width:100%;max-width:420px;padding:0 20px;">
-  <div style="background:white;border-radius:20px;box-shadow:0 25px 60px rgba(0,0,0,.35);padding:40px 28px 28px;position:relative;margin-top:56px;">
-
-    <div style="position:absolute;top:-48px;left:50%;transform:translateX(-50%);width:96px;height:96px;background:white;border-radius:50%;padding:8px;box-shadow:0 4px 20px rgba(132,0,21,.3);display:flex;align-items:center;justify-content:center;">
-      <div class="logo-pulse" style="width:100%;height:100%;border:3px solid #840015;border-radius:50%;display:flex;align-items:center;justify-content:center;">
-        <span class="material-symbols-outlined" style="color:#840015;font-size:42px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;">emergency</span>
-      </div>
+  <div class="auth-bg">
+    <div class="bukavu-scene" aria-hidden="true">
+      <div class="sky-glow"></div>
+      <div class="lake-shine"></div>
+      <div class="hill hill-back"></div>
+      <div class="hill hill-front"></div>
+      <div class="city-lights"></div>
     </div>
-
-    <div style="text-align:center;margin-bottom:20px;">
-      <h1 style="font-size:22px;font-weight:800;color:#840015;margin-bottom:4px;">Créer un compte</h1>
-      <p style="font-size:13px;color:#5b403e;">Rejoignez la communauté AlertBukavu</p>
-    </div>
-
-    <div class="input-wrap">
-      <span class="input-ico">badge</span>
-      <input id="nom" type="text" class="field-input" placeholder="Nom complet"/>
-    </div>
-    <div class="input-wrap">
-      <span class="input-ico">mail</span>
-      <input id="email" type="email" class="field-input" placeholder="Adresse email"/>
-    </div>
-    <div class="input-wrap">
-      <span class="input-ico">phone</span>
-      <input id="telephone" type="tel" class="field-input" placeholder="+243 8X XXX XXXX"/>
-    </div>
-    <div class="input-wrap" style="margin-bottom:12px;">
-      <span class="input-ico">location_on</span>
-      <select id="quartier" class="field-input" style="appearance:none;padding-right:36px;">
-        <option value="">Votre quartier...</option>
-      </select>
-      <span class="material-symbols-outlined" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24;">expand_more</span>
-    </div>
-    <div class="input-wrap">
-      <span class="input-ico">vpn_key</span>
-      <input id="password" type="password" class="field-input" placeholder="Mot de passe (min. 6 car.)" style="padding-right:44px;"/>
-      <button onclick="togglePwd()" style="position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#906f6d;">
-        <span class="material-symbols-outlined" id="eyeIcon" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24;">visibility</span>
-      </button>
-    </div>
-
-    <!-- Barre force mot de passe -->
-    <div style="height:4px;border-radius:2px;background:#f0eded;margin-bottom:16px;overflow:hidden;">
-      <div id="pwdFill" style="height:100%;width:0%;border-radius:2px;transition:all .3s;"></div>
-    </div>
-
-    <button id="btnRegister" class="btn-primary" onclick="register()">
-      CRÉER MON COMPTE
-      <span class="material-symbols-outlined" style="font-size:18px;color:white;">arrow_forward</span>
-    </button>
-
-    <p style="text-align:center;margin-top:16px;font-size:13px;color:#5b403e;">
-      Déjà un compte ? <a href="login.html" style="color:#840015;font-weight:700;">Se connecter</a>
-    </p>
+    <div class="auth-overlay"></div>
   </div>
-</main>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="config.js"></script>
-<script>
-  AB.redirectIfAuth();
-  const sel = document.getElementById('quartier');
-  QUARTIERS.forEach(q => { const o = document.createElement('option'); o.value = q; o.textContent = q; sel.appendChild(o); });
+  <div class="auth-scroll">
+    <div class="auth-shell">
+      <div class="glass-card register-card">
 
-  function togglePwd() {
-    const i = document.getElementById('password'), ic = document.getElementById('eyeIcon');
-    i.type = i.type === 'password' ? 'text' : 'password';
-    ic.textContent = i.type === 'password' ? 'visibility' : 'visibility_off';
-  }
+        <div class="floating-logo">
+          <img src="logo.png" alt="AlertBukavu" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-pulse\' style=\'width:100%;height:100%;border:3px solid #840015;border-radius:50%;display:flex;align-items:center;justify-content:center\'><span class=\'material-symbols-outlined\' style=\'color:#840015;font-size:46px;font-variation-settings:\"FILL\" 1,\"wght\" 700,\"GRAD\" 0,\"opsz\" 48\'>notification_important</span></div>'"/>
+        </div>
 
-  document.getElementById('password').addEventListener('input', function() {
-    const p = this.value; let s = 0;
-    if (p.length >= 6) s++; if (p.length >= 10) s++;
-    if (/[A-Z]/.test(p)) s++; if (/[0-9]/.test(p)) s++;
-    const colors = ['#FF3D71','#FF9F43','#FFD43B','#00C48C'];
-    const widths = ['25%','50%','75%','100%'];
-    const fill = document.getElementById('pwdFill');
-    fill.style.width = s > 0 ? widths[Math.min(s-1,3)] : '0%';
-    fill.style.background = s > 0 ? colors[Math.min(s-1,3)] : '';
-  });
+        <div style="text-align:center;margin-bottom:20px;">
+          <h1 style="font-size:22px;font-weight:800;color:#840015;margin-bottom:4px;">Créer un compte</h1>
+          <p style="font-size:13px;color:#5b403e;">Rejoignez la communauté AlertBukavu</p>
+        </div>
 
-  async function register() {
-    const nom = document.getElementById('nom').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const telephone = document.getElementById('telephone').value.trim();
-    const quartier = document.getElementById('quartier').value;
-    const password = document.getElementById('password').value;
-    const btn = document.getElementById('btnRegister');
+        <form onsubmit="return false;">
 
-    if (!nom) { showToast('Le nom est requis', 'error'); return; }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Email invalide', 'error'); return; }
-    if (!quartier) { showToast('Choisissez votre quartier', 'error'); return; }
-    if (password.length < 6) { showToast('Mot de passe trop court (min. 6 car.)', 'error'); return; }
+          <div class="input-wrap">
+            <input id="nom" type="text" class="field-input" placeholder="Nom complet"/>
+            <span class="auth-icon user" aria-hidden="true"></span>
+          </div>
 
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>&nbsp;Création du compte...';
-    try {
-      const data = await AB.api('auth/register', 'POST', { nom, email, telephone, quartier, password });
-      AB.saveToken(data.token);
-      AB.saveUser(data.user);
-      await showAlert('Compte créé !', `Bienvenue sur AlertBukavu, ${nom} !`, 'success');
-      window.location.href = 'index.html';
-    } catch(e) {
-      showToast(e.message, 'error');
-      btn.disabled = false;
-      btn.innerHTML = 'CRÉER MON COMPTE <span class="material-symbols-outlined" style="font-size:18px;color:white;">arrow_forward</span>';
+          <div class="input-wrap" style="margin-bottom:4px;">
+            <input id="username" type="text" class="field-input" placeholder="Nom d'utilisateur (ex: jean_bukavu)" maxlength="20" oninput="verifierUsername(this.value)" autocomplete="username"/>
+            <span class="auth-icon at" aria-hidden="true"></span>
+          </div>
+          <p id="usernameStatus" style="font-size:11px;margin-bottom:12px;padding-left:4px;min-height:16px;"></p>
+
+          <div class="input-wrap">
+            <input id="email" type="email" class="field-input" placeholder="Adresse email" autocomplete="email"/>
+            <span class="auth-icon mail" aria-hidden="true"></span>
+          </div>
+
+          <!-- Téléphone +243 -->
+          <div class="tel-wrap">
+            <div class="tel-prefix">+243</div>
+            <input id="telephone" type="tel" class="tel-input" placeholder="812 345 678" oninput="formatTel(this)" inputmode="numeric"/>
+          </div>
+          <p id="telStatus" style="font-size:11px;margin-bottom:12px;padding-left:4px;min-height:16px;"></p>
+
+          <div class="input-wrap" style="margin-bottom:12px;">
+            <select id="quartier" class="field-input" style="appearance:none;padding-right:36px;cursor:pointer;">
+              <option value="">Votre quartier...</option>
+            </select>
+            <span class="auth-icon pin" aria-hidden="true"></span>
+            <span class="select-caret" aria-hidden="true"></span>
+          </div>
+
+          <div class="input-wrap" style="margin-bottom:4px;">
+            <input id="password" type="password" class="field-input" placeholder="Mot de passe (min. 8 car.)" style="padding-right:48px;" oninput="updateStrength(this.value)" autocomplete="new-password"/>
+            <span class="auth-icon key" aria-hidden="true"></span>
+            <button type="button" class="password-toggle" onclick="togglePwd()" aria-label="Afficher">
+              <span id="eyeIcon" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div style="height:4px;border-radius:2px;background:#f0eded;margin-bottom:16px;overflow:hidden;">
+            <div id="pwdFill" style="height:100%;width:0%;border-radius:2px;transition:all .3s;"></div>
+          </div>
+
+          <button type="button" id="btnReg" class="btn-primary" onclick="register()" style="margin-top:4px;">
+            CRÉER MON COMPTE <span class="btn-arrow" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <p style="text-align:center;margin-top:16px;font-size:13px;color:#5b403e;">
+          Déjà un compte ? <a href="login.html" style="color:#840015;font-weight:700;">Se connecter</a>
+        </p>
+      </div>
+
+      <p class="auth-footer">AlertBukavu • Réseau communautaire • Bukavu, RDC</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="config.js"></script>
+  <script>
+    AB.redirectIfAuth();
+
+    QUARTIERS.forEach(q => {
+      const o = document.createElement('option');
+      o.value = q; o.textContent = q;
+      document.getElementById('quartier').appendChild(o);
+    });
+
+    function togglePwd() {
+      const i = document.getElementById('password'), ic = document.getElementById('eyeIcon');
+      i.type = i.type === 'password' ? 'text' : 'password';
+      ic.className = i.type === 'password' ? '' : 'is-visible';
     }
-  }
-</script>
+
+    let usernameOk = false;
+    async function verifierUsername(val) {
+      const p = document.getElementById('usernameStatus');
+      if (!val) { p.textContent = ''; usernameOk = false; return; }
+      if (!validerUsername(val)) {
+        p.textContent = '3-20 caractères, lettres/chiffres/_';
+        p.style.color = '#ba1a1a'; usernameOk = false; return;
+      }
+      p.textContent = 'Vérification...'; p.style.color = '#906f6d';
+      try {
+        const data = await AB.api(`auth/check-username?username=${val}`);
+        if (data.available) {
+          p.textContent = '✓ Disponible'; p.style.color = '#00c48c'; usernameOk = true;
+        } else {
+          p.textContent = '✗ Déjà utilisé'; p.style.color = '#ba1a1a'; usernameOk = false;
+        }
+      } catch { p.textContent = ''; usernameOk = true; }
+    }
+
+    function formatTel(input) {
+      const digits = input.value.replace(/\D/g, '').slice(0, 9);
+      input.value = digits;
+      const p = document.getElementById('telStatus');
+      if (digits.length > 0 && digits.length < 9) {
+        p.textContent = `${digits.length}/9 chiffres`; p.style.color = '#906f6d';
+      } else if (digits.length === 9) {
+        p.textContent = `+243 ${digits} ✓`; p.style.color = '#00c48c';
+      } else { p.textContent = ''; }
+    }
+
+    function updateStrength(p) {
+      let s = 0;
+      if (p.length >= 8) s++; if (p.length >= 12) s++;
+      if (/[A-Z]/.test(p)) s++; if (/[0-9]/.test(p)) s++;
+      const colors = ['#FF3D71','#FF9F43','#FFD43B','#00C48C'];
+      const widths = ['25%','50%','75%','100%'];
+      const fill = document.getElementById('pwdFill');
+      fill.style.width = s > 0 ? widths[Math.min(s-1,3)] : '0%';
+      fill.style.background = s > 0 ? colors[Math.min(s-1,3)] : '';
+    }
+
+    async function register() {
+      const nom = document.getElementById('nom').value.trim();
+      const username = document.getElementById('username').value.trim().toLowerCase();
+      const email = document.getElementById('email').value.trim();
+      const telDigits = document.getElementById('telephone').value.replace(/\D/g,'');
+      const quartier = document.getElementById('quartier').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('btnReg');
+
+      if (!nom) { showToast('Le nom est requis', 'error'); return; }
+      if (!username || !validerUsername(username)) { showToast('Nom d\'utilisateur invalide', 'error'); return; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Email invalide', 'error'); return; }
+      if (telDigits.length > 0 && telDigits.length !== 9) { showToast('Numéro incomplet (9 chiffres après +243)', 'error'); return; }
+      if (!quartier) { showToast('Choisissez votre quartier', 'error'); return; }
+      if (password.length < 8) { showToast('Mot de passe trop court (min. 8 car.)', 'error'); return; }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>&nbsp;Création du compte...';
+
+      const telephone = telDigits.length === 9 ? normaliserTelephone(telDigits) : '';
+
+      try {
+        const data = await AB.api('auth/register', 'POST', { nom, username, email, telephone, quartier, password });
+        AB.saveToken(data.token);
+        AB.saveUser(data.user);
+        await showAlert('Compte créé !', `Bienvenue sur AlertBukavu, ${nom} !`, 'success');
+        window.location.href = 'index.html';
+      } catch(e) {
+        showToast(e.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = 'CRÉER MON COMPTE <span class="btn-arrow" aria-hidden="true"></span>';
+      }
+    }
+  </script>
 </body>
 </html>

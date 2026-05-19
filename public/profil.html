@@ -1,111 +1,155 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AlertBukavu — Mon Profil</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css"/>
-<style>
-  body { padding-bottom:80px;background:#fcf9f8; }
-  .stat-mini { flex:1;background:white;border-radius:12px;border:1px solid #e4bdbb;padding:16px;text-align:center; }
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AlertBukavu — Mon Profil</title>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
+    body{padding-bottom:80px;}
+    .alerte-row{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid #efecea;}
+    .alerte-row:last-child{border-bottom:none;padding-bottom:0;}
+  </style>
 </head>
 <body>
 
-<header class="top-bar">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <span class="material-symbols-outlined" style="font-size:20px;color:white;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;">emergency</span>
-    <h1 style="font-size:17px;font-weight:800;color:white;">Mon Profil</h1>
-  </div>
-</header>
-
-<section style="background:#840015;padding:24px 20px 56px;text-align:center;">
-  <img id="profilePhoto" src="" alt="" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.4);box-shadow:0 4px 20px rgba(0,0,0,.2);margin-bottom:14px;"/>
-  <h2 id="nomUser" style="font-size:20px;font-weight:800;color:white;margin-bottom:2px;"></h2>
-  <p id="emailUser" style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:10px;"></p>
-  <span id="quartierBadge" style="background:rgba(255,255,255,.15);color:white;padding:4px 16px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3);"></span>
-</section>
-
-<main style="max-width:640px;margin:-32px auto 0;padding:0 16px;position:relative;z-index:1;">
-
-  <div style="display:flex;gap:12px;margin-bottom:14px;">
-    <div class="stat-mini">
-      <p id="nbAlertes" style="font-size:28px;font-weight:800;color:#840015;line-height:1;margin-bottom:4px;">0</p>
-      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Alertes</p>
+  <header class="top-bar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <img src="logo.png" alt="Logo" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'"/>
+      <h1 style="font-size:17px;font-weight:800;color:white;">AlertBukavu</h1>
     </div>
-    <div class="stat-mini">
-      <p id="nbConfirmations" style="font-size:28px;font-weight:800;color:#00C48C;line-height:1;margin-bottom:4px;">0</p>
-      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Confirmées</p>
+  </header>
+
+  <section class="hero-section" style="padding:24px 20px 56px;text-align:center;">
+    <div class="profile-photo-wrap">
+      <img id="photoUser" class="profile-photo" src="" alt="Photo de profil"/>
+      <label for="photoInput" class="photo-edit-btn" title="Changer la photo">
+        <span class="material-symbols-outlined" style="font-size:18px;">photo_camera</span>
+      </label>
+      <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="changerPhoto(event)"/>
     </div>
-    <div class="stat-mini">
-      <p id="nbFausses" style="font-size:28px;font-weight:800;color:#FF3D71;line-height:1;margin-bottom:4px;">0</p>
-      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Fausses</p>
+    <h2 id="nomUser" style="font-size:20px;font-weight:800;color:white;margin-bottom:2px;">Chargement...</h2>
+    <p id="usernameUser" style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:8px;"></p>
+    <p id="emailUser" style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:10px;"></p>
+    <span id="quartierBadge" style="background:rgba(255,255,255,.15);color:white;padding:4px 16px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3);"></span>
+  </section>
+
+  <main style="max-width:640px;margin:-32px auto 0;padding:0 16px;position:relative;z-index:1;">
+
+    <div style="display:flex;gap:12px;margin-bottom:14px;">
+      <div class="stat-mini"><p id="nbAlertes" style="font-size:28px;font-weight:800;color:#840015;line-height:1;margin-bottom:4px;">0</p><p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Alertes</p></div>
+      <div class="stat-mini"><p id="nbConfirmations" style="font-size:28px;font-weight:800;color:#00c48c;line-height:1;margin-bottom:4px;">0</p><p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Confirmations</p></div>
+      <div class="stat-mini"><p id="nbFausses" style="font-size:28px;font-weight:800;color:#ff3d71;line-height:1;margin-bottom:4px;">0</p><p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Fausses alertes</p></div>
     </div>
-  </div>
 
-  <div class="section-card">
-    <h2 style="font-size:15px;font-weight:700;color:#1c1b1b;margin-bottom:14px;">Mes alertes récentes</h2>
-    <div id="mesAlertesList">
-      <div class="skeleton" style="height:52px;margin-bottom:10px;border-radius:8px;"></div>
-      <div class="skeleton" style="height:52px;border-radius:8px;"></div>
+    <div class="section-card">
+      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">history</span>Mes alertes récentes
+      </h2>
+      <p style="font-size:12px;color:#906f6d;margin-bottom:14px;">Vos 10 dernières publications</p>
+      <div id="mesAlertesList">
+        <div class="skeleton" style="height:56px;margin-bottom:10px;border-radius:8px;"></div>
+        <div class="skeleton" style="height:56px;margin-bottom:10px;border-radius:8px;"></div>
+        <div class="skeleton" style="height:56px;border-radius:8px;"></div>
+      </div>
     </div>
-  </div>
 
-  <button onclick="AB.logout()" style="width:100%;height:52px;background:white;border:1.5px solid #e4bdbb;border-radius:8px;color:#5b403e;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;">
-    <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">logout</span>
-    Se déconnecter
-  </button>
-</main>
+    <button onclick="AB.logout()" class="btn-outline" style="margin-bottom:20px;">
+      <span class="material-symbols-outlined" style="font-size:18px;">logout</span>Se déconnecter
+    </button>
+  </main>
 
-<nav class="bottom-nav">
-  <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
-  <a href="publier.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
-  <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
-  <a href="profil.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">person</span><span>Profil</span></a>
-</nav>
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
+    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
+    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
+    <a href="profil.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">person</span><span>Profil</span></a>
+  </nav>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="config.js"></script>
-<script>
-const user = AB.requireAuth();
-if (user) {
-  document.getElementById('nomUser').textContent = user.nom || 'Utilisateur';
-  document.getElementById('emailUser').textContent = user.email || '';
-  document.getElementById('profilePhoto').src = genererAvatar(user.nom || 'U', 88);
-  document.getElementById('quartierBadge').textContent = user.quartier || 'Bukavu';
-}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="config.js"></script>
+  <script>
+    const user = AB.requireAuth();
 
-async function chargerMesAlertes() {
-  try {
-    const data = await AB.api('alertes/mes-alertes');
-    const alertes = data.alertes || [];
-    document.getElementById('nbAlertes').textContent = alertes.length;
-    const list = document.getElementById('mesAlertesList');
-    if (!alertes.length) {
-      list.innerHTML = '<p style="color:#906f6d;font-size:13px;text-align:center;padding:16px 0;">Aucune alerte publiée</p>';
-      return;
+    if (user) {
+      document.getElementById('nomUser').textContent = user.nom || 'Utilisateur';
+      document.getElementById('usernameUser').textContent = user.username ? '@' + user.username : '';
+      document.getElementById('emailUser').textContent = user.email || '';
+      document.getElementById('quartierBadge').textContent = user.quartier || 'Bukavu';
+      const photo = document.getElementById('photoUser');
+      photo.src = getPhotoUrl(user, 104);
+      photo.onerror = () => { photo.src = genererAvatar(user.nom || 'U', 104); };
     }
-    list.innerHTML = alertes.map(a => {
-      const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
-      const urg = URGENCES[a.urgence] || URGENCES.moyen;
-      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0eded;">
-        <span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:${urg.bg};color:${urg.color};white-space:nowrap;">${urg.label}</span>
-        <div style="flex:1;min-width:0;">
-          <p style="font-size:13px;font-weight:700;color:#1c1b1b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(a.titre)}</p>
-          <p style="font-size:11px;color:#906f6d;">${tempsRelatif(a.created_at)} • ${escHtml(a.quartier||'Bukavu')}</p>
-        </div>
-        <span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};white-space:nowrap;">${cat.label}</span>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    document.getElementById('mesAlertesList').innerHTML = '<p style="color:#906f6d;font-size:13px;text-align:center;">Impossible de charger</p>';
-  }
-}
 
-chargerMesAlertes();
-afficherMenuAdmin();
-</script>
+    async function changerPhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { showToast('Choisissez une image', 'error'); return; }
+      if (file.size > 8 * 1024 * 1024) { showToast('Image trop lourde (max 8 Mo)', 'error'); return; }
+
+      Swal.fire({ title: 'Upload...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const previewUrl = URL.createObjectURL(file);
+        document.getElementById('photoUser').src = previewUrl;
+        const photoUrl = await uploadImage(file, 'profils');
+        await AB.api('auth/update-photo', 'PUT', { photoUrl });
+        const updatedUser = { ...AB.getUser(), photoUrl };
+        AB.saveUser(updatedUser);
+        URL.revokeObjectURL(previewUrl);
+        Swal.close();
+        showToast('Photo de profil mise à jour');
+      } catch(e) {
+        Swal.close();
+        showToast('Upload impossible : ' + e.message, 'error');
+      }
+      event.target.value = '';
+    }
+
+    async function chargerMesAlertes() {
+      try {
+        const data = await AB.api('alertes/mes-alertes');
+        const alertes = data.alertes || [];
+        document.getElementById('nbAlertes').textContent = alertes.length;
+        const list = document.getElementById('mesAlertesList');
+        if (!alertes.length) {
+          list.innerHTML = '<div style="text-align:center;padding:28px 0;"><span class="material-symbols-outlined" style="font-size:36px;color:#ddb8b6;">inbox</span><p style="color:#906f6d;font-size:13px;margin-top:8px;">Aucune alerte publiée</p></div>';
+          return;
+        }
+        const statutStyle = s => ({
+          active:    {label:'Active',    bg:'#FFF5EC', color:'#FF9F43'},
+          resolue:   {label:'Résolue',   bg:'#efecea', color:'#906f6d'},
+          suspendue: {label:'Suspendue', bg:'#ffdad8', color:'#840015'}
+        }[s] || {label:'Active', bg:'#FFF5EC', color:'#FF9F43'});
+
+        list.innerHTML = alertes.slice(0,10).map(a => {
+          const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
+          const urg = URGENCES[a.urgence] || URGENCES.moyen;
+          const st = statutStyle(a.statut);
+          return `<div class="alerte-row">
+            <div style="width:10px;height:10px;border-radius:50%;background:${urg.color};margin-top:5px;flex-shrink:0;"></div>
+            <div style="flex:1;min-width:0;">
+              <p style="font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(a.titre)}</p>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span style="font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};padding:2px 8px;border-radius:4px;">${cat.label}</span>
+                <span style="font-size:11px;color:#906f6d;">${tempsRelatif(a.created_at)}</span>
+                <span style="font-size:11px;color:#906f6d;">${a.nb_confirmations||0} confirmation${(a.nb_confirmations||0)>1?'s':''}</span>
+              </div>
+            </div>
+            <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;background:${st.bg};color:${st.color};white-space:nowrap;flex-shrink:0;">${st.label}</span>
+          </div>`;
+        }).join('');
+      } catch(e) {
+        document.getElementById('mesAlertesList').innerHTML = '<p style="color:#906f6d;font-size:13px;text-align:center;padding:20px 0;">Impossible de charger</p>';
+      }
+    }
+
+    chargerMesAlertes();
+    afficherMenuAdmin();
+  </script>
 </body>
 </html>
