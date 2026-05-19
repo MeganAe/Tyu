@@ -119,18 +119,24 @@ app.post('/api/auth/login', async (req, res) => {
 // Toutes les alertes
 app.get('/api/alertes', verifyToken, async (req, res) => {
   const { data: alertes, error } = await supabase
-    .from('alertes').select('*, users(nom, quartier)')
+    .from('alertes').select('*, users(nom, username, quartier, photo_url)')
     .neq('statut', 'suspendue')
     .order('created_at', { ascending: false }).limit(60);
 
   if (error) return res.status(500).json({ error: 'Erreur serveur' });
-  const formatted = (alertes || []).map(a => ({ ...a, auteur_nom: a.users?.nom || 'Habitant', auteur_quartier: a.users?.quartier || '' }));
+  const formatted = (alertes || []).map(a => ({
+    ...a,
+    auteur_nom: a.users?.nom || 'Habitant',
+    auteur_username: a.users?.username || null,
+    auteur_quartier: a.users?.quartier || '',
+    photo_auteur: a.users?.photo_url || null
+  }));
   return res.json({ alertes: formatted });
 });
 
 // Mes alertes
 app.get('/api/alertes/mes-alertes', verifyToken, async (req, res) => {
-  const { data: alertes } = await supabase.from('alertes').select('*')
+  const { data: alertes } = await supabase.from('alertes').select('*, users(nom, username, quartier, photo_url)')
     .eq('user_id', req.user.id).order('created_at', { ascending: false }).limit(20);
   return res.json({ alertes: alertes || [] });
 });
@@ -240,3 +246,19 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.ht
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 app.listen(PORT, () => console.log(`AlertBukavu running on http://localhost:${PORT}`));
+
+// Check username disponible
+app.get('/api/auth/check-username', async (req, res) => {
+  const { username } = req.query;
+  if (!username) return res.json({ available: false });
+  const { data } = await supabase.from('users').select('id').eq('username', username.toLowerCase()).single();
+  return res.json({ available: !data });
+});
+
+// Mettre à jour photo profil
+app.put('/api/auth/update-photo', verifyToken, async (req, res) => {
+  const { photoUrl } = req.body;
+  if (!photoUrl) return res.status(400).json({ error: 'URL photo manquante' });
+  await supabase.from('users').update({ photo_url: photoUrl }).eq('id', req.user.id);
+  return res.json({ message: 'Photo mise à jour' });
+});
