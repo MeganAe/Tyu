@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AlertBukavu — Publier une alerte</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { padding-bottom:80px;background:#fcf9f8; }
+  .cat-btn { display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px;border-radius:10px;border:1.5px solid #e4bdbb;background:white;cursor:pointer;font-family:'Inter',sans-serif;color:#5b403e;font-weight:600;font-size:12px;transition:all .2s; }
+  .cat-btn.active { border-color:#840015;background:#ffdad8;color:#840015; }
+  .urg-btn { flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid #e4bdbb;background:white;font-family:'Inter',sans-serif;transition:all .2s; }
+  .urg-btn.faible.active { background:#E6FAF5;color:#00C48C;border-color:#00C48C; }
+  .urg-btn.moyen.active { background:#FFF5EC;color:#FF9F43;border-color:#FF9F43; }
+  .urg-btn.critique.active { background:#FFF0F5;color:#FF3D71;border-color:#FF3D71; }
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button onclick="history.back()" style="background:none;border:none;cursor:pointer;color:white;display:flex;align-items:center;">
+      <span class="material-symbols-outlined" style="font-size:22px;color:white;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
+    </button>
+    <span class="material-symbols-outlined" style="font-size:20px;color:white;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;">emergency</span>
+    <h1 style="font-size:17px;font-weight:800;color:white;">Publier une alerte</h1>
+  </div>
+</header>
+
+<section style="background:#840015;padding:16px 20px 36px;">
+  <p style="font-size:13px;color:rgba(255,255,255,.8);">Signalez un incident à la communauté de Bukavu</p>
+</section>
+
+<main style="max-width:640px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
+  <div class="d-flex flex-column gap-4" style="display:flex;flex-direction:column;gap:16px;">
+
+    <!-- Titre -->
+    <div class="section-card">
+      <label class="field-label">Titre de l'alerte *</label>
+      <input id="titre" type="text" class="field-input no-icon" placeholder="Ex: Route bloquée à Kadutu..." maxlength="80" style="height:50px;font-size:14px;"/>
+      <p style="font-size:11px;color:#906f6d;text-align:right;margin-top:4px;"><span id="titreCount">0</span> / 80</p>
+    </div>
+
+    <!-- Catégorie -->
+    <div class="section-card">
+      <label class="field-label">Catégorie *</label>
+      <div id="catGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;"></div>
+    </div>
+
+    <!-- Quartier + Urgence -->
+    <div class="section-card">
+      <label class="field-label">Quartier concerné *</label>
+      <div style="position:relative;margin-bottom:16px;">
+        <select id="quartier" class="field-input no-icon" style="height:50px;font-size:14px;appearance:none;padding-right:36px;">
+          <option value="">Choisir un quartier...</option>
+        </select>
+        <span class="material-symbols-outlined" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24;">expand_more</span>
+      </div>
+      <label class="field-label">Niveau d'urgence *</label>
+      <div style="display:flex;gap:10px;">
+        <button class="urg-btn faible" onclick="selectUrg(this,'faible')">Faible</button>
+        <button class="urg-btn moyen active" onclick="selectUrg(this,'moyen')">Moyen</button>
+        <button class="urg-btn critique" onclick="selectUrg(this,'critique')">Critique</button>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="section-card">
+      <label class="field-label">Description détaillée *</label>
+      <textarea id="description" class="field-input no-icon" placeholder="Décrivez la situation avec précision..." maxlength="500" style="height:110px;padding:14px 16px;resize:none;"></textarea>
+      <p style="font-size:11px;color:#906f6d;text-align:right;margin-top:4px;"><span id="descCount">0</span> / 500</p>
+    </div>
+
+    <!-- GPS -->
+    <div class="section-card">
+      <label class="field-label">Localisation GPS <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
+      <button onclick="getLocation()" id="btnGps" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+        <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">location_on</span>
+        <span id="gpsLabel">Obtenir ma position</span>
+      </button>
+    </div>
+
+    <!-- Avertissement -->
+    <div style="background:#ffdad8;border-left:4px solid #840015;border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start;">
+      <span class="material-symbols-outlined" style="color:#840015;font-size:20px;flex-shrink:0;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">warning</span>
+      <div>
+        <p style="font-size:13px;color:#410006;font-weight:700;margin-bottom:4px;">Responsabilité</p>
+        <p style="font-size:12px;color:#410006;line-height:1.5;">Toute fausse alerte entraîne la suspension de votre compte. Après 3 fausses alertes, le compte est définitivement bloqué.</p>
+      </div>
+    </div>
+
+    <button id="btnPublier" class="btn-primary" onclick="publier()" style="height:52px;">
+      <span class="material-symbols-outlined" style="font-size:20px;color:white;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">add_alert</span>
+      PUBLIER L'ALERTE
+    </button>
+  </div>
+</main>
+
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
+  <a href="publier.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">add_alert</span><span>Publier</span></a>
+  <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
+  <a href="profil.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">person</span><span>Profil</span></a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="config.js"></script>
+<script>
+AB.requireAuth();
+
+let catChoisie = '', urgChoisie = 'moyen', userLat = null, userLng = null;
+
+// Remplir quartiers
+const sel = document.getElementById('quartier');
+QUARTIERS.forEach(q => { const o = document.createElement('option'); o.value = q; o.textContent = q; sel.appendChild(o); });
+
+// Remplir catégories
+const catGrid = document.getElementById('catGrid');
+Object.entries(CATEGORIES).forEach(([key, cat]) => {
+  const btn = document.createElement('button');
+  btn.className = 'cat-btn';
+  btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:24px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">${cat.icon}</span>${cat.label}`;
+  btn.onclick = () => { document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); catChoisie = key; };
+  catGrid.appendChild(btn);
+});
+
+function selectUrg(btn, val) {
+  document.querySelectorAll('.urg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); urgChoisie = val;
+}
+
+document.getElementById('titre').addEventListener('input', function() { document.getElementById('titreCount').textContent = this.value.length; });
+document.getElementById('description').addEventListener('input', function() { document.getElementById('descCount').textContent = this.value.length; });
+
+function getLocation() {
+  if (!navigator.geolocation) { showToast('Géolocalisation non supportée', 'error'); return; }
+  document.getElementById('gpsLabel').textContent = 'Localisation...';
+  navigator.geolocation.getCurrentPosition(pos => {
+    userLat = pos.coords.latitude.toFixed(5);
+    userLng = pos.coords.longitude.toFixed(5);
+    document.getElementById('gpsLabel').textContent = `${userLat}, ${userLng}`;
+    document.getElementById('btnGps').style.cssText += 'background:#E6FAF5;color:#00C48C;';
+    showToast('Position obtenue');
+  }, () => {
+    document.getElementById('gpsLabel').textContent = 'Obtenir ma position';
+    showToast("Impossible d'obtenir la position", 'error');
+  });
+}
+
+async function publier() {
+  const titre = document.getElementById('titre').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const quartier = document.getElementById('quartier').value;
+  const btn = document.getElementById('btnPublier');
+
+  if (!titre) { showToast('Le titre est obligatoire', 'error'); return; }
+  if (!catChoisie) { showToast('Choisissez une catégorie', 'error'); return; }
+  if (!quartier) { showToast('Choisissez le quartier concerné', 'error'); return; }
+  if (!description) { showToast('La description est obligatoire', 'error'); return; }
+
+  if (urgChoisie === 'critique') {
+    const r = await showConfirm('Alerte CRITIQUE', 'Vous êtes sur le point de publier une alerte critique. Êtes-vous certain de la gravité ?', 'Oui, publier', 'warning');
+    if (!r.isConfirmed) return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>&nbsp;Publication en cours...';
+
+  try {
+    await AB.api('alertes', 'POST', { titre, categorie: catChoisie, quartier, urgence: urgChoisie, description, lat: userLat, lng: userLng });
+    await showAlert('Alerte publiée !', 'Votre alerte a été envoyée à la communauté et aux autorités.', 'success');
+    window.location.href = 'index.html';
+  } catch(e) {
+    showToast(e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:white;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;">add_alert</span> PUBLIER L\'ALERTE';
+  }
+}
+</script>
+</body>
+</html>

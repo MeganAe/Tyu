@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AlertBukavu — Inscription</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { min-height:100dvh;display:flex;align-items:center;justify-content:center;position:relative;overflow-y:auto;background:#1c1b1b;padding:60px 0 40px; }
+  .input-wrap { position:relative;margin-bottom:12px; }
+  .input-ico { position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-family:'Material Symbols Outlined';font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24; }
+</style>
+</head>
+<body>
+
+<div style="position:absolute;inset:0;z-index:0;">
+  <img src="https://images.unsplash.com/photo-1580746738099-b2d61a5a0c1e?w=800&q=80" alt="Bukavu" style="width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(.6);position:fixed;"/>
+  <div style="position:fixed;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.3),transparent,rgba(0,0,0,.5));"></div>
+</div>
+
+<main style="position:relative;z-index:10;width:100%;max-width:420px;padding:0 20px;">
+  <div style="background:white;border-radius:20px;box-shadow:0 25px 60px rgba(0,0,0,.35);padding:40px 28px 28px;position:relative;margin-top:56px;">
+
+    <div style="position:absolute;top:-48px;left:50%;transform:translateX(-50%);width:96px;height:96px;background:white;border-radius:50%;padding:8px;box-shadow:0 4px 20px rgba(132,0,21,.3);display:flex;align-items:center;justify-content:center;">
+      <div class="logo-pulse" style="width:100%;height:100%;border:3px solid #840015;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined" style="color:#840015;font-size:42px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;">emergency</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-bottom:20px;">
+      <h1 style="font-size:22px;font-weight:800;color:#840015;margin-bottom:4px;">Créer un compte</h1>
+      <p style="font-size:13px;color:#5b403e;">Rejoignez la communauté AlertBukavu</p>
+    </div>
+
+    <div class="input-wrap">
+      <span class="input-ico">badge</span>
+      <input id="nom" type="text" class="field-input" placeholder="Nom complet"/>
+    </div>
+    <div class="input-wrap">
+      <span class="input-ico">mail</span>
+      <input id="email" type="email" class="field-input" placeholder="Adresse email"/>
+    </div>
+    <div class="input-wrap">
+      <span class="input-ico">phone</span>
+      <input id="telephone" type="tel" class="field-input" placeholder="+243 8X XXX XXXX"/>
+    </div>
+    <div class="input-wrap" style="margin-bottom:12px;">
+      <span class="input-ico">location_on</span>
+      <select id="quartier" class="field-input" style="appearance:none;padding-right:36px;">
+        <option value="">Votre quartier...</option>
+      </select>
+      <span class="material-symbols-outlined" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24;">expand_more</span>
+    </div>
+    <div class="input-wrap">
+      <span class="input-ico">vpn_key</span>
+      <input id="password" type="password" class="field-input" placeholder="Mot de passe (min. 6 car.)" style="padding-right:44px;"/>
+      <button onclick="togglePwd()" style="position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#906f6d;">
+        <span class="material-symbols-outlined" id="eyeIcon" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24;">visibility</span>
+      </button>
+    </div>
+
+    <!-- Barre force mot de passe -->
+    <div style="height:4px;border-radius:2px;background:#f0eded;margin-bottom:16px;overflow:hidden;">
+      <div id="pwdFill" style="height:100%;width:0%;border-radius:2px;transition:all .3s;"></div>
+    </div>
+
+    <button id="btnRegister" class="btn-primary" onclick="register()">
+      CRÉER MON COMPTE
+      <span class="material-symbols-outlined" style="font-size:18px;color:white;">arrow_forward</span>
+    </button>
+
+    <p style="text-align:center;margin-top:16px;font-size:13px;color:#5b403e;">
+      Déjà un compte ? <a href="login.html" style="color:#840015;font-weight:700;">Se connecter</a>
+    </p>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="config.js"></script>
+<script>
+  AB.redirectIfAuth();
+  const sel = document.getElementById('quartier');
+  QUARTIERS.forEach(q => { const o = document.createElement('option'); o.value = q; o.textContent = q; sel.appendChild(o); });
+
+  function togglePwd() {
+    const i = document.getElementById('password'), ic = document.getElementById('eyeIcon');
+    i.type = i.type === 'password' ? 'text' : 'password';
+    ic.textContent = i.type === 'password' ? 'visibility' : 'visibility_off';
+  }
+
+  document.getElementById('password').addEventListener('input', function() {
+    const p = this.value; let s = 0;
+    if (p.length >= 6) s++; if (p.length >= 10) s++;
+    if (/[A-Z]/.test(p)) s++; if (/[0-9]/.test(p)) s++;
+    const colors = ['#FF3D71','#FF9F43','#FFD43B','#00C48C'];
+    const widths = ['25%','50%','75%','100%'];
+    const fill = document.getElementById('pwdFill');
+    fill.style.width = s > 0 ? widths[Math.min(s-1,3)] : '0%';
+    fill.style.background = s > 0 ? colors[Math.min(s-1,3)] : '';
+  });
+
+  async function register() {
+    const nom = document.getElementById('nom').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telephone = document.getElementById('telephone').value.trim();
+    const quartier = document.getElementById('quartier').value;
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('btnRegister');
+
+    if (!nom) { showToast('Le nom est requis', 'error'); return; }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Email invalide', 'error'); return; }
+    if (!quartier) { showToast('Choisissez votre quartier', 'error'); return; }
+    if (password.length < 6) { showToast('Mot de passe trop court (min. 6 car.)', 'error'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>&nbsp;Création du compte...';
+    try {
+      const data = await AB.api('auth/register', 'POST', { nom, email, telephone, quartier, password });
+      AB.saveToken(data.token);
+      AB.saveUser(data.user);
+      await showAlert('Compte créé !', `Bienvenue sur AlertBukavu, ${nom} !`, 'success');
+      window.location.href = 'index.html';
+    } catch(e) {
+      showToast(e.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = 'CRÉER MON COMPTE <span class="material-symbols-outlined" style="font-size:18px;color:white;">arrow_forward</span>';
+    }
+  }
+</script>
+</body>
+</html>

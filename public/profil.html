@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AlertBukavu — Mon Profil</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { padding-bottom:80px;background:#fcf9f8; }
+  .stat-mini { flex:1;background:white;border-radius:12px;border:1px solid #e4bdbb;padding:16px;text-align:center; }
+</style>
+</head>
+<body>
+
+<header class="top-bar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="material-symbols-outlined" style="font-size:20px;color:white;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;">emergency</span>
+    <h1 style="font-size:17px;font-weight:800;color:white;">Mon Profil</h1>
+  </div>
+</header>
+
+<section style="background:#840015;padding:24px 20px 56px;text-align:center;">
+  <img id="profilePhoto" src="" alt="" style="width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.4);box-shadow:0 4px 20px rgba(0,0,0,.2);margin-bottom:14px;"/>
+  <h2 id="nomUser" style="font-size:20px;font-weight:800;color:white;margin-bottom:2px;"></h2>
+  <p id="emailUser" style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:10px;"></p>
+  <span id="quartierBadge" style="background:rgba(255,255,255,.15);color:white;padding:4px 16px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3);"></span>
+</section>
+
+<main style="max-width:640px;margin:-32px auto 0;padding:0 16px;position:relative;z-index:1;">
+
+  <div style="display:flex;gap:12px;margin-bottom:14px;">
+    <div class="stat-mini">
+      <p id="nbAlertes" style="font-size:28px;font-weight:800;color:#840015;line-height:1;margin-bottom:4px;">0</p>
+      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Alertes</p>
+    </div>
+    <div class="stat-mini">
+      <p id="nbConfirmations" style="font-size:28px;font-weight:800;color:#00C48C;line-height:1;margin-bottom:4px;">0</p>
+      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Confirmées</p>
+    </div>
+    <div class="stat-mini">
+      <p id="nbFausses" style="font-size:28px;font-weight:800;color:#FF3D71;line-height:1;margin-bottom:4px;">0</p>
+      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Fausses</p>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <h2 style="font-size:15px;font-weight:700;color:#1c1b1b;margin-bottom:14px;">Mes alertes récentes</h2>
+    <div id="mesAlertesList">
+      <div class="skeleton" style="height:52px;margin-bottom:10px;border-radius:8px;"></div>
+      <div class="skeleton" style="height:52px;border-radius:8px;"></div>
+    </div>
+  </div>
+
+  <button onclick="AB.logout()" style="width:100%;height:52px;background:white;border:1.5px solid #e4bdbb;border-radius:8px;color:#5b403e;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;">
+    <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">logout</span>
+    Se déconnecter
+  </button>
+</main>
+
+<nav class="bottom-nav">
+  <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
+  <a href="publier.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
+  <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
+  <a href="profil.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">person</span><span>Profil</span></a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="config.js"></script>
+<script>
+const user = AB.requireAuth();
+if (user) {
+  document.getElementById('nomUser').textContent = user.nom || 'Utilisateur';
+  document.getElementById('emailUser').textContent = user.email || '';
+  document.getElementById('profilePhoto').src = genererAvatar(user.nom || 'U', 88);
+  document.getElementById('quartierBadge').textContent = user.quartier || 'Bukavu';
+}
+
+async function chargerMesAlertes() {
+  try {
+    const data = await AB.api('alertes/mes-alertes');
+    const alertes = data.alertes || [];
+    document.getElementById('nbAlertes').textContent = alertes.length;
+    const list = document.getElementById('mesAlertesList');
+    if (!alertes.length) {
+      list.innerHTML = '<p style="color:#906f6d;font-size:13px;text-align:center;padding:16px 0;">Aucune alerte publiée</p>';
+      return;
+    }
+    list.innerHTML = alertes.map(a => {
+      const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
+      const urg = URGENCES[a.urgence] || URGENCES.moyen;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0eded;">
+        <span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:${urg.bg};color:${urg.color};white-space:nowrap;">${urg.label}</span>
+        <div style="flex:1;min-width:0;">
+          <p style="font-size:13px;font-weight:700;color:#1c1b1b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(a.titre)}</p>
+          <p style="font-size:11px;color:#906f6d;">${tempsRelatif(a.created_at)} • ${escHtml(a.quartier||'Bukavu')}</p>
+        </div>
+        <span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};white-space:nowrap;">${cat.label}</span>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('mesAlertesList').innerHTML = '<p style="color:#906f6d;font-size:13px;text-align:center;">Impossible de charger</p>';
+  }
+}
+
+chargerMesAlertes();
+afficherMenuAdmin();
+</script>
+</body>
+</html>

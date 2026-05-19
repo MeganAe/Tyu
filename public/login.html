@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AlertBukavu — Connexion</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  body { min-height:100dvh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#1c1b1b; }
+  .input-wrap { position:relative;margin-bottom:14px; }
+  .input-ico { position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-family:'Material Symbols Outlined';font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24; }
+</style>
+</head>
+<body>
+
+<div style="position:absolute;inset:0;z-index:0;">
+  <img src="https://images.unsplash.com/photo-1580746738099-b2d61a5a0c1e?w=800&q=80" alt="Bukavu" style="width:100%;height:100%;object-fit:cover;filter:brightness(.7) saturate(.6);"/>
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.2),transparent,rgba(0,0,0,.6));"></div>
+</div>
+
+<main style="position:relative;z-index:10;width:100%;max-width:400px;padding:0 20px;">
+  <div style="background:white;border-radius:20px;box-shadow:0 25px 60px rgba(0,0,0,.35);padding:48px 28px 32px;position:relative;margin-top:56px;">
+
+    <div style="position:absolute;top:-48px;left:50%;transform:translateX(-50%);width:96px;height:96px;background:white;border-radius:50%;padding:8px;box-shadow:0 4px 20px rgba(132,0,21,.3);display:flex;align-items:center;justify-content:center;">
+      <div class="logo-pulse" style="width:100%;height:100%;border:3px solid #840015;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined" style="color:#840015;font-size:42px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;">emergency</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-bottom:28px;">
+      <h1 style="font-size:28px;font-weight:800;color:#840015;margin-bottom:4px;">ALERT BUKAVU</h1>
+      <p style="font-size:13px;color:#5b403e;font-weight:500;">Informer. Protéger. Agir.</p>
+    </div>
+
+    <div class="input-wrap">
+      <span class="input-ico">mail</span>
+      <input id="email" type="email" class="field-input" placeholder="Adresse email" autocomplete="email"/>
+    </div>
+    <div class="input-wrap">
+      <span class="input-ico">vpn_key</span>
+      <input id="password" type="password" class="field-input" placeholder="Mot de passe" style="padding-right:48px;" onkeydown="if(event.key==='Enter')login()"/>
+      <button onclick="togglePwd()" style="position:absolute;right:13px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#906f6d;">
+        <span class="material-symbols-outlined" id="eyeIcon" style="font-size:18px;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24;">visibility</span>
+      </button>
+    </div>
+
+    <button id="btnLogin" class="btn-primary" onclick="login()" style="margin-top:8px;">
+      SE CONNECTER
+      <span class="material-symbols-outlined" style="font-size:18px;color:white;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">arrow_forward</span>
+    </button>
+
+    <div style="margin:18px 0;display:flex;align-items:center;gap:12px;">
+      <div style="flex:1;height:1px;background:#e4bdbb;"></div>
+      <span style="color:#906f6d;font-size:12px;">ou</span>
+      <div style="flex:1;height:1px;background:#e4bdbb;"></div>
+    </div>
+
+    <a href="register.html" style="display:flex;align-items:center;justify-content:center;height:48px;background:#ffdad8;border-radius:8px;color:#840015;font-weight:700;font-size:14px;text-decoration:none;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">person_add</span>
+      Créer un compte
+    </a>
+  </div>
+
+  <p style="margin-top:20px;text-align:center;color:rgba(255,255,255,.6);font-size:11px;">
+    AlertBukavu • Réseau communautaire • Bukavu, RDC
+  </p>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="config.js"></script>
+<script>
+  AB.redirectIfAuth();
+
+  function togglePwd() {
+    const i = document.getElementById('password'), ic = document.getElementById('eyeIcon');
+    i.type = i.type === 'password' ? 'text' : 'password';
+    ic.textContent = i.type === 'password' ? 'visibility' : 'visibility_off';
+  }
+
+  async function login() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('btnLogin');
+    if (!email) { showToast('Entrez votre email', 'error'); return; }
+    if (!password) { showToast('Entrez votre mot de passe', 'error'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>&nbsp;Connexion...';
+    try {
+      const data = await AB.api('auth/login', 'POST', { email, password });
+      AB.saveToken(data.token);
+      AB.saveUser(data.user);
+      window.location.href = 'index.html';
+    } catch(e) {
+      showToast(e.message, 'error');
+      btn.disabled = false;
+      btn.innerHTML = 'SE CONNECTER <span class="material-symbols-outlined" style="font-size:18px;color:white;font-variation-settings:\'FILL\' 1,\'wght\' 400,\'GRAD\' 0,\'opsz\' 48;">arrow_forward</span>';
+    }
+  }
+</script>
+</body>
+</html>
