@@ -11,44 +11,68 @@
   <style>
     .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
     body{padding-bottom:80px;}
-    .alerte-row{display:flex;align-items:flex-start;gap:12px;padding:14px 0;border-bottom:1px solid #efecea;}
+
+    /* Photo de profil */
+    .profile-photo-wrap{position:relative;display:inline-block;margin-bottom:14px;}
+    .profile-photo{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 4px 20px rgba(0,0,0,.25);display:block;}
+    .photo-edit-btn{position:absolute;bottom:2px;right:2px;width:30px;height:30px;background:#840015;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .2s;}
+    .photo-edit-btn:hover{transform:scale(1.1);}
+    .photo-edit-btn .material-symbols-outlined{font-size:15px;color:white;}
+
+    .stat-mini{flex:1;background:white;border-radius:12px;border:1px solid #ddb8b6;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(132,0,21,.05);}
+    .alerte-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #efecea;}
     .alerte-row:last-child{border-bottom:none;padding-bottom:0;}
+    .section-card{background:white;border-radius:14px;border:1px solid #ddb8b6;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(132,0,21,.04);}
+    .btn-outline{width:100%;height:50px;background:white;border:1.5px solid #ddb8b6;border-radius:10px;color:#5b403e;font-size:14px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-bottom:20px;}
+    .btn-outline:hover{border-color:#840015;color:#840015;background:#ffdad8;}
   </style>
 </head>
 <body>
 
   <header class="top-bar">
     <div style="display:flex;align-items:center;gap:10px;">
-      <img src="logo.png" alt="Logo" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'"/>
-      <h1 style="font-size:17px;font-weight:800;color:white;">AlertBukavu</h1>
+      <h1 style="font-size:17px;font-weight:800;color:white;">Mon Profil</h1>
     </div>
   </header>
 
+  <!-- Hero avec photo -->
   <section class="hero-section" style="padding:24px 20px 56px;text-align:center;">
     <div class="profile-photo-wrap">
       <img id="photoUser" class="profile-photo" src="" alt="Photo de profil"/>
       <label for="photoInput" class="photo-edit-btn" title="Changer la photo">
-        <span class="material-symbols-outlined" style="font-size:18px;">photo_camera</span>
+        <span class="material-symbols-outlined">photo_camera</span>
       </label>
       <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="changerPhoto(event)"/>
     </div>
-    <h2 id="nomUser" style="font-size:20px;font-weight:800;color:white;margin-bottom:2px;">Chargement...</h2>
-    <p id="usernameUser" style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:8px;"></p>
-    <p id="emailUser" style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:10px;"></p>
+    <h2 id="nomUser" style="font-size:20px;font-weight:800;color:white;margin-bottom:2px;"></h2>
+    <p id="usernameUser" style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:6px;"></p>
+    <p id="emailUser" style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:10px;"></p>
     <span id="quartierBadge" style="background:rgba(255,255,255,.15);color:white;padding:4px 16px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3);"></span>
   </section>
 
   <main style="max-width:640px;margin:-32px auto 0;padding:0 16px;position:relative;z-index:1;">
 
+    <!-- Stats mini -->
     <div style="display:flex;gap:12px;margin-bottom:14px;">
-      <div class="stat-mini"><p id="nbAlertes" style="font-size:28px;font-weight:800;color:#840015;line-height:1;margin-bottom:4px;">0</p><p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Alertes</p></div>
-      <div class="stat-mini"><p id="nbConfirmations" style="font-size:28px;font-weight:800;color:#00c48c;line-height:1;margin-bottom:4px;">0</p><p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Confirmations</p></div>
-      <div class="stat-mini"><p id="nbFausses" style="font-size:28px;font-weight:800;color:#ff3d71;line-height:1;margin-bottom:4px;">0</p><p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Fausses alertes</p></div>
+      <div class="stat-mini">
+        <p id="nbAlertes" style="font-size:28px;font-weight:800;color:#840015;line-height:1;margin-bottom:4px;">0</p>
+        <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Alertes</p>
+      </div>
+      <div class="stat-mini">
+        <p id="nbConfirmations" style="font-size:28px;font-weight:800;color:#00c48c;line-height:1;margin-bottom:4px;">0</p>
+        <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Confirmées</p>
+      </div>
+      <div class="stat-mini">
+        <p id="nbFausses" style="font-size:28px;font-weight:800;color:#ff3d71;line-height:1;margin-bottom:4px;">0</p>
+        <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Fausses</p>
+      </div>
     </div>
 
+    <!-- Mes alertes -->
     <div class="section-card">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">history</span>Mes alertes récentes
+        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">history</span>
+        Mes alertes récentes
       </h2>
       <p style="font-size:12px;color:#906f6d;margin-bottom:14px;">Vos 10 dernières publications</p>
       <div id="mesAlertesList">
@@ -58,15 +82,17 @@
       </div>
     </div>
 
-    <button onclick="AB.logout()" class="btn-outline" style="margin-bottom:20px;">
-      <span class="material-symbols-outlined" style="font-size:18px;">logout</span>Se déconnecter
+    <button onclick="AB.logout()" class="btn-outline">
+      <span class="material-symbols-outlined" style="font-size:18px;">logout</span>
+      Se déconnecter
     </button>
+
   </main>
 
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
-    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
-    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
+    <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
+    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
+    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
     <a href="profil.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">person</span><span>Profil</span></a>
   </nav>
 
@@ -81,52 +107,71 @@
       document.getElementById('emailUser').textContent = user.email || '';
       document.getElementById('quartierBadge').textContent = user.quartier || 'Bukavu';
       const photo = document.getElementById('photoUser');
-      photo.src = getPhotoUrl(user, 104);
-      photo.onerror = () => { photo.src = genererAvatar(user.nom || 'U', 104); };
+      photo.src = getPhotoUrl(user, 96);
+      photo.onerror = () => { photo.src = genererAvatar(user.nom || 'U', 96); };
     }
 
+    // Upload photo de profil
     async function changerPhoto(event) {
       const file = event.target.files[0];
       if (!file) return;
       if (!file.type.startsWith('image/')) { showToast('Choisissez une image', 'error'); return; }
       if (file.size > 8 * 1024 * 1024) { showToast('Image trop lourde (max 8 Mo)', 'error'); return; }
 
-      Swal.fire({ title: 'Upload...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+      // Preview immédiate
+      const previewUrl = URL.createObjectURL(file);
+      document.getElementById('photoUser').src = previewUrl;
+
+      Swal.fire({ title: 'Upload en cours...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
 
       try {
-        const previewUrl = URL.createObjectURL(file);
-        document.getElementById('photoUser').src = previewUrl;
         const photoUrl = await uploadImage(file, 'profils');
         await AB.api('auth/update-photo', 'PUT', { photoUrl });
-        const updatedUser = { ...AB.getUser(), photoUrl };
+        const updatedUser = { ...AB.getUser(), photo_url: photoUrl };
         AB.saveUser(updatedUser);
         URL.revokeObjectURL(previewUrl);
+        document.getElementById('photoUser').src = photoUrl;
         Swal.close();
-        showToast('Photo de profil mise à jour');
+        showToast('Photo de profil mise à jour !');
       } catch(e) {
         Swal.close();
-        showToast('Upload impossible : ' + e.message, 'error');
+        document.getElementById('photoUser').src = getPhotoUrl(user, 96);
+        URL.revokeObjectURL(previewUrl);
+        showToast('Erreur : ' + e.message, 'error');
       }
       event.target.value = '';
     }
 
+    // Charger mes alertes
     async function chargerMesAlertes() {
       try {
         const data = await AB.api('alertes/mes-alertes');
         const alertes = data.alertes || [];
         document.getElementById('nbAlertes').textContent = alertes.length;
+
+        // Total confirmations reçues
+        const totalConf = alertes.reduce((sum, a) => sum + (a.nb_confirmations || 0), 0);
+        document.getElementById('nbConfirmations').textContent = totalConf;
+
+        // Fausses alertes depuis le profil user
+        document.getElementById('nbFausses').textContent = user?.nb_fausses_alertes || 0;
+
         const list = document.getElementById('mesAlertesList');
         if (!alertes.length) {
-          list.innerHTML = '<div style="text-align:center;padding:28px 0;"><span class="material-symbols-outlined" style="font-size:36px;color:#ddb8b6;">inbox</span><p style="color:#906f6d;font-size:13px;margin-top:8px;">Aucune alerte publiée</p></div>';
+          list.innerHTML = `<div style="text-align:center;padding:28px 0;">
+            <span class="material-symbols-outlined" style="font-size:36px;color:#ddb8b6;">inbox</span>
+            <p style="color:#906f6d;font-size:13px;margin-top:8px;">Aucune alerte publiée</p>
+          </div>`;
           return;
         }
-        const statutStyle = s => ({
-          active:    {label:'Active',    bg:'#FFF5EC', color:'#FF9F43'},
-          resolue:   {label:'Résolue',   bg:'#efecea', color:'#906f6d'},
-          suspendue: {label:'Suspendue', bg:'#ffdad8', color:'#840015'}
-        }[s] || {label:'Active', bg:'#FFF5EC', color:'#FF9F43'});
 
-        list.innerHTML = alertes.slice(0,10).map(a => {
+        const statutStyle = s => ({
+          active:    { label: 'Active',    bg: '#FFF5EC', color: '#FF9F43' },
+          resolue:   { label: 'Résolue',   bg: '#efecea', color: '#906f6d' },
+          suspendue: { label: 'Suspendue', bg: '#ffdad8', color: '#840015' }
+        }[s] || { label: 'Active', bg: '#FFF5EC', color: '#FF9F43' });
+
+        list.innerHTML = alertes.slice(0, 10).map(a => {
           const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
           const urg = URGENCES[a.urgence] || URGENCES.moyen;
           const st = statutStyle(a.statut);
@@ -137,14 +182,14 @@
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <span style="font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};padding:2px 8px;border-radius:4px;">${cat.label}</span>
                 <span style="font-size:11px;color:#906f6d;">${tempsRelatif(a.created_at)}</span>
-                <span style="font-size:11px;color:#906f6d;">${a.nb_confirmations||0} confirmation${(a.nb_confirmations||0)>1?'s':''}</span>
+                <span style="font-size:11px;color:#906f6d;">${a.nb_confirmations || 0} confirmation${(a.nb_confirmations || 0) > 1 ? 's' : ''}</span>
               </div>
             </div>
             <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;background:${st.bg};color:${st.color};white-space:nowrap;flex-shrink:0;">${st.label}</span>
           </div>`;
         }).join('');
       } catch(e) {
-        document.getElementById('mesAlertesList').innerHTML = '<p style="color:#906f6d;font-size:13px;text-align:center;padding:20px 0;">Impossible de charger</p>';
+        document.getElementById('mesAlertesList').innerHTML = '<p style="color:#906f6d;font-size:13px;text-align:center;padding:20px 0;">Impossible de charger les alertes</p>';
       }
     }
 

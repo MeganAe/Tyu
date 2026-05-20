@@ -7,8 +7,23 @@
   <link rel="icon" type="image/png" href="logo.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
+    <script src="https://www.hCaptcha.com/1/api.js" async defer></script>
   <link rel="stylesheet" href="style.css"/>
-  <style>.material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}body{padding-bottom:80px;}</style>
+  <style>
+    .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
+    body{padding-bottom:80px;}
+    .cat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px;border-radius:10px;border:1.5px solid #ddb8b6;background:white;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:#5b403e;font-weight:600;font-size:12px;transition:all .2s;}
+    .cat-btn:hover{border-color:#840015;background:#ffdad8;}
+    .cat-btn.active{border-color:#840015;background:#ffdad8;color:#840015;}
+    .urg-btn{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid #ddb8b6;background:white;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
+    .urg-btn.faible.active{background:#E6FAF5;color:#00C48C;border-color:#00C48C;}
+    .urg-btn.moyen.active{background:#FFF5EC;color:#FF9F43;border-color:#FF9F43;}
+    .urg-btn.critique.active{background:#FFF0F5;color:#FF3D71;border-color:#FF3D71;}
+    .photo-upload-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s;}
+    .photo-upload-btn:hover{background:#ffb3af;}
+    .warning-box{background:#ffdad8;border-left:4px solid #840015;border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;}
+    .char-count{font-size:11px;color:#906f6d;text-align:right;margin-top:4px;margin-bottom:0;}
+  </style>
 </head>
 <body>
 
@@ -17,7 +32,6 @@
       <button onclick="history.back()" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;">
         <span class="material-symbols-outlined" style="font-size:22px;color:white;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
       </button>
-      <img src="logo.png" alt="Logo" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'"/>
       <h1 style="font-size:17px;font-weight:800;color:white;">Publier une alerte</h1>
     </div>
   </header>
@@ -31,7 +45,7 @@
     <!-- Titre -->
     <div class="section-card">
       <label class="field-label">Titre de l'alerte *</label>
-      <input id="titre" type="text" class="field-input no-icon" placeholder="Ex: Route bloquée à Kadutu..." maxlength="80" style="height:50px;font-size:14px;"/>
+      <input id="titre" type="text" class="field-input no-icon" placeholder="Ex: Incendie au marché central..." maxlength="80" style="height:50px;font-size:14px;"/>
       <p class="char-count"><span id="titreCount">0</span> / 80</p>
     </div>
 
@@ -71,9 +85,9 @@
       <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Ajoutez une photo pour mieux documenter l'incident</p>
       <div id="photoPreviewWrap" style="display:none;margin-bottom:12px;">
         <img id="photoPreview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid #ddb8b6;"/>
-        <button onclick="supprimerPhoto()" style="margin-top:8px;padding:6px 14px;background:#ffdad8;color:#840015;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Supprimer</button>
+        <button onclick="supprimerPhoto()" style="margin-top:8px;padding:6px 14px;background:#ffdad8;color:#840015;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Supprimer la photo</button>
       </div>
-      <label for="photoInput" class="photo-upload-btn" style="cursor:pointer;">
+      <label for="photoInput" class="photo-upload-btn">
         <span class="material-symbols-outlined" style="font-size:18px;">add_photo_alternate</span>
         <span id="photoLabel">Ajouter une photo</span>
       </label>
@@ -83,8 +97,9 @@
     <!-- GPS -->
     <div class="section-card">
       <label class="field-label">Localisation GPS <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
+      <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Aide à localiser l'alerte sur la carte</p>
       <button onclick="getLocation()" id="btnGps" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;">
-        <span class="material-symbols-outlined" style="font-size:18px;">location_on</span>
+        <span class="material-symbols-outlined" style="font-size:18px;">my_location</span>
         <span id="gpsLabel">Obtenir ma position</span>
       </button>
     </div>
@@ -102,29 +117,44 @@
       <span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span>
       PUBLIER L'ALERTE
     </button>
+
   </main>
 
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
+    <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
     <a href="publier.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">add_alert</span><span>Publier</span></a>
-    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
-    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">person</span><span>Profil</span></a>
+    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
+    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">person</span><span>Profil</span></a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="config.js"></script>
   <script>
     AB.requireAuth();
+
+    let captchaValidated = false;
+    function onCaptchaSuccess(token) { captchaValidated = true; }
+    function onCaptchaExpire() { captchaValidated = false; }
     let catChoisie = '', urgChoisie = 'moyen', userLat = null, userLng = null, photoFile = null;
 
-    QUARTIERS.forEach(q => { const o = document.createElement('option'); o.value = q; o.textContent = q; document.getElementById('quartier').appendChild(o); });
+    // Remplir quartiers
+    QUARTIERS.forEach(q => {
+      const o = document.createElement('option');
+      o.value = q; o.textContent = q;
+      document.getElementById('quartier').appendChild(o);
+    });
 
+    // Remplir catégories — toutes restaurées
     const catGrid = document.getElementById('catGrid');
     Object.entries(CATEGORIES).forEach(([key, cat]) => {
       const btn = document.createElement('button');
       btn.className = 'cat-btn';
-      btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:24px;">${cat.icon}</span>${cat.label}`;
-      btn.onclick = () => { document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); catChoisie = key; };
+      btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:24px;color:${cat.color};">${cat.icon}</span>${cat.label}`;
+      btn.onclick = () => {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        catChoisie = key;
+      };
       catGrid.appendChild(btn);
     });
 
@@ -133,8 +163,12 @@
       btn.classList.add('active'); urgChoisie = val;
     }
 
-    document.getElementById('titre').addEventListener('input', function() { document.getElementById('titreCount').textContent = this.value.length; });
-    document.getElementById('description').addEventListener('input', function() { document.getElementById('descCount').textContent = this.value.length; });
+    document.getElementById('titre').addEventListener('input', function() {
+      document.getElementById('titreCount').textContent = this.value.length;
+    });
+    document.getElementById('description').addEventListener('input', function() {
+      document.getElementById('descCount').textContent = this.value.length;
+    });
 
     function previewPhoto(event) {
       const file = event.target.files[0];
@@ -155,20 +189,24 @@
       document.getElementById('photoInput').value = '';
     }
 
-    function getLocation() {
-      if (!navigator.geolocation) { showToast('Géolocalisation non supportée', 'error'); return; }
-      const lbl = document.getElementById('gpsLabel'), btn = document.getElementById('btnGps');
-      lbl.textContent = 'Localisation...';
-      navigator.geolocation.getCurrentPosition(pos => {
-        userLat = pos.coords.latitude.toFixed(5);
-        userLng = pos.coords.longitude.toFixed(5);
+    async function getLocation() {
+      const lbl = document.getElementById('gpsLabel');
+      const btn = document.getElementById('btnGps');
+      lbl.textContent = 'Localisation en cours...';
+      btn.disabled = true;
+      try {
+        const pos = await obtenirPosition();
+        userLat = pos.lat;
+        userLng = pos.lng;
         lbl.textContent = `${userLat}, ${userLng}`;
-        btn.style.background = '#E6FAF5'; btn.style.color = '#00C48C';
-        showToast('Position obtenue');
-      }, () => {
+        btn.style.background = '#E6FAF5';
+        btn.style.color = '#00C48C';
+        showToast('Position obtenue avec succès');
+      } catch(e) {
         lbl.textContent = 'Obtenir ma position';
-        showToast("Impossible d'obtenir la position", 'error');
-      });
+        showToast(e.message, 'error');
+      }
+      btn.disabled = false;
     }
 
     async function publier() {
@@ -181,6 +219,7 @@
       if (!catChoisie) { showToast('Choisissez une catégorie', 'error'); return; }
       if (!quartier) { showToast('Choisissez le quartier concerné', 'error'); return; }
       if (!description) { showToast('La description est obligatoire', 'error'); return; }
+      if (!captchaValidated) { showToast('Veuillez valider le captcha', 'error'); return; }
 
       if (urgChoisie === 'critique') {
         const r = await showConfirm('Alerte CRITIQUE', 'Êtes-vous certain de la gravité de la situation ?', 'Oui, publier', 'warning');
@@ -193,17 +232,23 @@
       try {
         let photo_url = null;
         if (photoFile) {
-          Swal.fire({ title: 'Upload photo...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+          Swal.fire({ title: 'Upload de la photo...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
           photo_url = await uploadImage(photoFile, 'alertes');
           Swal.close();
         }
 
-        await AB.api('alertes', 'POST', { titre, categorie: catChoisie, quartier, urgence: urgChoisie, description, lat: userLat, lng: userLng, photo_url });
+        await AB.api('alertes', 'POST', {
+          titre, categorie: catChoisie, quartier,
+          urgence: urgChoisie, description,
+          lat: userLat, lng: userLng, photo_url
+        });
+
         await showAlert('Alerte publiée !', 'Votre alerte a été envoyée à la communauté et aux autorités.', 'success');
         window.location.href = 'index.html';
       } catch(e) {
         Swal.close();
         showToast(e.message, 'error');
+        if (typeof hcaptcha !== 'undefined') { hcaptcha.reset(); captchaValidated = false; }
         btn.disabled = false;
         btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span> PUBLIER L\'ALERTE';
       }

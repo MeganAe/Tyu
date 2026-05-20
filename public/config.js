@@ -61,13 +61,17 @@ const QUARTIERS = [
   'Kasha','Panzi','Ciherano','Essence','Nyawera','Kasali','Autre'
 ];
 
+// Toutes les catégories originales restaurées
 const CATEGORIES = {
-  securite:   { label: 'Sécurité',   icon: 'shield',             color: '#FF3D71', bg: '#FFF0F5' },
-  eau:        { label: 'Eau',         icon: 'water_drop',         color: '#840015', bg: '#ffdad8' },
-  routes:     { label: 'Routes',      icon: 'traffic',            color: '#FF9F43', bg: '#FFF5EC' },
-  sante:      { label: 'Santé',       icon: 'medical_services',   color: '#00C48C', bg: '#E6FAF5' },
-  meteo:      { label: 'Météo',       icon: 'thunderstorm',       color: '#761f24', bg: '#ffdad8' },
-  autre:      { label: 'Autre',       icon: 'more_horiz',         color: '#5b403e', bg: '#f0eded' }
+  incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#FF3D71', bg: '#FFF0F5' },
+  route:      { label: 'Route dégradée',  icon: 'construction',          color: '#FF9F43', bg: '#FFF5EC' },
+  inondation: { label: 'Inondation',      icon: 'water',                 color: '#2471A3', bg: '#E0F7FA' },
+  accident:   { label: 'Accident',        icon: 'car_crash',             color: '#8E44AD', bg: '#F5EEF8' },
+  securite:   { label: 'Sécurité',        icon: 'shield',                color: '#840015', bg: '#ffdad8' },
+  sante:      { label: 'Santé',           icon: 'medical_services',      color: '#00C48C', bg: '#E6FAF5' },
+  eau:        { label: 'Eau',             icon: 'water_drop',            color: '#0077B6', bg: '#E0F0FF' },
+  meteo:      { label: 'Météo',           icon: 'thunderstorm',          color: '#761f24', bg: '#ffdad8' },
+  autre:      { label: 'Autre',           icon: 'report',                color: '#5b403e', bg: '#f0eded' }
 };
 
 const URGENCES = {
@@ -98,13 +102,14 @@ function genererAvatar(nom, taille = 40) {
   const couleur = couleurs[nom ? nom.charCodeAt(0) % couleurs.length : 0];
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}">
     <circle cx="${taille/2}" cy="${taille/2}" r="${taille/2}" fill="${couleur}"/>
-    <text x="${taille/2}" y="${taille/2 + taille*0.14}" text-anchor="middle" fill="white"
+    <text x="${taille/2}" y="${taille/2+taille*0.14}" text-anchor="middle" fill="white"
       font-family="Plus Jakarta Sans,Inter,sans-serif" font-weight="800" font-size="${taille*0.38}">${initiales}</text>
   </svg>`;
   return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
 }
 
 function getPhotoUrl(userData, taille = 40) {
+  if (userData && userData.photo_url) return userData.photo_url;
   if (userData && userData.photoUrl) return userData.photoUrl;
   return genererAvatar(userData?.nom || userData?.username || 'U', taille);
 }
@@ -112,8 +117,29 @@ function getPhotoUrl(userData, taille = 40) {
 function validerUsername(u) { return /^[a-zA-Z0-9_]{3,20}$/.test(u); }
 
 function normaliserTelephone(digits) {
-  const clean = String(digits).replace(/\D/g, '');
-  return '+243' + clean;
+  return '+243' + String(digits).replace(/\D/g, '');
+}
+
+// ---- Géolocalisation ----
+function obtenirPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Géolocalisation non supportée par ce navigateur'));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      pos => resolve({ lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) }),
+      err => {
+        const msgs = {
+          1: 'Permission refusée. Autorisez la localisation dans les paramètres du navigateur.',
+          2: 'Position indisponible. Vérifiez votre connexion GPS.',
+          3: 'Délai dépassé. Réessayez.'
+        };
+        reject(new Error(msgs[err.code] || 'Erreur de géolocalisation'));
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  });
 }
 
 // ---- SweetAlert2 ----
@@ -142,6 +168,6 @@ function afficherMenuAdmin() {
   link.href = 'admin.html';
   link.id = 'adminNavItem';
   link.className = 'nav-item';
-  link.innerHTML = `<span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">admin_panel_settings</span><span>Modération</span>`;
+  link.innerHTML = `<span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">admin_panel_settings</span><span>Admin</span>`;
   nav.appendChild(link);
 }

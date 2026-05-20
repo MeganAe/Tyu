@@ -1,115 +1,124 @@
 <!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AlertBukavu — Connexion</title>
-  <link rel="icon" type="image/png" href="logo.png"/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
-  <style>html,body{min-height:100%;margin:0}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}</style>
-</head>
-<body class="auth-page">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlertBukavu — Connexion</title>
+    <link rel="icon" type="image/png" href="logo.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.hCaptcha.com/1/api.js" async defer></script>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      html,body{min-height:100%;margin:0}
+      .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+    </style>
+  </head>
+  <body class="auth-page">
 
-  <!-- Scène Bukavu animée -->
-  <div class="auth-bg">
-    <div class="bukavu-scene" aria-hidden="true">
-      <div class="sky-glow"></div>
-      <div class="lake-shine"></div>
-      <div class="hill hill-back"></div>
-      <div class="hill hill-front"></div>
-      <div class="city-lights"></div>
-    </div>
-    <div class="auth-overlay"></div>
-  </div>
-
-  <div class="auth-scroll">
-    <div class="auth-shell">
-      <div class="glass-card">
-
-        <div class="floating-logo">
-          <img src="logo.png" alt="AlertBukavu" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-pulse\' style=\'width:100%;height:100%;border:3px solid #840015;border-radius:50%;display:flex;align-items:center;justify-content:center\'><span class=\'material-symbols-outlined\' style=\'color:#840015;font-size:46px;font-variation-settings:\"FILL\" 1,\"wght\" 700,\"GRAD\" 0,\"opsz\" 48\'>notification_important</span></div>'"/>
-        </div>
-
-        <div class="auth-heading">
-          <h1>ALERT BUKAVU</h1>
-          <p>Informer. Protéger. Agir.</p>
-        </div>
-
-        <div id="bloqueMsg" style="display:none;background:#ffdad8;border:1px solid #840015;border-radius:8px;padding:12px 16px;margin-bottom:16px;color:#410006;font-size:13px;font-weight:600;text-align:center;">
-          Votre compte a été suspendu pour fausse alerte.
-        </div>
-
-        <form onsubmit="return false;">
-          <div class="input-wrap">
-            <input id="email" type="email" class="field-input" placeholder="Adresse email" autocomplete="email"/>
-            <span class="auth-icon mail" aria-hidden="true"></span>
-          </div>
-          <div class="input-wrap" style="margin-bottom:6px;">
-            <input id="password" type="password" class="field-input" placeholder="Mot de passe" style="padding-right:48px;" onkeydown="if(event.key==='Enter')login()" autocomplete="current-password"/>
-            <span class="auth-icon key" aria-hidden="true"></span>
-            <button type="button" class="password-toggle" onclick="togglePwd()" aria-label="Afficher">
-              <span id="eyeIcon" aria-hidden="true"></span>
-            </button>
-          </div>
-
-          <button type="button" id="btnLogin" class="btn-primary" onclick="login()" style="margin-top:16px;">
-            SE CONNECTER <span class="btn-arrow" aria-hidden="true"></span>
-          </button>
-        </form>
-
-        <div style="margin:18px 0;display:flex;align-items:center;gap:12px;">
-          <div style="flex:1;height:1px;background:#ddb8b6;"></div>
-          <span style="color:#906f6d;font-size:12px;">ou</span>
-          <div style="flex:1;height:1px;background:#ddb8b6;"></div>
-        </div>
-
-        <a href="register.html" class="btn-secondary">
-          <span class="btn-user-plus" aria-hidden="true"></span>
-          Créer un compte
-        </a>
+    <div class="auth-bg">
+      <div class="bukavu-scene" aria-hidden="true">
+        <div class="sky-glow"></div>
+        <div class="lake-shine"></div>
+        <div class="hill hill-back"></div>
+        <div class="hill hill-front"></div>
+        <div class="city-lights"></div>
       </div>
-
-      <p class="auth-footer">AlertBukavu • Réseau communautaire • Bukavu, RDC</p>
+      <div class="auth-overlay"></div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="config.js"></script>
-  <script>
-    AB.redirectIfAuth();
+    <div class="auth-scroll">
+      <div class="auth-shell">
+        <div class="glass-card">
 
-    if (new URLSearchParams(window.location.search).get('bloque')) {
-      document.getElementById('bloqueMsg').style.display = 'block';
-    }
+          <div class="floating-logo">
+            <img src="logo.png" alt="AlertBukavu Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-pulse\' style=\'width:100%;height:100%;border:3px solid #840015;border-radius:50%;display:flex;align-items:center;justify-content:center\'><span class=\'material-symbols-outlined\' style=\'color:#840015;font-size:46px;font-variation-settings:&quot;FILL&quot; 1,&quot;wght&quot; 700,&quot;GRAD&quot; 0,&quot;opsz&quot; 48\'>notification_important</span></div>'" />
+          </div>
 
-    function togglePwd() {
-      const i = document.getElementById('password'), ic = document.getElementById('eyeIcon');
-      i.type = i.type === 'password' ? 'text' : 'password';
-      ic.className = i.type === 'password' ? '' : 'is-visible';
-    }
+          <div class="auth-heading">
+            <h1>ALERT BUKAVU</h1>
+            <p>Informer. Protéger. Agir.</p>
+          </div>
 
-    async function login() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      const btn = document.getElementById('btnLogin');
-      if (!email) { showToast('Entrez votre email', 'error'); return; }
-      if (!password) { showToast('Entrez votre mot de passe', 'error'); return; }
+          <form onsubmit="return false;">
+            <div class="input-wrap">
+              <input id="email" type="email" class="field-input" placeholder="Adresse email" autocomplete="email" />
+              <span class="auth-icon mail" aria-hidden="true"></span>
+            </div>
 
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>&nbsp;Connexion...';
-      try {
-        const data = await AB.api('auth/login', 'POST', { email, password });
-        AB.saveToken(data.token);
-        AB.saveUser(data.user);
-        window.location.href = 'index.html';
-      } catch(e) {
-        showToast(e.message, 'error');
-        btn.disabled = false;
-        btn.innerHTML = 'SE CONNECTER <span class="btn-arrow" aria-hidden="true"></span>';
+            <div class="input-wrap" style="margin-bottom:6px">
+              <input id="password" type="password" class="field-input" placeholder="Mot de passe" style="padding-right:48px" onkeydown="if(event.key==='Enter')login()" autocomplete="current-password" />
+              <span class="auth-icon key" aria-hidden="true"></span>
+              <button type="button" class="password-toggle" onclick="togglePwd()" aria-label="Afficher le mot de passe">
+                <span id="eyeIcon" aria-hidden="true"></span>
+              </button>
+            </div>
+
+            <!-- hCaptcha -->
+            <div class="captcha-wrap" style="margin-bottom:12px">
+              <div class="h-captcha" data-sitekey="6b5a506e-395a-46d0-8bba-77941038b772" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
+            </div>
+
+            <button type="button" id="btnLogin" class="btn-primary" onclick="login()" style="margin-top:4px">
+              SE CONNECTER
+              <span class="btn-arrow" aria-hidden="true"></span>
+            </button>
+          </form>
+
+          <div style="margin:18px 0;display:flex;align-items:center;gap:12px">
+            <div style="flex:1;height:1px;background:#ddb8b6"></div>
+            <span style="color:#906f6d;font-size:12px">ou</span>
+            <div style="flex:1;height:1px;background:#ddb8b6"></div>
+          </div>
+
+          <a href="register.html" class="btn-secondary">
+            <span class="btn-user-plus" aria-hidden="true"></span>
+            Créer un compte
+          </a>
+        </div>
+
+        <p class="auth-footer">AlertBukavu • Réseau communautaire • Bukavu, RDC</p>
+      </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script>
+      AB.redirectIfAuth();
+
+      let captchaValidated = false;
+      function onCaptchaSuccess(token) { captchaValidated = true; }
+      function onCaptchaExpire() { captchaValidated = false; }
+
+      function togglePwd() {
+        const i = document.getElementById('password'), ic = document.getElementById('eyeIcon');
+        i.type = i.type === 'password' ? 'text' : 'password';
+        ic.className = i.type === 'password' ? '' : 'is-visible';
       }
-    }
-  </script>
-</body>
+
+      async function login() {
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('btnLogin');
+        if (!email) { showToast('Entrez votre email', 'error'); return; }
+        if (!password) { showToast('Entrez votre mot de passe', 'error'); return; }
+        if (!captchaValidated) { showToast('Veuillez valider le captcha', 'error'); return; }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span>&nbsp;Connexion...';
+        try {
+          const data = await AB.api('auth/login', 'POST', { email, password });
+          AB.saveToken(data.token);
+          AB.saveUser(data.user);
+          window.location.href = 'index.html';
+        } catch(e) {
+          showToast(e.message, 'error');
+          if (typeof hcaptcha !== 'undefined') { hcaptcha.reset(); captchaValidated = false; }
+          btn.disabled = false;
+          btn.innerHTML = 'SE CONNECTER <span class="btn-arrow" aria-hidden="true"></span>';
+        }
+      }
+    </script>
+  </body>
 </html>

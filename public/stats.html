@@ -1,127 +1,177 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>AlertBukavu — Statistiques</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-<link rel="stylesheet" href="style.css"/>
-<style>
-  body { padding-bottom:80px;background:#fcf9f8; }
-  .stat-card { background:white;border-radius:12px;border:1px solid #e4bdbb;padding:20px;text-align:center;box-shadow:0 1px 4px rgba(132,0,21,.05); }
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AlertBukavu — Statistiques</title>
+  <link rel="icon" type="image/png" href="logo.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
+    body{padding-bottom:80px;}
+    .stat-big{background:white;border-radius:14px;border:1px solid #ddb8b6;padding:20px;text-align:center;box-shadow:0 2px 8px rgba(132,0,21,.06);}
+    .stat-big .num{font-size:40px;font-weight:800;line-height:1;margin-bottom:6px;}
+    .stat-big .lbl{font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.08em;}
+    .progress-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+    .progress-row:last-child{margin-bottom:0;}
+    .progress-label{font-size:13px;font-weight:600;color:#1a1a1a;width:110px;flex-shrink:0;}
+    .progress-track{flex:1;height:8px;background:#f0eded;border-radius:4px;overflow:hidden;}
+    .progress-fill{height:100%;border-radius:4px;transition:width .7s ease;}
+    .progress-count{font-size:13px;font-weight:700;color:#906f6d;width:28px;text-align:right;flex-shrink:0;}
+    .section-card{background:white;border-radius:14px;border:1px solid #ddb8b6;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(132,0,21,.04);}
+  </style>
 </head>
 <body>
 
-<header class="top-bar">
-  <div style="display:flex;align-items:center;gap:10px;">
-    <span class="material-symbols-outlined" style="font-size:20px;color:white;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;">emergency</span>
-    <h1 style="font-size:17px;font-weight:800;color:white;">Statistiques</h1>
-  </div>
-</header>
-
-<section style="background:#840015;padding:16px 20px 36px;">
-  <p style="font-size:13px;color:rgba(255,255,255,.8);">Vue d'ensemble des alertes de Bukavu</p>
-</section>
-
-<main style="max-width:900px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
-
-  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px;">
-    <div class="stat-card">
-      <p id="statTotal" style="font-size:36px;font-weight:800;color:#840015;line-height:1;margin-bottom:6px;">—</p>
-      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Total</p>
+  <header class="top-bar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <h1 style="font-size:17px;font-weight:800;color:white;">Statistiques</h1>
     </div>
-    <div class="stat-card">
-      <p id="statResolues" style="font-size:36px;font-weight:800;color:#00C48C;line-height:1;margin-bottom:6px;">—</p>
-      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Résolues</p>
+  </header>
+
+  <section class="hero-section" style="padding:16px 20px 36px;">
+    <p style="font-size:13px;color:rgba(255,255,255,.85);">Vue d'ensemble des incidents signalés à Bukavu</p>
+  </section>
+
+  <main style="max-width:900px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
+
+    <!-- 4 stats en grille -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px;">
+      <div class="stat-big">
+        <div class="num" id="statTotal" style="color:#840015;">—</div>
+        <div class="lbl">Total alertes</div>
+      </div>
+      <div class="stat-big">
+        <div class="num" id="statResolues" style="color:#00C48C;">—</div>
+        <div class="lbl">Résolues</div>
+      </div>
+      <div class="stat-big" style="border-color:#FF3D71;">
+        <div class="num" id="statCritiques" style="color:#FF3D71;">—</div>
+        <div class="lbl">Critiques</div>
+      </div>
+      <div class="stat-big">
+        <div class="num" id="statConfirmations" style="color:#FF9F43;font-size:32px;">—</div>
+        <div class="lbl">Confirmations</div>
+      </div>
     </div>
-    <div class="stat-card" style="border-color:#FF3D71;">
-      <p id="statCritiques" style="font-size:36px;font-weight:800;color:#FF3D71;line-height:1;margin-bottom:6px;">—</p>
-      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Critiques</p>
+
+    <!-- Zone la plus active -->
+    <div class="section-card" style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
+      <div style="width:48px;height:48px;background:#ffdad8;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span class="material-symbols-outlined" style="font-size:24px;color:#840015;">location_on</span>
+      </div>
+      <div>
+        <p style="font-size:12px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;">Zone la plus active</p>
+        <p id="statTopQ" style="font-size:20px;font-weight:800;color:#1a1a1a;">—</p>
+      </div>
     </div>
-    <div class="stat-card">
-      <p id="statTopQ" style="font-size:16px;font-weight:800;color:#FF9F43;line-height:1;margin-bottom:6px;text-align:center;">—</p>
-      <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Zone active</p>
+
+    <!-- Par catégorie -->
+    <div class="section-card">
+      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">category</span>
+        Par catégorie
+      </h2>
+      <div id="catStats"></div>
     </div>
-  </div>
 
-  <div class="section-card">
-    <h2 style="font-size:15px;font-weight:700;color:#1c1b1b;margin-bottom:16px;">Par catégorie</h2>
-    <div id="catStats" style="display:flex;flex-direction:column;gap:12px;"></div>
-  </div>
-
-  <div class="section-card">
-    <h2 style="font-size:15px;font-weight:700;color:#1c1b1b;margin-bottom:16px;">Par niveau d'urgence</h2>
-    <div id="urgStats" style="display:flex;flex-direction:column;gap:12px;"></div>
-  </div>
-
-  <div class="section-card">
-    <h2 style="font-size:15px;font-weight:700;color:#1c1b1b;margin-bottom:16px;">Top quartiers</h2>
-    <div id="quartierStats" style="display:flex;flex-direction:column;gap:12px;"></div>
-  </div>
-</main>
-
-<nav class="bottom-nav">
-  <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
-  <a href="publier.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
-  <a href="stats.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">analytics</span><span>Stats</span></a>
-  <a href="profil.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">person</span><span>Profil</span></a>
-</nav>
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="config.js"></script>
-<script>
-AB.requireAuth();
-
-function barre(label, count, total, color) {
-  const pct = total > 0 ? Math.round(count / total * 100) : 0;
-  return `<div style="display:flex;align-items:center;gap:12px;">
-    <span style="font-size:13px;font-weight:600;color:#1c1b1b;width:90px;flex-shrink:0;">${label}</span>
-    <div style="flex:1;height:6px;background:#f0eded;border-radius:3px;overflow:hidden;">
-      <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width .6s;"></div>
+    <!-- Par urgence -->
+    <div class="section-card">
+      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">warning</span>
+        Par niveau d'urgence
+      </h2>
+      <div id="urgStats"></div>
     </div>
-    <span style="font-size:13px;font-weight:700;color:#906f6d;width:24px;text-align:right;">${count}</span>
-  </div>`;
-}
 
-async function chargerStats() {
-  try {
-    const data = await AB.api('alertes');
-    const alertes = data.alertes || [];
-    const total = alertes.length;
-    let resolues = 0, critiques = 0;
-    const parCat = {}, parUrg = {}, parQ = {};
+    <!-- Par quartier -->
+    <div class="section-card">
+      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">apartment</span>
+        Top quartiers
+      </h2>
+      <div id="quartierStats"></div>
+    </div>
 
-    alertes.forEach(a => {
-      if (a.statut === 'resolue') resolues++;
-      if (a.urgence === 'critique') critiques++;
-      parCat[a.categorie] = (parCat[a.categorie]||0)+1;
-      parUrg[a.urgence] = (parUrg[a.urgence]||0)+1;
-      const q = a.quartier || 'Bukavu';
-      parQ[q] = (parQ[q]||0)+1;
-    });
+  </main>
 
-    document.getElementById('statTotal').textContent = total;
-    document.getElementById('statResolues').textContent = resolues;
-    document.getElementById('statCritiques').textContent = critiques;
-    let topQ = '—', maxQ = 0;
-    Object.entries(parQ).forEach(([q,n]) => { if (n > maxQ) { maxQ = n; topQ = q; } });
-    document.getElementById('statTopQ').textContent = topQ;
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
+    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
+    <a href="stats.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">analytics</span><span>Stats</span></a>
+    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">person</span><span>Profil</span></a>
+  </nav>
 
-    document.getElementById('catStats').innerHTML = Object.entries(CATEGORIES)
-      .map(([k,c]) => barre(c.label, parCat[k]||0, total, c.color)).join('');
-    document.getElementById('urgStats').innerHTML = Object.entries(URGENCES)
-      .map(([k,u]) => barre(u.label, parUrg[k]||0, total, u.color)).join('');
-    const sortedQ = Object.entries(parQ).sort((a,b)=>b[1]-a[1]).slice(0,6);
-    document.getElementById('quartierStats').innerHTML = sortedQ.length
-      ? sortedQ.map(([q,n]) => barre(q, n, total, '#840015')).join('')
-      : '<p style="color:#906f6d;font-size:13px;text-align:center;padding:12px 0;">Aucune donnée disponible</p>';
-  } catch(e) { showToast('Erreur de chargement', 'error'); }
-}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="config.js"></script>
+  <script>
+    AB.requireAuth();
 
-chargerStats();
-afficherMenuAdmin();
-</script>
+    function barre(label, count, total, color) {
+      const pct = total > 0 ? Math.round(count / total * 100) : 0;
+      return `<div class="progress-row">
+        <span class="progress-label">${label}</span>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:${pct}%;background:${color};"></div>
+        </div>
+        <span class="progress-count">${count}</span>
+      </div>`;
+    }
+
+    async function chargerStats() {
+      try {
+        const data = await AB.api('alertes');
+        const alertes = data.alertes || [];
+        const total = alertes.length;
+        let resolues = 0, critiques = 0, totalConfirmations = 0;
+        const parCat = {}, parUrg = {}, parQ = {};
+
+        alertes.forEach(a => {
+          if (a.statut === 'resolue') resolues++;
+          if (a.urgence === 'critique') critiques++;
+          totalConfirmations += (a.nb_confirmations || 0);
+          parCat[a.categorie] = (parCat[a.categorie] || 0) + 1;
+          parUrg[a.urgence] = (parUrg[a.urgence] || 0) + 1;
+          const q = a.quartier || 'Bukavu';
+          parQ[q] = (parQ[q] || 0) + 1;
+        });
+
+        document.getElementById('statTotal').textContent = total;
+        document.getElementById('statResolues').textContent = resolues;
+        document.getElementById('statCritiques').textContent = critiques;
+        document.getElementById('statConfirmations').textContent = totalConfirmations;
+
+        // Zone top
+        let topQ = '—', maxQ = 0;
+        Object.entries(parQ).forEach(([q, n]) => { if (n > maxQ) { maxQ = n; topQ = q; } });
+        document.getElementById('statTopQ').textContent = topQ;
+
+        // Par catégorie
+        document.getElementById('catStats').innerHTML = Object.entries(CATEGORIES)
+          .filter(([k]) => parCat[k] > 0)
+          .sort(([,a],[,b]) => (parCat[b.label]||0) - (parCat[a.label]||0))
+          .map(([k, c]) => barre(c.label, parCat[k] || 0, total, c.color)).join('') ||
+          '<p style="color:#906f6d;font-size:13px;text-align:center;padding:12px 0;">Aucune donnée</p>';
+
+        // Par urgence
+        document.getElementById('urgStats').innerHTML = Object.entries(URGENCES)
+          .map(([k, u]) => barre(u.label, parUrg[k] || 0, total, u.color)).join('');
+
+        // Par quartier — top 6
+        const sortedQ = Object.entries(parQ).sort((a, b) => b[1] - a[1]).slice(0, 6);
+        document.getElementById('quartierStats').innerHTML = sortedQ.length
+          ? sortedQ.map(([q, n]) => barre(q, n, total, '#840015')).join('')
+          : '<p style="color:#906f6d;font-size:13px;text-align:center;padding:12px 0;">Aucune donnée</p>';
+
+      } catch(e) {
+        showToast('Erreur de chargement des statistiques', 'error');
+      }
+    }
+
+    chargerStats();
+    afficherMenuAdmin();
+  </script>
 </body>
 </html>
