@@ -12,6 +12,34 @@
   .tab-btn { padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid #e4bdbb;background:white;color:#5b403e;font-family:'Inter',sans-serif;transition:all .2s; }
   .tab-btn.active { background:#840015;color:white;border-color:#840015; }
   .alerte-row { background:white;border-radius:12px;border:1px solid #e4bdbb;padding:14px 16px;margin-bottom:10px; }
+  .filter-pill {
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1px solid #e4bdbb;
+    background: white;
+    color: #5b403e;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .filter-pill:hover {
+    background: #ffdad8;
+    color: #840015;
+    border-color: #840015;
+  }
+  .filter-pill.active {
+    background: #840015;
+    color: white;
+    border-color: #840015;
+  }
+  @keyframes blink {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+  }
 </style>
 </head>
 <body>
@@ -24,7 +52,13 @@
     <span class="material-symbols-outlined" style="font-size:20px;color:white;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">admin_panel_settings</span>
     <h1 style="font-size:17px;font-weight:800;color:white;">Administration</h1>
   </div>
-  <span style="background:rgba(255,255,255,.2);color:white;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;">ADMIN</span>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <span style="background:rgba(255,255,255,.2);color:white;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;">ADMIN</span>
+    <span style="background:#FF9F43;color:white;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;">
+      <span style="width:6px;height:6px;background:white;border-radius:50%;animation:blink 1.2s infinite;display:inline-block;"></span>
+      <span id="activeCountText">0</span> Actives
+    </span>
+  </div>
 </header>
 
 <section style="background:#840015;padding:16px 20px 36px;">
@@ -45,16 +79,57 @@
       <button class="tab-btn active" onclick="switchTab(this,'tabSignalees')">Signalées</button>
       <button class="tab-btn" onclick="switchTab(this,'tabToutes')">Toutes les alertes</button>
       <button class="tab-btn" onclick="switchTab(this,'tabUsers')">Utilisateurs</button>
+      <button class="tab-btn" onclick="switchTab(this,'tabStats')">Statistiques</button>
     </div>
 
     <div id="tabSignalees">
       <div id="listSignalees"><div class="skeleton" style="height:80px;margin-bottom:12px;border-radius:12px;"></div></div>
     </div>
+    
     <div id="tabToutes" style="display:none;">
+      <div style="display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;">
+        <button class="filter-pill active" onclick="filtrerToutesAlertes(this, 'tous')">Toutes</button>
+        <button class="filter-pill" onclick="filtrerToutesAlertes(this, 'active')">Actives</button>
+        <button class="filter-pill" onclick="filtrerToutesAlertes(this, 'resolue')">Résolues</button>
+        <button class="filter-pill" onclick="filtrerToutesAlertes(this, 'suspendue')">Suspendues</button>
+      </div>
       <div id="listToutes"><div class="skeleton" style="height:80px;border-radius:12px;"></div></div>
     </div>
+    
     <div id="tabUsers" style="display:none;">
       <div id="listUsers"><div class="skeleton" style="height:80px;border-radius:12px;"></div></div>
+    </div>
+
+    <div id="tabStats" style="display:none;">
+      <div class="section-card" style="margin-bottom:16px;">
+        <h2 style="font-size:15px;font-weight:700;color:#1c1b1b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+          <span class="material-symbols-outlined" style="color:#840015;">analytics</span>
+          Répartition par Niveau d'Urgence
+        </h2>
+        <div id="urgencyStats" style="display:flex;flex-direction:column;gap:12px;">
+          <!-- Urgences custom horizontal progress bars -->
+        </div>
+      </div>
+
+      <div class="section-card" style="margin-bottom:16px;">
+        <h2 style="font-size:15px;font-weight:700;color:#1c1b1b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+          <span class="material-symbols-outlined" style="color:#840015;">category</span>
+          Répartition par Catégorie d'Incident
+        </h2>
+        <div id="categoryStats" style="display:flex;flex-direction:column;gap:12px;">
+          <!-- Categories custom progress bars -->
+        </div>
+      </div>
+
+      <div class="section-card" style="margin-bottom:16px;">
+        <h2 style="font-size:15px;font-weight:700;color:#1c1b1b;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+          <span class="material-symbols-outlined" style="color:#840015;">home</span>
+          Répartition par Quartier de Bukavu
+        </h2>
+        <div id="quartierStats" style="display:flex;flex-direction:column;gap:12px;">
+          <!-- Quartier progress bars -->
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -69,14 +144,32 @@ if (!AB.isAdmin()) {
 } else {
   document.getElementById('adminContent').style.display = 'block';
   chargerSignalees();
+  chargerActiveCounter();
+}
+
+let toutesLesAlertes = [];
+let filtreStatutActuel = 'tous';
+
+async function chargerActiveCounter() {
+  try {
+    const data = await AB.api('alertes');
+    const alertes = data.alertes || [];
+    const actives = alertes.filter(a => a.statut === 'active').length;
+    document.getElementById('activeCountText').textContent = actives;
+  } catch(e) {
+    console.error(e);
+  }
 }
 
 function switchTab(btn, id) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  ['tabSignalees','tabToutes','tabUsers'].forEach(t => document.getElementById(t).style.display = t === id ? 'block' : 'none');
+  ['tabSignalees','tabToutes','tabUsers','tabStats'].forEach(t => document.getElementById(t).style.display = t === id ? 'block' : 'none');
+  if (id === 'tabSignalees') chargerSignalees();
   if (id === 'tabToutes') chargerToutes();
   if (id === 'tabUsers') chargerUsers();
+  if (id === 'tabStats') chargerStatistiquesOnglet();
+  chargerActiveCounter();
 }
 
 function renderAlerte(a, showSignal = false) {
@@ -84,9 +177,13 @@ function renderAlerte(a, showSignal = false) {
   const urg = URGENCES[a.urgence] || URGENCES.moyen;
   const statutColor = a.statut === 'suspendue' ? '#840015' : a.statut === 'resolue' ? '#00C48C' : '#FF9F43';
   const statutBg = a.statut === 'suspendue' ? '#ffdad8' : a.statut === 'resolue' ? '#E6FAF5' : '#FFF5EC';
+  
+  // Bouton de notification seulement si alerte active
+  const canNotify = a.statut === 'active';
+  
   return `<div class="alerte-row">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
-      <div style="flex:1;min-width:0;">
+      <div style="flex:1;min-width:0;text-align:left;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
           <span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:${urg.bg};color:${urg.color};">${urg.label}</span>
           <span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};">${cat.label}</span>
@@ -95,13 +192,36 @@ function renderAlerte(a, showSignal = false) {
         <p style="font-size:14px;font-weight:700;color:#1c1b1b;margin-bottom:2px;">${escHtml(a.titre)}</p>
         <p style="font-size:12px;color:#906f6d;">${escHtml(a.quartier||'Bukavu')} • ${tempsRelatif(a.created_at)}</p>
       </div>
-      <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;background:${statutBg};color:${statutColor};white-space:nowrap;">${a.statut}</span>
+      <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;background:${statutBg};color:${statutColor};white-space:nowrap;text-transform:capitalize;">${a.statut}</span>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       ${a.statut !== 'suspendue' ? `<button onclick="changerStatut('${a.id}','suspendue')" style="padding:8px 14px;background:#ffdad8;color:#840015;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Suspendre</button>` : `<button onclick="changerStatut('${a.id}','active')" style="padding:8px 14px;background:#E6FAF5;color:#00C48C;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Restaurer</button>`}
       ${a.statut !== 'resolue' ? `<button onclick="changerStatut('${a.id}','resolue')" style="padding:8px 14px;background:#E6FAF5;color:#00C48C;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Marquer résolu</button>` : ''}
+      ${canNotify ? `<button onclick="notifierHabitants('${a.id}', '${escHtml(a.titre)}')" style="padding:8px 14px;background:#E6F5FF;color:#008cff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:14px;">campaign</span> Notifier quartier
+      </button>` : ''}
     </div>
   </div>`;
+}
+
+async function notifierHabitants(id, titre) {
+  const confirm = await showConfirm(
+    'Notifier le quartier ?',
+    `Un email d'alerte sera immédiatement envoyé à tous les résidents enregistrés de ce quartier pour l'alerte "${titre}".`,
+    'Oui, notifier',
+    'warning'
+  );
+  if (!confirm.isConfirmed) return;
+  
+  try {
+    Swal.fire({ title: 'Envoi des notifications...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+    const res = await AB.api(`admin/alertes/${id}/notifier`, 'POST');
+    Swal.close();
+    await showAlert('Notifications envoyées !', res.message, 'success');
+  } catch(e) {
+    Swal.close();
+    showToast(e.message, 'error');
+  }
 }
 
 async function chargerSignalees() {
@@ -117,30 +237,72 @@ async function chargerSignalees() {
 async function chargerToutes() {
   try {
     const data = await AB.api('alertes');
-    const alertes = data.alertes || [];
-    document.getElementById('listToutes').innerHTML = alertes.length
-      ? alertes.map(a => renderAlerte(a)).join('')
-      : '<p style="color:#906f6d;font-size:14px;text-align:center;padding:28px 0;">Aucune alerte</p>';
+    toutesLesAlertes = data.alertes || [];
+    appliquerFiltreToutesAlertes();
   } catch(e) { showToast('Erreur de chargement', 'error'); }
+}
+
+function filtrerToutesAlertes(btn, statut) {
+  document.querySelectorAll('#tabToutes .filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filtreStatutActuel = statut;
+  appliquerFiltreToutesAlertes();
+}
+
+function appliquerFiltreToutesAlertes() {
+  let aFiltrer = toutesLesAlertes;
+  if (filtreStatutActuel !== 'tous') {
+    aFiltrer = toutesLesAlertes.filter(a => a.statut === filtreStatutActuel);
+  }
+  
+  document.getElementById('listToutes').innerHTML = aFiltrer.length
+    ? aFiltrer.map(a => renderAlerte(a)).join('')
+    : `<p style="color:#906f6d;font-size:14px;text-align:center;padding:28px 0;">Aucune alerte avec le statut "${filtreStatutActuel}"</p>`;
 }
 
 async function chargerUsers() {
   try {
     const data = await AB.api('admin/users');
     const users = data.users || [];
-    document.getElementById('listUsers').innerHTML = users.length ? users.map(u => `
-      <div style="background:white;border-radius:12px;border:1px solid #e4bdbb;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;">
-        <img src="${genererAvatar(u.nom||'U', 44)}" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;"/>
+    document.getElementById('listUsers').innerHTML = users.length ? users.map(u => {
+      const photoSrc = u.photo_url ? u.photo_url : genererAvatar(u.nom||'U', 44);
+      return `
+      <div style="background:white;border-radius:12px;border:1px solid #e4bdbb;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left;">
+        <img src="${photoSrc}" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;object-fit:cover;" onerror="this.src='${genererAvatar(u.nom||'U', 44)}'"/>
         <div style="flex:1;min-width:0;">
-          <p style="font-size:14px;font-weight:700;color:#1c1b1b;">${escHtml(u.nom)}</p>
-          <p style="font-size:12px;color:#906f6d;">${escHtml(u.email)} • ${u.role} • ${escHtml(u.quartier||'')}</p>
+          <p style="font-size:14px;font-weight:700;color:#1c1b1b;margin-bottom:2px;">${escHtml(u.nom)}</p>
+          <p style="font-size:12px;color:#906f6d;margin-bottom:2px;">${escHtml(u.email)} • <b style="color:#840015;text-transform:uppercase;font-size:10px;">${u.role}</b> • ${escHtml(u.quartier||'Non spécifié')}</p>
+          <p style="font-size:11px;color:#5b403e;">Compte créé le : ${new Date(u.created_at).toLocaleDateString('fr-FR')} • Fausses : <b>${u.nb_fausses_alertes || 0}</b> • Publications : <b>${u.nb_alertes || 0}</b></p>
         </div>
-        <button onclick="toggleBlock('${u.id}',${!u.est_bloque})" style="padding:6px 14px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;background:${u.est_bloque?'#E6FAF5':'#ffdad8'};color:${u.est_bloque?'#00C48C':'#840015'};">
-          ${u.est_bloque ? 'Débloquer' : 'Bloquer'}
-        </button>
-      </div>`).join('')
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+          ${u.role !== 'admin' ? `
+            <button onclick="promouvoirAdmin('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:white;color:#00C48C;border:1.5px solid #00C48C;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;" onmouseover="this.style.background='#E6FAF5'" onmouseout="this.style.background='white'">
+              Promouvoir admin
+            </button>
+          ` : ''}
+          <button onclick="toggleBlock('${u.id}',${!u.est_bloque})" style="padding:6px 12px;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;background:${u.est_bloque?'#E6FAF5':'#ffdad8'};color:${u.est_bloque?'#00C48C':'#840015'};">
+            ${u.est_bloque ? 'Débloquer' : 'Bloquer'}
+          </button>
+        </div>
+      </div>`;
+    }).join('')
       : '<p style="color:#906f6d;text-align:center;padding:28px 0;">Aucun utilisateur</p>';
   } catch(e) { showToast('Erreur de chargement', 'error'); }
+}
+
+async function promouvoirAdmin(id, nom) {
+  const r = await showConfirm(
+    'Promouvoir administrateur ?',
+    `Voulez-vous accorder les privilèges d'administration à ${nom} ? Cette action est définitive.`,
+    'Oui, promouvoir',
+    'question'
+  );
+  if (!r.isConfirmed) return;
+  try {
+    await AB.api(`admin/users/${id}/promouvoir`, 'PUT');
+    showToast(`${nom} est désormais Administrateur`);
+    chargerUsers();
+  } catch(e) { showToast(e.message, 'error'); }
 }
 
 async function changerStatut(id, statut) {
@@ -148,6 +310,7 @@ async function changerStatut(id, statut) {
     await AB.api(`alertes/${id}/statut`, 'PUT', { statut });
     showToast('Statut mis à jour');
     chargerSignalees();
+    chargerActiveCounter();
     if (document.getElementById('tabToutes').style.display !== 'none') chargerToutes();
   } catch(e) { showToast(e.message, 'error'); }
 }
@@ -160,6 +323,54 @@ async function toggleBlock(id, bloquer) {
     showToast(bloquer ? 'Utilisateur bloqué' : 'Utilisateur débloqué');
     chargerUsers();
   } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function chargerStatistiquesOnglet() {
+  try {
+    const stats = await AB.api('stats');
+    
+    const total = stats.total || 0;
+    const urgMap = stats.parUrgence || { faible: 0, moyen: 0, critique: 0 };
+    const getPct = val => total > 0 ? Math.round((val / total) * 100) : 0;
+    
+    // 1. Répartition Urgences
+    document.getElementById('urgencyStats').innerHTML = `
+      ${renderProgressBar('Critique', urgMap.critique || 0, getPct(urgMap.critique || 0), '#FF3D71')}
+      ${renderProgressBar('Moyen', urgMap.moyen || 0, getPct(urgMap.moyen || 0), '#FF9F43')}
+      ${renderProgressBar('Faible', urgMap.faible || 0, getPct(urgMap.faible || 0), '#00C48C')}
+    `;
+    
+    // 2. Répartition Catégories
+    const catHtml = Object.entries(CATEGORIES).map(([key, cat]) => {
+      const count = stats.parCat[key] || 0;
+      return renderProgressBar(cat.label, count, getPct(count), cat.color || '#840015');
+    }).join('');
+    document.getElementById('categoryStats').innerHTML = catHtml || '<p style="color:#906f6d;font-size:12px;text-align:center;">Aucune catégorie</p>';
+    
+    // 3. Répartition Quartiers
+    const qHtml = QUARTIERS.map(q => {
+      const count = stats.parQuartier[q] || 0;
+      return renderProgressBar(q, count, getPct(count), '#a95a56');
+    }).join('');
+    document.getElementById('quartierStats').innerHTML = qHtml || '<p style="color:#906f6d;font-size:12px;text-align:center;">Aucun quartier</p>';
+    
+  } catch (e) {
+    showToast('Erreur lors du chargement des statistiques', 'error');
+  }
+}
+
+function renderProgressBar(label, val, pct, color) {
+  return `
+    <div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:#5b403e;margin-bottom:4px;">
+        <span>${label} (${val})</span>
+        <span>${pct}%</span>
+      </div>
+      <div style="width:100%;height:8px;background:#f5e2e1;border-radius:100px;overflow:hidden;border:1.5px solid #e4bdbb;">
+        <div style="width: ${pct}%;height:100%;background:${color};border-radius:100px;transition:width 0.8s ease-out;"></div>
+      </div>
+    </div>
+  `;
 }
 </script>
 </body>

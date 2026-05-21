@@ -142,21 +142,124 @@ function obtenirPosition() {
   });
 }
 
-// ---- SweetAlert2 ----
+// ---- Local Dev Detection ----
+function estLocal() {
+  const hn = window.location.hostname;
+  const pr = window.location.protocol;
+  return pr === 'file:' || !hn || hn === 'localhost' || hn === '127.0.0.1' || hn === '[::1]' || hn.startsWith('192.168.') || hn.startsWith('10.') || hn.startsWith('172.');
+}
+
+// ---- SweetAlert2 & Fallback ----
+let isSwalFallback = false;
+if (typeof Swal === 'undefined') {
+  isSwalFallback = true;
+  window.Swal = {
+    fire: function(opts) {
+      if (typeof opts === 'string') {
+        alert(opts);
+      } else {
+        alert((opts.title ? opts.title + '\n\n' : '') + (opts.text || ''));
+      }
+      return Promise.resolve({ isConfirmed: true });
+    },
+    mixin: function() {
+      return {
+        fire: function(opts) {
+          showToast(opts.title || opts.text || '');
+        }
+      };
+    },
+    close: function() {},
+    showLoading: function() {}
+  };
+}
+
 const Toast = Swal.mixin({
   toast: true, position: 'bottom',
   showConfirmButton: false, timer: 3500, timerProgressBar: true,
   customClass: { popup: 'swal-toast-custom' }
 });
 
-function showToast(msg, type = 'success') { Toast.fire({ icon: type, title: msg }); }
+function showToast(msg, type = 'success') {
+  if (!isSwalFallback) {
+    Toast.fire({ icon: type, title: msg });
+  } else {
+    // Inject fallback toast style if not present
+    if (!document.getElementById('fallback-toast-style')) {
+      const style = document.createElement('style');
+      style.id = 'fallback-toast-style';
+      style.textContent = `
+        #fallback-toast-container {
+          position: fixed;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          pointer-events: none;
+        }
+        .fallback-toast {
+          color: white;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          pointer-events: auto;
+          min-width: 250px;
+          text-align: center;
+          animation: slideUpToast 0.3s ease both;
+          transition: opacity 0.4s ease;
+        }
+        @keyframes slideUpToast {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    // Create container if not present
+    let container = document.getElementById('fallback-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'fallback-toast-container';
+      document.body.appendChild(container);
+    }
+    
+    const t = document.createElement('div');
+    t.className = 'fallback-toast';
+    const colors = { success: '#00C48C', error: '#FF3D71', warning: '#FF9F43', info: '#840015' };
+    t.style.backgroundColor = colors[type] || '#1a1a1a';
+    t.textContent = msg;
+    container.appendChild(t);
+    
+    setTimeout(() => {
+      t.style.opacity = '0';
+      setTimeout(() => t.remove(), 400);
+    }, 3500);
+  }
+}
 
 function showConfirm(title, text, confirmText = 'Confirmer', icon = 'question') {
-  return Swal.fire({ title, text, icon, showCancelButton: true, confirmButtonColor: '#840015', cancelButtonColor: '#906f6d', confirmButtonText: confirmText, cancelButtonText: 'Annuler' });
+  if (!isSwalFallback) {
+    return Swal.fire({ title, text, icon, showCancelButton: true, confirmButtonColor: '#840015', cancelButtonColor: '#906f6d', confirmButtonText: confirmText, cancelButtonText: 'Annuler' });
+  } else {
+    const res = confirm(`${title}\n\n${text}`);
+    return Promise.resolve({ isConfirmed: res });
+  }
 }
 
 function showAlert(title, text, icon = 'info') {
-  return Swal.fire({ title, text, icon, confirmButtonColor: '#840015' });
+  if (!isSwalFallback) {
+    return Swal.fire({ title, text, icon, confirmButtonColor: '#840015' });
+  } else {
+    alert(`${title}\n\n${text}`);
+    return Promise.resolve();
+  }
 }
 
 // ---- Menu admin ----

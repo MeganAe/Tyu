@@ -5,22 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AlertBukavu — Publier une alerte</title>
   <link rel="icon" type="image/png" href="logo.png"/>
+  
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="AlertBukavu — Publier une alerte"/>
+  <meta property="og:description" content="Signalez un danger, une inondation, un incendie ou un autre incident à Bukavu en temps réel."/>
+  
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-    <script src="https://www.hCaptcha.com/1/api.js" async defer></script>
+  <script src="https://www.hCaptcha.com/1/api.js" async defer></script>
   <link rel="stylesheet" href="style.css"/>
   <style>
     .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
-    body{padding-bottom:80px;}
+    body{padding-bottom:80px; scroll-behavior: smooth;}
+    html { scroll-behavior: smooth; }
+    
     .cat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px;border-radius:10px;border:1.5px solid #ddb8b6;background:white;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:#5b403e;font-weight:600;font-size:12px;transition:all .2s;}
     .cat-btn:hover{border-color:#840015;background:#ffdad8;}
     .cat-btn.active{border-color:#840015;background:#ffdad8;color:#840015;}
+    
     .urg-btn{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid #ddb8b6;background:white;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
     .urg-btn.faible.active{background:#E6FAF5;color:#00C48C;border-color:#00C48C;}
     .urg-btn.moyen.active{background:#FFF5EC;color:#FF9F43;border-color:#FF9F43;}
     .urg-btn.critique.active{background:#FFF0F5;color:#FF3D71;border-color:#FF3D71;}
+    
     .photo-upload-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s;}
     .photo-upload-btn:hover{background:#ffb3af;}
+    
     .warning-box{background:#ffdad8;border-left:4px solid #840015;border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;}
     .char-count{font-size:11px;color:#906f6d;text-align:right;margin-top:4px;margin-bottom:0;}
   </style>
@@ -79,10 +89,10 @@
       <p class="char-count"><span id="descCount">0</span> / 500</p>
     </div>
 
-    <!-- Photo -->
+    <!-- Photo avec compression Client-side -->
     <div class="section-card">
       <label class="field-label">Photo <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
-      <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Ajoutez une photo pour mieux documenter l'incident</p>
+      <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Ajoutez une photo. Elle sera automatiquement optimisée.</p>
       <div id="photoPreviewWrap" style="display:none;margin-bottom:12px;">
         <img id="photoPreview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid #ddb8b6;"/>
         <button onclick="supprimerPhoto()" style="margin-top:8px;padding:6px 14px;background:#ffdad8;color:#840015;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Supprimer la photo</button>
@@ -94,14 +104,42 @@
       <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="previewPhoto(event)"/>
     </div>
 
-    <!-- GPS -->
+    <!-- GPS avec Google Maps preview & Saisie manuelle -->
     <div class="section-card">
       <label class="field-label">Localisation GPS <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
       <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Aide à localiser l'alerte sur la carte</p>
-      <button onclick="getLocation()" id="btnGps" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;">
-        <span class="material-symbols-outlined" style="font-size:18px;">my_location</span>
-        <span id="gpsLabel">Obtenir ma position</span>
-      </button>
+      <div style="display:flex;gap:10px;">
+        <button onclick="getLocation()" id="btnGps" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;">
+          <span class="material-symbols-outlined" style="font-size:18px;">my_location</span>
+          <span id="gpsLabel">Obtenir ma position</span>
+        </button>
+        <button onclick="toggleManualGps()" id="btnManualGps" style="padding:10px 14px;background:white;color:#906f6d;border:1px solid #ddb8b6;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
+          Saisie manuelle
+        </button>
+      </div>
+
+      <!-- Saisie GPS manuelle -->
+      <div id="manualGpsWrap" style="display:none;margin-top:12px;align-items:flex-end;gap:10px;">
+        <div style="flex:1;">
+          <label class="field-label" style="font-size:11px;margin-bottom:4px;">Latitude</label>
+          <input id="manualLat" type="number" step="any" class="field-input no-icon" style="height:40px;font-size:13px;" placeholder="Ex: -2.5012"/>
+        </div>
+        <div style="flex:1;">
+          <label class="field-label" style="font-size:11px;margin-bottom:4px;">Longitude</label>
+          <input id="manualLng" type="number" step="any" class="field-input no-icon" style="height:40px;font-size:13px;" placeholder="Ex: 28.8623"/>
+        </div>
+        <button onclick="validerManuelGps()" style="height:40px;padding:0 16px;background:#840015;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Valider</button>
+      </div>
+
+      <!-- Google Maps Iframe preview -->
+      <div id="mapPreviewWrap" style="display:none;margin-top:12px;border-radius:8px;overflow:hidden;border:1px solid #ddb8b6;">
+        <iframe id="mapPreview" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+      </div>
+    </div>
+
+    <!-- hCaptcha Manquant Intégré -->
+    <div class="captcha-wrap" style="display:flex;justify-content:center;margin-bottom:16px;">
+      <div class="h-captcha" data-sitekey="6b5a506e-395a-46d0-8bba-77941038b772" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
     </div>
 
     <!-- Avertissement -->
@@ -113,28 +151,56 @@
       </div>
     </div>
 
-    <button id="btnPublier" class="btn-primary" onclick="publier()" style="height:52px;">
+    <!-- Bouton Soumission -->
+    <button id="btnPublier" class="btn-primary" onclick="publier()" style="height:52px;margin-bottom:20px;">
       <span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span>
       PUBLIER L'ALERTE
     </button>
 
   </main>
 
+  <!-- Bouton Scroll to top -->
+  <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="position:fixed;bottom:88px;left:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid #ddb8b6;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:99;transition:all .3s;">
+    <span class="material-symbols-outlined" style="color:#840015;font-size:22px;">arrow_upward</span>
+  </button>
+
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
+    <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;">rss_feed</span><span>Alertes</span></a>
     <a href="publier.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">add_alert</span><span>Publier</span></a>
-    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
-    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">person</span><span>Profil</span></a>
+    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;">analytics</span><span>Stats</span></a>
+    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;">person</span><span>Profil</span></a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="config.js"></script>
   <script>
-    AB.requireAuth();
+    const user = AB.requireAuth();
+
+    // Vérifier le statut de l'utilisateur sur le serveur au chargement
+    async function verifierStatutCompte() {
+      try {
+        const u = AB.getUser();
+        if (u && u.est_bloque) {
+          await showAlert('Compte suspendu', 'Votre compte est suspendu pour fausses alertes. Redirection...', 'error');
+          window.location.href = 'index.html';
+        }
+      } catch (e) {}
+    }
+    verifierStatutCompte();
 
     let captchaValidated = false;
     function onCaptchaSuccess(token) { captchaValidated = true; }
     function onCaptchaExpire() { captchaValidated = false; }
+
+    // Désactiver le captcha sur localhost pour faciliter le développement local
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      captchaValidated = true;
+      window.addEventListener('DOMContentLoaded', () => {
+        const wrap = document.querySelector('.captcha-wrap');
+        if (wrap) wrap.style.display = 'none';
+      });
+    }
+    
     let catChoisie = '', urgChoisie = 'moyen', userLat = null, userLng = null, photoFile = null;
 
     // Remplir quartiers
@@ -144,7 +210,7 @@
       document.getElementById('quartier').appendChild(o);
     });
 
-    // Remplir catégories — toutes restaurées
+    // Remplir catégories
     const catGrid = document.getElementById('catGrid');
     Object.entries(CATEGORIES).forEach(([key, cat]) => {
       const btn = document.createElement('button');
@@ -170,16 +236,56 @@
       document.getElementById('descCount').textContent = this.value.length;
     });
 
-    function previewPhoto(event) {
+    // Image Compressor Client-side (canvas resize à max 1200px)
+    function compressImage(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const max_size = 1200;
+            let width = img.width;
+            let height = img.height;
+            if (width > height) {
+              if (width > max_size) {
+                height *= max_size / width;
+                width = max_size;
+              }
+            } else {
+              if (height > max_size) {
+                width *= max_size / height;
+                height = max_size;
+              }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob((blob) => {
+              resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+            }, 'image/jpeg', 0.85); // JPEG 85% pour haute qualité et légèreté
+          };
+        };
+      });
+    }
+
+    async function previewPhoto(event) {
       const file = event.target.files[0];
       if (!file) return;
       if (!file.type.startsWith('image/')) { showToast('Choisissez une image', 'error'); return; }
-      if (file.size > 8 * 1024 * 1024) { showToast('Image trop lourde (max 8 Mo)', 'error'); return; }
-      photoFile = file;
-      const url = URL.createObjectURL(file);
+      
+      showToast('Optimisation de la photo...');
+      // Compression
+      const compressed = await compressImage(file);
+      photoFile = compressed;
+      
+      const url = URL.createObjectURL(compressed);
       document.getElementById('photoPreview').src = url;
       document.getElementById('photoPreviewWrap').style.display = 'block';
-      document.getElementById('photoLabel').textContent = file.name;
+      document.getElementById('photoLabel').textContent = `${compressed.name} (optimisée)`;
     }
 
     function supprimerPhoto() {
@@ -187,6 +293,43 @@
       document.getElementById('photoPreviewWrap').style.display = 'none';
       document.getElementById('photoLabel').textContent = 'Ajouter une photo';
       document.getElementById('photoInput').value = '';
+    }
+
+    // Afficher/Masquer saisie GPS manuelle
+    function toggleManualGps() {
+      const el = document.getElementById('manualGpsWrap');
+      el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function validerManuelGps() {
+      const latVal = parseFloat(document.getElementById('manualLat').value);
+      const lngVal = parseFloat(document.getElementById('manualLng').value);
+      
+      if (isNaN(latVal) || isNaN(lngVal)) {
+        showToast('Veuillez entrer des coordonnées numériques valides.', 'error');
+        return;
+      }
+      if (latVal < -90 || latVal > 90 || lngVal < -180 || lngVal > 180) {
+        showToast('Coordonnées géographiques hors limites.', 'error');
+        return;
+      }
+      
+      userLat = latVal.toFixed(5);
+      userLng = lngVal.toFixed(5);
+      
+      document.getElementById('gpsLabel').textContent = `${userLat}, ${userLng}`;
+      const btn = document.getElementById('btnGps');
+      btn.style.background = '#E6FAF5';
+      btn.style.color = '#00C48C';
+      
+      updateMapPreview(userLat, userLng);
+      showToast('Position manuelle enregistrée');
+    }
+
+    function updateMapPreview(lat, lng) {
+      const iframe = document.getElementById('mapPreview');
+      iframe.src = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+      document.getElementById('mapPreviewWrap').style.display = 'block';
     }
 
     async function getLocation() {
@@ -201,10 +344,14 @@
         lbl.textContent = `${userLat}, ${userLng}`;
         btn.style.background = '#E6FAF5';
         btn.style.color = '#00C48C';
+        
+        updateMapPreview(userLat, userLng);
         showToast('Position obtenue avec succès');
       } catch(e) {
         lbl.textContent = 'Obtenir ma position';
-        showToast(e.message, 'error');
+        // Afficher l'avertissement et la saisie manuelle si le GPS échoue
+        showToast(e.message + ' Saisie manuelle activée.', 'warning');
+        document.getElementById('manualGpsWrap').style.display = 'flex';
       }
       btn.disabled = false;
     }
@@ -216,9 +363,11 @@
       const btn = document.getElementById('btnPublier');
 
       if (!titre) { showToast('Le titre est obligatoire', 'error'); return; }
+      if (titre.length > 80) { showToast('Le titre ne doit pas dépasser 80 caractères', 'error'); return; }
       if (!catChoisie) { showToast('Choisissez une catégorie', 'error'); return; }
       if (!quartier) { showToast('Choisissez le quartier concerné', 'error'); return; }
       if (!description) { showToast('La description est obligatoire', 'error'); return; }
+      if (description.length > 500) { showToast('La description ne doit pas dépasser 500 caractères', 'error'); return; }
       if (!captchaValidated) { showToast('Veuillez valider le captcha', 'error'); return; }
 
       if (urgChoisie === 'critique') {
@@ -253,6 +402,16 @@
         btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span> PUBLIER L\'ALERTE';
       }
     }
+
+    // Gestion du scroll
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('scrollToTopBtn');
+      if (window.scrollY > 300) {
+        btn.style.display = 'flex';
+      } else {
+        btn.style.display = 'none';
+      }
+    });
   </script>
 </body>
 </html>

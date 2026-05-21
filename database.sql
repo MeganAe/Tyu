@@ -1,9 +1,5 @@
--- Alert Bukavu v3 — Schema SQL complet
--- Executer dans Supabase SQL Editor
-
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Supprimer les anciennes tables si elles existent
 DROP TABLE IF EXISTS signalements CASCADE;
 DROP TABLE IF EXISTS confirmations CASCADE;
 DROP TABLE IF EXISTS alertes CASCADE;
@@ -76,9 +72,14 @@ CREATE POLICY "alertes_update" ON alertes FOR UPDATE USING (true);
 CREATE POLICY "confirmations_all" ON confirmations FOR ALL USING (true);
 CREATE POLICY "signalements_all" ON signalements FOR ALL USING (true);
 
--- Colonnes supplémentaires (si pas encore présentes)
+-- Colonnes supplémentaires 
 ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(30) UNIQUE;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS photo_url TEXT;
 ALTER TABLE alertes ADD COLUMN IF NOT EXISTS photo_url TEXT;
 ALTER TABLE alertes ADD COLUMN IF NOT EXISTS photo_auteur TEXT;
 ALTER TABLE alertes ADD COLUMN IF NOT EXISTS auteur_username VARCHAR(30);
+ALTER TABLE alertes ADD COLUMN IF NOT EXISTS auteur_quartier VARCHAR(100);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS nb_alertes INTEGER DEFAULT 0;
+ALTER TABLE alertes ADD COLUMN IF NOT EXISTS resolved_at TIMESTAMPTZ;
+

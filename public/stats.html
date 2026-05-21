@@ -68,6 +68,36 @@
       </div>
     </div>
 
+    <!-- Performance de résolution -->
+    <div class="section-card" style="margin-bottom:14px;">
+      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">speed</span>
+        Performance de Résolution
+      </h2>
+      <div style="display:flex;gap:12px;">
+        <div style="flex:1;background:#E6FAF5;border:1px solid #00C48C;border-radius:12px;padding:16px;text-align:center;">
+          <p id="txResolutionVal" style="font-size:28px;font-weight:800;color:#00C48C;margin-bottom:4px;">0%</p>
+          <p style="font-size:11px;font-weight:700;color:#007d59;text-transform:uppercase;letter-spacing:.05em;">Taux de résolution</p>
+        </div>
+        <div style="flex:1;background:#E6F5FF;border:1px solid #008cff;border-radius:12px;padding:16px;text-align:center;">
+          <p id="tpsResolutionVal" style="font-size:28px;font-weight:800;color:#008cff;margin-bottom:4px;">0h</p>
+          <p style="font-size:11px;font-weight:700;color:#005cb8;text-transform:uppercase;letter-spacing:.05em;">Temps moyen</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique des 7 derniers jours -->
+    <div class="section-card" style="margin-bottom:14px;">
+      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">calendar_today</span>
+        Activité des 7 derniers jours
+      </h2>
+      <div id="timelineChart" style="display:flex;justify-content:space-between;align-items:flex-end;height:120px;padding:10px 10px 20px;border-bottom:1px solid #efecea;margin-bottom:14px;">
+        <!-- CSS vertical bars populated dynamically -->
+      </div>
+      <p style="font-size:11px;color:#906f6d;text-align:center;">Nombre de nouvelles alertes quotidiennes</p>
+    </div>
+
     <!-- Par catégorie -->
     <div class="section-card">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
@@ -122,40 +152,70 @@
 
     async function chargerStats() {
       try {
-        const data = await AB.api('alertes');
-        const alertes = data.alertes || [];
-        const total = alertes.length;
-        let resolues = 0, critiques = 0, totalConfirmations = 0;
-        const parCat = {}, parUrg = {}, parQ = {};
-
-        alertes.forEach(a => {
-          if (a.statut === 'resolue') resolues++;
-          if (a.urgence === 'critique') critiques++;
-          totalConfirmations += (a.nb_confirmations || 0);
-          parCat[a.categorie] = (parCat[a.categorie] || 0) + 1;
-          parUrg[a.urgence] = (parUrg[a.urgence] || 0) + 1;
-          const q = a.quartier || 'Bukavu';
-          parQ[q] = (parQ[q] || 0) + 1;
-        });
-
+        const data = await AB.api('stats');
+        
+        const total = data.total || 0;
+        const resolues = data.resolues || 0;
+        const critiques = data.critiques || 0;
+        const totalConfirmations = data.totalConfirmations || 0;
+        
         document.getElementById('statTotal').textContent = total;
         document.getElementById('statResolues').textContent = resolues;
         document.getElementById('statCritiques').textContent = critiques;
         document.getElementById('statConfirmations').textContent = totalConfirmations;
 
-        // Zone top
+        // Taux de résolution et temps moyen de résolution
+        document.getElementById('txResolutionVal').textContent = `${data.txResolution || 0}%`;
+        
+        const tpsHours = parseFloat(data.tempsMoyenResolution || 0);
+        let tpsStr = '—';
+        if (tpsHours > 0) {
+          if (tpsHours < 24) {
+            tpsStr = `${tpsHours}h`;
+          } else {
+            tpsStr = `${(tpsHours / 24).toFixed(1)}j`;
+          }
+        } else if (resolues > 0 && tpsHours === 0) {
+          tpsStr = '<1h';
+        }
+        document.getElementById('tpsResolutionVal').textContent = tpsStr;
+
+        // Zone la plus active
+        const parQ = data.parQuartier || {};
         let topQ = '—', maxQ = 0;
-        Object.entries(parQ).forEach(([q, n]) => { if (n > maxQ) { maxQ = n; topQ = q; } });
+        Object.entries(parQ).forEach(([q, n]) => {
+          if (n > maxQ) {
+            maxQ = n;
+            topQ = q;
+          }
+        });
         document.getElementById('statTopQ').textContent = topQ;
 
+        // Activité des 7 derniers jours (Timeline dynamique)
+        const timeline = data.timeline || [];
+        const maxTimelineCount = Math.max(...timeline.map(t => t.count), 1);
+        const chartHtml = timeline.map(t => {
+          const heightPct = Math.round((t.count / maxTimelineCount) * 100);
+          return `
+            <div style="display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;min-width:30px;">
+              <span style="font-size:11px;font-weight:800;color:#840015;margin-bottom:4px;">${t.count}</span>
+              <div style="width:16px;height:${heightPct}%;background:linear-gradient(180deg, #ff4d6d 0%, #840015 100%);border-radius:4px 4px 0 0;transition:height .7s ease;min-height:3px;" title="${t.count} alerte(s) le ${t.label}"></div>
+              <span style="font-size:10px;font-weight:700;color:#906f6d;margin-top:6px;text-transform:capitalize;">${t.label}</span>
+            </div>
+          `;
+        }).join('');
+        document.getElementById('timelineChart').innerHTML = chartHtml || '<p style="color:#906f6d;font-size:13px;text-align:center;width:100%;">Aucune donnée</p>';
+
         // Par catégorie
+        const parCat = data.parCat || {};
         document.getElementById('catStats').innerHTML = Object.entries(CATEGORIES)
           .filter(([k]) => parCat[k] > 0)
-          .sort(([,a],[,b]) => (parCat[b.label]||0) - (parCat[a.label]||0))
+          .sort(([k1], [k2]) => (parCat[k2] || 0) - (parCat[k1] || 0))
           .map(([k, c]) => barre(c.label, parCat[k] || 0, total, c.color)).join('') ||
           '<p style="color:#906f6d;font-size:13px;text-align:center;padding:12px 0;">Aucune donnée</p>';
 
         // Par urgence
+        const parUrg = data.parUrgence || {};
         document.getElementById('urgStats').innerHTML = Object.entries(URGENCES)
           .map(([k, u]) => barre(u.label, parUrg[k] || 0, total, u.color)).join('');
 

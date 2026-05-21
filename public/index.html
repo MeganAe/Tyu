@@ -5,15 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AlertBukavu — Alertes en cours</title>
   <link rel="icon" type="image/png" href="logo.png"/>
+  
+  <!-- Open Graph Meta Tags pour partage sur réseaux sociaux -->
+  <meta property="og:title" content="AlertBukavu — Plateforme d'alertes citoyennes"/>
+  <meta property="og:description" content="Signalez et suivez les incidents en temps réel à Bukavu (RDC) pour protéger votre communauté."/>
+  <meta property="og:image" content="/logo.png"/>
+  <meta property="og:type" content="website"/>
+  
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <style>
     .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
-    body{padding-bottom:80px}
+    body{padding-bottom:90px; scroll-behavior: smooth;}
+    html { scroll-behavior: smooth; }
+    
+    /* Skeleton loader modern */
+    .skeleton-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #ddb8b6;
+      padding: 16px;
+      height: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .skeleton-line {
+      height: 14px;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Service Worker registration script -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('Service Worker enregistré !', reg.scope))
+          .catch(err => console.error('Échec enregistrement Service Worker:', err));
+      });
+    }
+  </script>
 
   <header class="top-bar">
     <div style="display:flex;align-items:center;gap:10px;">
@@ -21,6 +56,8 @@
       <h1 style="font-size:18px;font-weight:800;color:white;">AlertBukavu</h1>
     </div>
     <div style="display:flex;align-items:center;gap:10px;">
+      <!-- Indicateur de rafraîchissement visuel -->
+      <span id="refreshIndicator" style="color:rgba(255,255,255,.8);font-size:11px;font-weight:600;margin-right:4px;transition:all .4s ease;opacity:0;display:none;">Mise à jour...</span>
       <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);padding:4px 10px;border-radius:100px;">
         <span class="live-dot"></span>
         <span style="color:white;font-size:11px;font-weight:700;">EN DIRECT</span>
@@ -37,59 +74,124 @@
     </p>
   </section>
 
-  <!-- Filtres -->
-  <div style="position:sticky;top:60px;z-index:30;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid #ddb8b6;box-shadow:0 2px 8px rgba(132,0,21,.05);">
-    <div style="display:flex;gap:8px;overflow-x:auto;padding:12px 16px;" class="no-scrollbar">
-      <button class="pill active" onclick="filtrer(this,'tous')">Toutes</button>
-      <button class="pill" onclick="filtrer(this,'securite')">Sécurité</button>
-      <button class="pill" onclick="filtrer(this,'eau')">Eau</button>
-      <button class="pill" onclick="filtrer(this,'routes')">Routes</button>
-      <button class="pill" onclick="filtrer(this,'sante')">Santé</button>
-      <button class="pill" onclick="filtrer(this,'meteo')">Météo</button>
-      <button class="pill" onclick="filtrer(this,'autre')">Autre</button>
+  <!-- Filtres (Catégorie + Quartier en un seul bloc sticky) -->
+  <div style="position:sticky;top:60px;z-index:30;background:rgba(255,255,255,.93);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #ddb8b6;box-shadow:0 2px 10px rgba(132,0,21,.05);padding:12px 16px;">
+    <div style="display:flex;gap:10px;align-items:center;overflow-x:auto;" class="no-scrollbar">
+      
+      <!-- Sélecteur de quartier moderne -->
+      <div style="position:relative;flex-shrink:0;">
+        <select id="filtreQuartier" onchange="filtrerParQuartier(this.value)" class="pill" style="padding-right:32px;appearance:none;-webkit-appearance:none;cursor:pointer;font-weight:700;border-color:#840015;color:#840015;background:#ffdad8;">
+          <option value="tous">Tous les quartiers</option>
+        </select>
+        <span class="material-symbols-outlined" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;color:#840015;pointer-events:none;">expand_more</span>
+      </div>
+      
+      <div style="width:1px;height:24px;background:#ddb8b6;flex-shrink:0;"></div>
+
+      <button class="pill active" onclick="filtrerParCat(this,'tous')">Toutes</button>
+      <button class="pill" onclick="filtrerParCat(this,'securite')">Sécurité</button>
+      <button class="pill" onclick="filtrerParCat(this,'eau')">Eau</button>
+      <button class="pill" onclick="filtrerParCat(this,'route')">Routes</button>
+      <button class="pill" onclick="filtrerParCat(this,'sante')">Santé</button>
+      <button class="pill" onclick="filtrerParCat(this,'meteo')">Météo</button>
+      <button class="pill" onclick="filtrerParCat(this,'autre')">Autre</button>
     </div>
   </div>
 
   <main style="max-width:900px;margin:0 auto;padding:20px 16px;">
+    <!-- Skeletons chargés par défaut -->
     <div id="alertesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
-      <div class="card" style="height:200px;"><div class="skeleton" style="height:100%;border-radius:12px;"></div></div>
-      <div class="card" style="height:200px;"><div class="skeleton" style="height:100%;border-radius:12px;"></div></div>
+      <div class="skeleton-card">
+        <div style="display:flex;gap:8px;"><div class="skeleton skeleton-line" style="width:60px;"></div><div class="skeleton skeleton-line" style="width:60px;"></div></div>
+        <div class="skeleton skeleton-line" style="width:80%;height:18px;margin-top:6px;"></div>
+        <div class="skeleton skeleton-line" style="width:100%;height:40px;"></div>
+        <div class="skeleton skeleton-line" style="width:40%;margin-top:auto;"></div>
+      </div>
+      <div class="skeleton-card">
+        <div style="display:flex;gap:8px;"><div class="skeleton skeleton-line" style="width:60px;"></div><div class="skeleton skeleton-line" style="width:60px;"></div></div>
+        <div class="skeleton skeleton-line" style="width:75%;height:18px;margin-top:6px;"></div>
+        <div class="skeleton skeleton-line" style="width:100%;height:40px;"></div>
+        <div class="skeleton skeleton-line" style="width:40%;margin-top:auto;"></div>
+      </div>
     </div>
+    
+    <!-- Zone de pagination -->
+    <div id="paginationContainer" style="text-align:center;margin-top:24px;display:none;">
+      <button onclick="voirPlus()" class="btn-outline" style="max-width:200px;margin:0 auto;height:44px;font-size:13px;border-radius:100px;">
+        Voir plus d'alertes
+        <span class="material-symbols-outlined" style="font-size:18px;">expand_more</span>
+      </button>
+    </div>
+
     <div id="emptyState" style="display:none;text-align:center;padding:64px 20px;">
       <div style="width:72px;height:72px;background:#ffdad8;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
         <span class="material-symbols-outlined" style="font-size:32px;color:#840015;">notifications_none</span>
       </div>
       <p style="font-weight:700;font-size:16px;color:#1a1a1a;margin-bottom:6px;">Aucune alerte</p>
-      <p style="color:#5b403e;font-size:14px;">Soyez le premier à signaler un incident</p>
+      <p style="color:#5b403e;font-size:14px;">Aucun incident signalé dans ce quartier ou cette catégorie.</p>
     </div>
   </main>
 
+  <!-- Bouton d'action flottant -->
   <button class="fab" onclick="window.location.href='publier.html'" title="Publier une alerte">
     <span class="material-symbols-outlined" style="font-size:26px;color:white;">add_alert</span>
   </button>
 
+  <!-- Bouton Scroll To Top Smooth -->
+  <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="position:fixed;bottom:88px;left:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid #ddb8b6;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:99;transition:all .3s;">
+    <span class="material-symbols-outlined" style="color:#840015;font-size:22px;">arrow_upward</span>
+  </button>
+
   <nav class="bottom-nav">
     <a href="index.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">rss_feed</span><span>Alertes</span></a>
-    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
-    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
-    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">person</span><span>Profil</span></a>
+    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;">add_alert</span><span>Publier</span></a>
+    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;">analytics</span><span>Stats</span></a>
+    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;">person</span><span>Profil</span></a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="config.js"></script>
   <script>
-    let toutesAlertes = [], filtreActuel = 'tous';
+    let toutesAlertes = [];
+    let filtreCatActuel = 'tous';
+    let filtreQuartierActuel = 'tous';
+    let limit = 20; // 20 alertes par page
     const user = AB.requireAuth();
+    
     if (user) {
       const av = document.getElementById('headerAvatar');
       av.src = getPhotoUrl(user, 36);
       av.onerror = () => { av.src = genererAvatar(user.nom || 'U', 36); };
     }
 
-    function filtrer(btn, cat) {
+    // Charger les quartiers dynamiquement dans le sélecteur
+    const qSel = document.getElementById('filtreQuartier');
+    QUARTIERS.forEach(q => {
+      const o = document.createElement('option');
+      o.value = q;
+      o.textContent = q;
+      qSel.appendChild(o);
+    });
+
+    // Filtre quartier
+    function filtrerParQuartier(quartier) {
+      filtreQuartierActuel = quartier;
+      limit = 20; // Réinitialise la pagination
+      afficherAlertes();
+    }
+
+    // Filtre catégorie
+    function filtrerParCat(btn, cat) {
       document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      filtreActuel = cat;
+      filtreCatActuel = cat;
+      limit = 20; // Réinitialise la pagination
+      afficherAlertes();
+    }
+
+    // Pagination
+    function voirPlus() {
+      limit += 20;
       afficherAlertes();
     }
 
@@ -98,10 +200,17 @@
       const urg = URGENCES[a.urgence] || URGENCES.moyen;
       const urgClass = `urgence-${a.urgence || 'moyen'}`;
       const photoAuteur = getPhotoUrl({ photoUrl: a.photo_auteur, nom: a.auteur_nom }, 36);
+      
+      // Déterminer si l'alerte est nouvelle (moins de 10 min)
+      const ageMs = Date.now() - new Date(a.created_at).getTime();
+      const estNouvelle = ageMs < 10 * 60 * 1000;
+      const badgeNouvelle = estNouvelle ? `<span class="badge" style="background:#ba1a1a;color:#fff;margin-right:6px;font-size:9px;">NOUVELLE</span>` : '';
+
       return `
-      <div class="card card-anim ${urgClass}" style="animation-delay:${i*60}ms;">
+      <div class="card card-anim ${urgClass}" style="animation-delay:${(i%20)*40}ms;">
         <div style="padding:16px 16px 12px;">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+            ${badgeNouvelle}
             <span style="padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;background:${urg.bg};color:${urg.color};">${urg.label}</span>
             <span style="padding:3px 10px;border-radius:100px;font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};">${cat.label}</span>
             <span style="margin-left:auto;font-size:11px;color:#906f6d;">${tempsRelatif(a.created_at)}</span>
@@ -113,7 +222,10 @@
               <span class="material-symbols-outlined" style="font-size:14px;color:#840015;">location_on</span>
               ${escHtml(a.quartier || 'Bukavu')}
             </span>
-            <span>${a.nb_confirmations || 0} confirmation${(a.nb_confirmations||0)>1?'s':''}</span>
+            <span style="display:flex;align-items:center;gap:8px;">
+              <span>${a.nb_confirmations || 0} conf.</span>
+              <span style="color:#ba1a1a;font-weight:600;">${a.nb_signalements || 0} sig.</span>
+            </span>
           </div>
         </div>
         ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" class="alerte-img" alt="Photo alerte" loading="lazy" onerror="this.style.display='none'"/>` : ''}
@@ -126,7 +238,7 @@
           ${a.statut === 'resolue' ? '<span style="font-size:10px;font-weight:700;background:#E6FAF5;color:#00C48C;padding:3px 10px;border-radius:100px;">RÉSOLUE</span>' : ''}
         </div>
         <div style="border-top:1px solid #efecea;padding:10px 16px;display:flex;gap:10px;">
-          <button onclick="confirmer('${a.id}')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#E6FAF5;color:#00C48C;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;">
+          <button onclick="confirmer('${a.id}','${a.user_id}')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#E6FAF5;color:#00C48C;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;">
             <span class="material-symbols-outlined" style="font-size:15px;">check_circle</span>Confirmer
           </button>
           <button onclick="signalerFausse('${a.id}','${a.user_id}')" style="padding:9px 14px;border-radius:8px;border:none;background:#ffdad8;color:#840015;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;">
@@ -137,30 +249,68 @@
     }
 
     function afficherAlertes() {
-      const liste = filtreActuel === 'tous' ? toutesAlertes : toutesAlertes.filter(a => a.categorie === filtreActuel);
+      // Filtrer les alertes
+      let liste = toutesAlertes;
+      if (filtreCatActuel !== 'tous') {
+        liste = liste.filter(a => a.categorie === filtreCatActuel);
+      }
+      if (filtreQuartierActuel !== 'tous') {
+        liste = liste.filter(a => a.quartier === filtreQuartierActuel);
+      }
+
       const grid = document.getElementById('alertesGrid');
       const empty = document.getElementById('emptyState');
-      document.getElementById('compteurLabel').textContent = `${toutesAlertes.length} alerte${toutesAlertes.length>1?'s':''} active${toutesAlertes.length>1?'s':''}`;
-      if (!liste.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+      const pag = document.getElementById('paginationContainer');
+
+      document.getElementById('compteurLabel').textContent = `${liste.length} alerte${liste.length>1?'s':''} active${liste.length>1?'s':''}`;
+      
+      if (!liste.length) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        pag.style.display = 'none';
+        return;
+      }
+
       empty.style.display = 'none';
-      grid.innerHTML = liste.map(cardHTML).join('');
+      
+      // Appliquer la pagination sur la liste filtrée
+      const paginee = liste.slice(0, limit);
+      grid.innerHTML = paginee.map((a, idx) => cardHTML(a, idx)).join('');
+
+      // Afficher/Masquer le bouton voir plus
+      if (liste.length > limit) {
+        pag.style.display = 'block';
+      } else {
+        pag.style.display = 'none';
+      }
     }
 
-    async function chargerAlertes() {
+    async function chargerAlertes(silencieux = false) {
+      const ind = document.getElementById('refreshIndicator');
+      if (silencieux && ind) {
+        ind.style.display = 'inline-block';
+        ind.style.opacity = '1';
+      }
       try {
         const data = await AB.api('alertes');
         toutesAlertes = data.alertes || [];
         afficherAlertes();
       } catch(e) {
         document.getElementById('alertesGrid').innerHTML = '<p style="color:#906f6d;text-align:center;padding:32px;grid-column:1/-1;">Impossible de charger les alertes</p>';
+      } finally {
+        if (ind) {
+          ind.style.opacity = '0';
+          setTimeout(() => { ind.style.display = 'none'; }, 400);
+        }
       }
     }
 
-    async function confirmer(id) {
+    async function confirmer(id, auteurId) {
+      if (user && auteurId === user.id) { showToast('Vous ne pouvez pas confirmer votre propre alerte', 'warning'); return; }
       try {
         const data = await AB.api(`alertes/${id}/confirmer`, 'POST');
         showToast(data.message);
-        chargerAlertes();
+        chargerAlertes(true);
       } catch(e) { showToast(e.message, 'error'); }
     }
 
@@ -171,12 +321,25 @@
       try {
         const data = await AB.api(`alertes/${id}/signaler`, 'POST');
         showToast(data.message);
-        chargerAlertes();
+        chargerAlertes(true);
       } catch(e) { showToast(e.message, 'error'); }
     }
 
+    // Gestion du scroll pour le bouton scroll-to-top
+    window.addEventListener('scroll', () => {
+      const btn = document.getElementById('scrollToTopBtn');
+      if (window.scrollY > 300) {
+        btn.style.display = 'flex';
+      } else {
+        btn.style.display = 'none';
+      }
+    });
+
     chargerAlertes();
-    setInterval(chargerAlertes, 30000);
+    
+    // Auto-refresh automatique toutes les 30s avec indicateur visuel silencieux
+    setInterval(() => chargerAlertes(true), 30000);
+    
     afficherMenuAdmin();
   </script>
 </body>

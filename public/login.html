@@ -42,14 +42,14 @@
             <p>Informer. Protéger. Agir.</p>
           </div>
 
-          <form onsubmit="return false;">
+          <form onsubmit="login(); return false;">
             <div class="input-wrap">
               <input id="email" type="email" class="field-input" placeholder="Adresse email" autocomplete="email" />
               <span class="auth-icon mail" aria-hidden="true"></span>
             </div>
 
             <div class="input-wrap" style="margin-bottom:6px">
-              <input id="password" type="password" class="field-input" placeholder="Mot de passe" style="padding-right:48px" onkeydown="if(event.key==='Enter')login()" autocomplete="current-password" />
+              <input id="password" type="password" class="field-input" placeholder="Mot de passe" style="padding-right:48px" autocomplete="current-password" />
               <span class="auth-icon key" aria-hidden="true"></span>
               <button type="button" class="password-toggle" onclick="togglePwd()" aria-label="Afficher le mot de passe">
                 <span id="eyeIcon" aria-hidden="true"></span>
@@ -61,7 +61,7 @@
               <div class="h-captcha" data-sitekey="6b5a506e-395a-46d0-8bba-77941038b772" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
             </div>
 
-            <button type="button" id="btnLogin" class="btn-primary" onclick="login()" style="margin-top:4px">
+            <button type="submit" id="btnLogin" class="btn-primary" style="margin-top:4px">
               SE CONNECTER
               <span class="btn-arrow" aria-hidden="true"></span>
             </button>
@@ -90,6 +90,13 @@
       let captchaValidated = false;
       function onCaptchaSuccess(token) { captchaValidated = true; }
       function onCaptchaExpire() { captchaValidated = false; }
+
+      // Désactiver le captcha en local pour faciliter le développement
+      if (estLocal()) {
+        captchaValidated = true;
+        const wrap = document.querySelector('.captcha-wrap');
+        if (wrap) wrap.style.display = 'none';
+      }
 
       function togglePwd() {
         const i = document.getElementById('password'), ic = document.getElementById('eyeIcon');

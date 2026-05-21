@@ -52,6 +52,15 @@
 
   <main style="max-width:640px;margin:-32px auto 0;padding:0 16px;position:relative;z-index:1;">
 
+    <!-- Avertissement de compte si nb_fausses_alertes >= 2 -->
+    <div id="warningCompte" style="display:none;background:#ffdad8;border-left:4px solid #840015;border-radius:8px;padding:14px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start;">
+      <span class="material-symbols-outlined" style="color:#840015;font-size:20px;flex-shrink:0;">warning</span>
+      <div>
+        <p style="font-size:13px;color:#410006;font-weight:700;margin-bottom:4px;">Compte en sursis (Averti)</p>
+        <p id="warningCompteMsg" style="font-size:12px;color:#410006;line-height:1.5;">Attention, vous avez déjà cumulé des fausses alertes. À la 3ème fausse alerte, votre compte sera définitivement suspendu !</p>
+      </div>
+    </div>
+
     <!-- Stats mini -->
     <div style="display:flex;gap:12px;margin-bottom:14px;">
       <div class="stat-mini">
@@ -68,13 +77,50 @@
       </div>
     </div>
 
+    <!-- Modifier mon profil -->
+    <div class="section-card">
+      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">manage_accounts</span>
+        Modifier mes informations
+      </h2>
+      <p style="font-size:12px;color:#906f6d;margin-bottom:14px;">Mettez à jour vos informations publiques</p>
+      
+      <div style="margin-bottom:12px;">
+        <label class="field-label" style="font-size:12px;font-weight:700;color:#5b403e;display:block;margin-bottom:6px;">Nom complet *</label>
+        <input id="editNom" type="text" class="field-input no-icon" style="height:44px;font-size:14px;" placeholder="Ex: Jean Mukengere" />
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label class="field-label" style="font-size:12px;font-weight:700;color:#5b403e;display:block;margin-bottom:6px;">Quartier de résidence *</label>
+        <div style="position:relative;">
+          <select id="editQuartier" class="field-input no-icon" style="height:44px;font-size:14px;appearance:none;padding-right:36px;">
+            <option value="">Sélectionner votre quartier...</option>
+          </select>
+          <span class="material-symbols-outlined" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">expand_more</span>
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label class="field-label" style="font-size:12px;font-weight:700;color:#5b403e;display:block;margin-bottom:6px;">Numéro de téléphone * (9 chiffres)</label>
+        <div style="display:flex;align-items:center;position:relative;">
+          <span style="position:absolute;left:14px;font-size:14px;color:#906f6d;font-weight:600;">+243</span>
+          <input id="editTelephone" type="text" class="field-input no-icon" style="height:44px;font-size:14px;padding-left:55px;" placeholder="991234567" maxlength="9" />
+        </div>
+      </div>
+
+      <button onclick="mettreAJourProfil()" id="btnSaveProfil" class="btn-primary" style="height:44px;font-size:13px;width:100%;margin:0;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <span class="material-symbols-outlined" style="font-size:18px;">save</span>
+        Enregistrer les modifications
+      </button>
+    </div>
+
     <!-- Mes alertes -->
     <div class="section-card">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
         <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">history</span>
         Mes alertes récentes
       </h2>
-      <p style="font-size:12px;color:#906f6d;margin-bottom:14px;">Vos 10 dernières publications</p>
+      <p style="font-size:12px;color:#906f6d;margin-bottom:14px;">Vos 10 dernières publications (avec option de suppression)</p>
       <div id="mesAlertesList">
         <div class="skeleton" style="height:56px;margin-bottom:10px;border-radius:8px;"></div>
         <div class="skeleton" style="height:56px;margin-bottom:10px;border-radius:8px;"></div>
@@ -101,6 +147,13 @@
   <script>
     const user = AB.requireAuth();
 
+    // Remplir la sélection de quartiers dans le formulaire
+    QUARTIERS.forEach(q => {
+      const o = document.createElement('option');
+      o.value = q; o.textContent = q;
+      document.getElementById('editQuartier').appendChild(o);
+    });
+
     if (user) {
       document.getElementById('nomUser').textContent = user.nom || 'Utilisateur';
       document.getElementById('usernameUser').textContent = user.username ? '@' + user.username : '';
@@ -109,6 +162,67 @@
       const photo = document.getElementById('photoUser');
       photo.src = getPhotoUrl(user, 96);
       photo.onerror = () => { photo.src = genererAvatar(user.nom || 'U', 96); };
+
+      // Pré-remplir le formulaire de modification
+      document.getElementById('editNom').value = user.nom || '';
+      document.getElementById('editQuartier').value = user.quartier || '';
+      if (user.telephone) {
+        const cleaned = user.telephone.replace(/\D/g, '');
+        // Garder les 9 derniers chiffres si préfixe +243 présent
+        document.getElementById('editTelephone').value = cleaned.slice(-9);
+      }
+
+      // Gérer l'avertissement de fausses alertes
+      const nbFausses = user.nb_fausses_alertes || 0;
+      const warningCompte = document.getElementById('warningCompte');
+      if (nbFausses >= 2) {
+        warningCompte.style.display = 'flex';
+        document.getElementById('warningCompteMsg').textContent = `Attention, vous avez déjà cumulé ${nbFausses} fausses alertes. À la 3ème fausse alerte, votre compte sera définitivement suspendu !`;
+      } else {
+        warningCompte.style.display = 'none';
+      }
+    }
+
+    // Mettre à jour les informations du profil
+    async function mettreAJourProfil() {
+      const nom = document.getElementById('editNom').value.trim();
+      const quartier = document.getElementById('editQuartier').value;
+      const telephone = document.getElementById('editTelephone').value.trim();
+      const btn = document.getElementById('btnSaveProfil');
+
+      if (!nom) { showToast('Le nom complet est obligatoire.', 'error'); return; }
+      if (nom.length < 2 || nom.length > 100) { showToast('Le nom doit faire entre 2 et 100 caractères.', 'error'); return; }
+      if (!quartier) { showToast('Sélectionnez votre quartier.', 'error'); return; }
+      if (!telephone) { showToast('Le numéro de téléphone est obligatoire.', 'error'); return; }
+
+      const digits = telephone.replace(/\D/g, '');
+      if (digits.length !== 9) {
+        showToast('Le numéro de téléphone doit contenir exactement 9 chiffres (ex: 991234567).', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> &nbsp;Enregistrement...';
+
+      try {
+        const res = await AB.api('auth/profile', 'PUT', { nom, quartier, telephone: digits });
+        
+        // Mettre à jour l'utilisateur local
+        AB.saveUser(res.user);
+        if (res.token) {
+          localStorage.setItem('ab_token', res.token);
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">save</span> Enregistrer les modifications';
+        
+        await showAlert('Profil mis à jour !', 'Vos informations ont été modifiées avec succès.', 'success');
+        location.reload();
+      } catch (e) {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">save</span> Enregistrer les modifications';
+        showToast(e.message, 'error');
+      }
     }
 
     // Upload photo de profil
@@ -140,6 +254,28 @@
         showToast('Erreur : ' + e.message, 'error');
       }
       event.target.value = '';
+    }
+
+    // Supprimer une alerte
+    async function supprimerAlerte(id) {
+      const confirm = await showConfirm(
+        'Supprimer l\'alerte ?',
+        'Cette action est irréversible. L\'alerte sera définitivement retirée.',
+        'Oui, supprimer',
+        'warning'
+      );
+      if (!confirm.isConfirmed) return;
+      
+      try {
+        Swal.fire({ title: 'Suppression de l\'alerte...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+        await AB.api(`alertes/${id}`, 'DELETE');
+        Swal.close();
+        showToast('Alerte supprimée avec succès');
+        chargerMesAlertes();
+      } catch (e) {
+        Swal.close();
+        showToast('Erreur : ' + e.message, 'error');
+      }
     }
 
     // Charger mes alertes
@@ -175,9 +311,9 @@
           const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
           const urg = URGENCES[a.urgence] || URGENCES.moyen;
           const st = statutStyle(a.statut);
-          return `<div class="alerte-row">
-            <div style="width:10px;height:10px;border-radius:50%;background:${urg.color};margin-top:5px;flex-shrink:0;"></div>
-            <div style="flex:1;min-width:0;">
+          return `<div class="alerte-row" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+            <div style="width:10px;height:10px;border-radius:50%;background:${urg.color};margin-top:2px;flex-shrink:0;margin-right:12px;"></div>
+            <div style="flex:1;min-width:0;text-align:left;">
               <p style="font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(a.titre)}</p>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <span style="font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};padding:2px 8px;border-radius:4px;">${cat.label}</span>
@@ -185,7 +321,12 @@
                 <span style="font-size:11px;color:#906f6d;">${a.nb_confirmations || 0} confirmation${(a.nb_confirmations || 0) > 1 ? 's' : ''}</span>
               </div>
             </div>
-            <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;background:${st.bg};color:${st.color};white-space:nowrap;flex-shrink:0;">${st.label}</span>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:12px;">
+              <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;background:${st.bg};color:${st.color};white-space:nowrap;">${st.label}</span>
+              <button onclick="supprimerAlerte('${a.id}')" style="background:none;border:none;color:#840015;cursor:pointer;display:inline-flex;align-items:center;padding:4px;border-radius:4px;transition:background 0.2s;" title="Supprimer l'alerte" onmouseover="this.style.background='#ffdad8'" onmouseout="this.style.background='none'">
+                <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 0;">delete</span>
+              </button>
+            </div>
           </div>`;
         }).join('');
       } catch(e) {

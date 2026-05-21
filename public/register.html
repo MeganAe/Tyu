@@ -42,7 +42,7 @@
             <p style="font-size:13px;color:#5b403e">Rejoignez la communauté AlertBukavu</p>
           </div>
 
-          <form onsubmit="return false;">
+          <form onsubmit="register(); return false;">
 
             <div class="input-wrap">
               <input id="nom" type="text" class="field-input" placeholder="Nom complet" />
@@ -91,7 +91,7 @@
               <div class="h-captcha" data-sitekey="6b5a506e-395a-46d0-8bba-77941038b772" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
             </div>
 
-            <button type="button" id="btnReg" class="btn-primary" onclick="register()" style="margin-top:12px">
+            <button type="submit" id="btnReg" class="btn-primary" style="margin-top:12px">
               CRÉER MON COMPTE
               <span class="btn-arrow" aria-hidden="true"></span>
             </button>
@@ -113,6 +113,13 @@
       let captchaValidated = false;
       function onCaptchaSuccess(token) { captchaValidated = true; }
       function onCaptchaExpire() { captchaValidated = false; }
+
+      // Désactiver le captcha en local pour faciliter le développement
+      if (estLocal()) {
+        captchaValidated = true;
+        const wrap = document.querySelector('.captcha-wrap');
+        if (wrap) wrap.style.display = 'none';
+      }
 
       const sel = document.getElementById('quartier');
       QUARTIERS.forEach(q => { const o = document.createElement('option'); o.value = q; o.textContent = q; sel.appendChild(o); });

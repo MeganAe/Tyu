@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page introuvable — AlertBukavu</title>
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      html,body{min-height:100%;margin:0;overflow:hidden;}
+      .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 600,'GRAD' 0,'opsz' 24}
+      
+      .error-card {
+        padding: 40px 32px;
+        text-align: center;
+      }
+      
+      .error-icon-container {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 218, 216, 0.15);
+        border: 2px solid #840015;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 24px;
+        animation: pulse-icon 2.5s infinite;
+        box-shadow: 0 0 15px rgba(132, 0, 21, 0.2);
+      }
+      
+      @keyframes pulse-icon {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(132, 0, 21, 0.4); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(132, 0, 21, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(132, 0, 21, 0); }
+      }
+      
+      .error-code {
+        font-size: 80px;
+        font-weight: 800;
+        line-height: 1;
+        color: #ba1a1a;
+        margin-bottom: 12px;
+        letter-spacing: -0.02em;
+        text-shadow: 0 2px 10px rgba(186, 26, 26, 0.15);
+      }
+      
+      .error-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 12px;
+      }
+      
+      .error-desc {
+        font-size: 14px;
+        color: #5b403e;
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+      
+      .btn-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      @media (min-width: 480px) {
+        .btn-container {
+          flex-direction: row;
+        }
+        .btn-container > a, .btn-container > button {
+          flex: 1;
+        }
+      }
+    </style>
+  </head>
+  <body class="auth-page">
+
+    <div class="auth-bg">
+      <div class="bukavu-scene" aria-hidden="true">
+        <div class="sky-glow"></div>
+        <div class="lake-shine"></div>
+        <div class="hill hill-back"></div>
+        <div class="hill hill-front"></div>
+        <div class="city-lights"></div>
+      </div>
+      <div class="auth-overlay"></div>
+    </div>
+
+    <div class="auth-scroll" style="display:flex;align-items:center;justify-content:center;">
+      <div class="auth-shell" style="padding-top:0;padding-bottom:0;width:100%;max-width:440px;">
+        <div class="glass-card error-card">
+          
+          <div class="error-icon-container">
+            <span class="material-symbols-outlined" style="color:#840015;font-size:38px;">wrong_location</span>
+          </div>
+
+          <div class="error-code">404</div>
+          <h1 class="error-title">Destination introuvable</h1>
+          <p class="error-desc">
+            Oups ! La colline ou le quartier que vous cherchez n'existe pas ou la page a été déplacée sur notre réseau communautaire de Bukavu.
+          </p>
+
+          <div class="btn-container">
+            <button id="btnBack" onclick="history.back()" class="btn-secondary" style="margin-top:0;height:48px;justify-content:center;font-weight:700;">
+              Retour
+            </button>
+            <a id="btnHome" href="index.html" class="btn-primary" style="height:48px;display:flex;align-items:center;justify-content:center;font-weight:700;text-decoration:none;letter-spacing:0.03em;">
+              ACCUEIL
+            </a>
+          </div>
+        </div>
+
+        <p class="auth-footer" style="margin-top:20px;">AlertBukavu • Signaler et protéger • RDC</p>
+      </div>
+    </div>
+  </body>
+</html>
