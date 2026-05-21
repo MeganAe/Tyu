@@ -181,7 +181,7 @@
         const username = document.getElementById('username').value.trim().toLowerCase();
         const email = document.getElementById('email').value.trim();
         const telRaw = document.getElementById('telephone').value.trim();
-        const telephone = telRaw ? '+243' + telRaw.replace(/\D/g, '') : '';
+        const telephone = telRaw.replace(/\D/g, '');
         const quartier = document.getElementById('quartier').value;
         const password = document.getElementById('password').value;
         const btn = document.getElementById('btnReg');
@@ -189,7 +189,8 @@
         if (!nom) { showToast('Le nom est requis', 'error'); return; }
         if (!username || !/^[a-zA-Z0-9_]{3,20}$/.test(username)) { showToast("Nom d'utilisateur invalide (3-20 car., lettres/chiffres/_)", 'error'); return; }
         if (!email) { showToast("L'email est requis", 'error'); return; }
-        if (!telRaw) { showToast('Le numéro de téléphone est requis', 'error'); return; }
+        if (!telephone) { showToast('Le numéro de téléphone est requis', 'error'); return; }
+        if (telephone.length !== 9) { showToast('Le numéro de téléphone doit contenir exactement 9 chiffres', 'error'); return; }
         if (!quartier) { showToast('Choisissez votre quartier', 'error'); return; }
         if (password.length < 8) { showToast('Mot de passe trop court (min. 8 car.)', 'error'); return; }
         if (!captchaValidated) { showToast('Veuillez valider le captcha', 'error'); return; }

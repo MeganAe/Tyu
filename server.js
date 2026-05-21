@@ -216,7 +216,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
       return res.status(400).json({ error: "L'adresse email n'est pas valide" });
     }
     
-    const digits = String(telephone).replace(/\D/g, '');
+    const digits = String(telephone).replace(/\D/g, '').replace(/^243(?=\d{9}$)/, '');
     if (digits.length !== 9) {
       return res.status(400).json({ error: 'Le numéro de téléphone doit contenir exactement 9 chiffres' });
     }
