@@ -38,12 +38,12 @@
   <!-- Hero avec photo -->
   <section class="hero-section" style="padding:24px 20px 56px;text-align:center;">
     <div class="profile-photo-wrap">
-      <img id="photoUser" class="profile-photo" src="" alt="Photo de profil"/>
-      <label for="photoInput" class="photo-edit-btn" title="Changer la photo">
+      <img id="photoUser" class="profile-photo" src="" alt="Photo de profil" style="cursor:pointer;" onclick="document.getElementById('photoInput').click()"/>
+      <div class="photo-edit-btn" title="Changer la photo" onclick="document.getElementById('photoInput').click()">
         <span class="material-symbols-outlined">photo_camera</span>
-      </label>
-      <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="changerPhoto(event)"/>
+      </div>
     </div>
+    <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="changerPhoto(event)"/>
     <h2 id="nomUser" style="font-size:20px;font-weight:800;color:white;margin-bottom:2px;"></h2>
     <p id="usernameUser" style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:6px;"></p>
     <p id="emailUser" style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:10px;"></p>

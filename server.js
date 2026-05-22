@@ -901,6 +901,9 @@ app.get('/api/admin/users', verifyToken, requireAdmin, async (req, res) => {
 
 // Bloquer / Débloquer
 app.put('/api/admin/users/:id/bloquer', verifyToken, requireAdmin, async (req, res) => {
+  if (req.params.id === req.user.id) {
+    return res.status(400).json({ error: 'Vous ne pouvez pas vous bloquer vous-même' });
+  }
   const { est_bloque } = req.body;
   try {
     const { error } = await dbQuery(
@@ -923,6 +926,30 @@ app.put('/api/admin/users/:id/promouvoir', verifyToken, requireAdmin, async (req
     return res.json({ message: 'Utilisateur promu au rôle Administrateur avec succès' });
   } catch (err) {
     return handleError(res, err, 'Erreur de promotion');
+  }
+});
+
+// Supprimer un utilisateur (admin)
+app.delete('/api/admin/users/:id', verifyToken, requireAdmin, async (req, res) => {
+  if (req.params.id === req.user.id) {
+    return res.status(400).json({ error: 'Vous ne pouvez pas vous supprimer vous-même' });
+  }
+  const userId = req.params.id;
+  try {
+    // 1. Supprimer les confirmations faites par cet utilisateur
+    await dbQuery(supabase.from('confirmations').delete().eq('user_id', userId));
+    // 2. Supprimer les signalements faits par cet utilisateur
+    await dbQuery(supabase.from('signalements').delete().eq('user_id', userId));
+    // 3. Supprimer les alertes de cet utilisateur (supprimera aussi en cascade les confirmations et signalements de ces alertes)
+    await dbQuery(supabase.from('alertes').delete().eq('user_id', userId));
+    // 4. Supprimer l'utilisateur lui-même
+    const { error } = await dbQuery(
+      supabase.from('users').delete().eq('id', userId)
+    );
+    if (error) throw error;
+    return res.json({ message: 'Utilisateur supprimé avec succès' });
+  } catch (err) {
+    return handleError(res, err, 'Erreur de suppression de l\'utilisateur');
   }
 });
 

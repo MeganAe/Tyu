@@ -200,6 +200,9 @@ function renderAlerte(a, showSignal = false) {
       ${canNotify ? `<button onclick="notifierHabitants('${a.id}', '${escHtml(a.titre)}')" style="padding:8px 14px;background:#E6F5FF;color:#008cff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:4px;">
         <span class="material-symbols-outlined" style="font-size:14px;">campaign</span> Notifier quartier
       </button>` : ''}
+      <button onclick="supprimerAlerteAdmin('${a.id}')" style="padding:8px 14px;background:#ffdad8;color:#840015;border:1px solid #840015;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:14px;">delete</span> Supprimer
+      </button>
     </div>
   </div>`;
 }
@@ -264,8 +267,12 @@ async function chargerUsers() {
   try {
     const data = await AB.api('admin/users');
     const users = data.users || [];
+    const userSession = AB.getUser();
+    
     document.getElementById('listUsers').innerHTML = users.length ? users.map(u => {
       const photoSrc = u.photo_url ? u.photo_url : genererAvatar(u.nom||'U', 44);
+      const isSelf = userSession && userSession.id === u.id;
+      
       return `
       <div style="background:white;border-radius:12px;border:1px solid #e4bdbb;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left;">
         <img src="${photoSrc}" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;object-fit:cover;" onerror="this.src='${genererAvatar(u.nom||'U', 44)}'"/>
@@ -275,14 +282,21 @@ async function chargerUsers() {
           <p style="font-size:11px;color:#5b403e;">Compte créé le : ${new Date(u.created_at).toLocaleDateString('fr-FR')} • Fausses : <b>${u.nb_fausses_alertes || 0}</b> • Publications : <b>${u.nb_alertes || 0}</b></p>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
-          ${u.role !== 'admin' ? `
-            <button onclick="promouvoirAdmin('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:white;color:#00C48C;border:1.5px solid #00C48C;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;" onmouseover="this.style.background='#E6FAF5'" onmouseout="this.style.background='white'">
-              Promouvoir admin
+          ${isSelf ? `
+            <span style="font-size:11px;font-weight:700;padding:6px 12px;background:#f5e2e1;color:#840015;border-radius:8px;">Vous</span>
+          ` : `
+            ${u.role !== 'admin' ? `
+              <button onclick="promouvoirAdmin('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:white;color:#00C48C;border:1.5px solid #00C48C;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;" onmouseover="this.style.background='#E6FAF5'" onmouseout="this.style.background='white'">
+                Promouvoir admin
+              </button>
+            ` : ''}
+            <button onclick="toggleBlock('${u.id}',${!u.est_bloque})" style="padding:6px 12px;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;background:${u.est_bloque?'#E6FAF5':'#ffdad8'};color:${u.est_bloque?'#00C48C':'#840015'};">
+              ${u.est_bloque ? 'Débloquer' : 'Bloquer'}
             </button>
-          ` : ''}
-          <button onclick="toggleBlock('${u.id}',${!u.est_bloque})" style="padding:6px 12px;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;background:${u.est_bloque?'#E6FAF5':'#ffdad8'};color:${u.est_bloque?'#00C48C':'#840015'};">
-            ${u.est_bloque ? 'Débloquer' : 'Bloquer'}
-          </button>
+            <button onclick="supprimerUtilisateur('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:#ffdad8;color:#840015;border:1px solid #840015;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+              Supprimer
+            </button>
+          `}
         </div>
       </div>`;
     }).join('')
@@ -323,6 +337,48 @@ async function toggleBlock(id, bloquer) {
     showToast(bloquer ? 'Utilisateur bloqué' : 'Utilisateur débloqué');
     chargerUsers();
   } catch(e) { showToast(e.message, 'error'); }
+}
+
+async function supprimerAlerteAdmin(id) {
+  const confirm = await showConfirm(
+    'Supprimer l\'alerte ?',
+    'Cette action retirera définitivement l\'alerte pour tout le monde.',
+    'Oui, supprimer',
+    'warning'
+  );
+  if (!confirm.isConfirmed) return;
+  try {
+    Swal.fire({ title: 'Suppression...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+    await AB.api(`alertes/${id}`, 'DELETE');
+    Swal.close();
+    showToast('Alerte supprimée avec succès');
+    chargerSignalees();
+    chargerActiveCounter();
+    if (document.getElementById('tabToutes').style.display !== 'none') chargerToutes();
+  } catch(e) {
+    Swal.close();
+    showToast(e.message, 'error');
+  }
+}
+
+async function supprimerUtilisateur(id, nom) {
+  const confirm = await showConfirm(
+    'Supprimer l\'utilisateur ?',
+    `Voulez-vous vraiment supprimer définitivement le compte de ${nom} ainsi que toutes ses publications ? Cette action est irréversible.`,
+    'Oui, supprimer',
+    'warning'
+  );
+  if (!confirm.isConfirmed) return;
+  try {
+    Swal.fire({ title: 'Suppression...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+    await AB.api(`admin/users/${id}`, 'DELETE');
+    Swal.close();
+    showToast(`Utilisateur ${nom} supprimé avec succès`);
+    chargerUsers();
+  } catch(e) {
+    Swal.close();
+    showToast(e.message, 'error');
+  }
 }
 
 async function chargerStatistiquesOnglet() {
