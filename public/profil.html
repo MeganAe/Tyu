@@ -13,7 +13,7 @@
     body{padding-bottom:80px;}
 
     /* Photo de profil */
-    .profile-photo-wrap{position:relative;display:inline-block;margin-bottom:14px;}
+    .profile-photo-wrap{position:relative;display:inline-block;margin-bottom:14px;z-index:2;}
     .profile-photo{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 4px 20px rgba(0,0,0,.25);display:block;}
     .photo-edit-btn{position:absolute;bottom:2px;right:2px;width:30px;height:30px;background:#840015;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .2s;}
     .photo-edit-btn:hover{transform:scale(1.1);}
@@ -37,12 +37,12 @@
 
   <!-- Hero avec photo -->
   <section class="hero-section" style="padding:24px 20px 56px;text-align:center;">
-    <div class="profile-photo-wrap">
-      <img id="photoUser" class="profile-photo" src="" alt="Photo de profil" style="cursor:pointer;" onclick="document.getElementById('photoInput').click()"/>
-      <div class="photo-edit-btn" title="Changer la photo" onclick="document.getElementById('photoInput').click()">
+    <label for="photoInput" class="profile-photo-wrap" style="cursor:pointer; display:inline-block; position:relative; z-index:2;">
+      <img id="photoUser" class="profile-photo" src="" alt="Photo de profil"/>
+      <div class="photo-edit-btn" title="Changer la photo">
         <span class="material-symbols-outlined">photo_camera</span>
       </div>
-    </div>
+    </label>
     <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="changerPhoto(event)"/>
     <h2 id="nomUser" style="font-size:20px;font-weight:800;color:white;margin-bottom:2px;"></h2>
     <p id="usernameUser" style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:6px;"></p>
