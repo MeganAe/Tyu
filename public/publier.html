@@ -139,7 +139,7 @@
 
     <!-- hCaptcha Manquant Intégré -->
     <div class="captcha-wrap" style="display:flex;justify-content:center;margin-bottom:16px;">
-      <div class="h-captcha" data-sitekey="6b5a506e-395a-46d0-8bba-77941038b772" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
+      <div class="h-captcha" data-sitekey="10000000-ffff-ffff-ffff-000000000001" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
     </div>
 
     <!-- Avertissement -->
@@ -195,10 +195,6 @@
     // Désactiver le captcha sur localhost pour faciliter le développement local
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       captchaValidated = true;
-      window.addEventListener('DOMContentLoaded', () => {
-        const wrap = document.querySelector('.captcha-wrap');
-        if (wrap) wrap.style.display = 'none';
-      });
     }
     
     let catChoisie = '', urgChoisie = 'moyen', userLat = null, userLng = null, photoFile = null;
