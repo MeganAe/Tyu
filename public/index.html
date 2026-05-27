@@ -95,7 +95,7 @@
   </section>
 
   <!-- Filtres (Catégorie + Quartier en un seul bloc sticky) -->
-  <div style="position:sticky;top:60px;z-index:30;background:rgba(255,255,255,.93);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #ddb8b6;box-shadow:0 2px 10px rgba(132,0,21,.05);padding:12px 16px;">
+  <div class="filter-bar-sticky" style="position:sticky;top:60px;z-index:30;background:rgba(255,255,255,.93);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #ddb8b6;box-shadow:0 2px 10px rgba(132,0,21,.05);padding:12px 16px;">
     <div style="display:flex;gap:10px;align-items:center;overflow-x:auto;" class="no-scrollbar">
       
       <!-- Sélecteur de quartier moderne -->
@@ -543,8 +543,13 @@
         overlay.style.opacity = '1';
         notifsOpen = true;
         
-        // Effacer le compteur immédiatement
-        localStorage.setItem('ab_last_read_notifs', new Date().toISOString());
+        // Effacer le compteur immédiatement (en prenant la date maximale pour pallier la dérive d'horloge)
+        let maxTime = Date.now();
+        if (toutesAlertes && toutesAlertes.length > 0) {
+          const times = toutesAlertes.map(a => new Date(a.created_at).getTime());
+          maxTime = Math.max(...times, maxTime);
+        }
+        localStorage.setItem('ab_last_read_notifs', new Date(maxTime).toISOString());
         const badge = document.getElementById('notifBadge');
         if (badge) badge.style.display = 'none';
         
