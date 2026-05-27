@@ -274,3 +274,86 @@ function afficherMenuAdmin() {
   link.innerHTML = `<span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">admin_panel_settings</span><span>Admin</span>`;
   nav.appendChild(link);
 }
+
+// ---- Injection automatique de la sidebar PC ----
+document.addEventListener('DOMContentLoaded', () => {
+  const bottomNav = document.querySelector('.bottom-nav');
+  if (bottomNav) {
+    const user = AB.getUser();
+    
+    // Create sidebar
+    const sidebar = document.createElement('div');
+    sidebar.className = 'sidebar-nav';
+    
+    const isAdmin = AB.isAdmin();
+    const path = window.location.pathname;
+    const isIndex = path.includes('index.html') || path.endsWith('/');
+    const isPublier = path.includes('publier.html');
+    const isStats = path.includes('stats.html');
+    const isProfil = path.includes('profil.html');
+    const isAdminPage = path.includes('admin.html');
+    
+    const avatarUrl = user ? getPhotoUrl(user, 42) : '';
+    const avatarFallback = user ? genererAvatar(user.nom || 'U', 42) : '';
+    
+    sidebar.innerHTML = `
+      <div class="sidebar-logo">
+        <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
+        <h1>AlertBukavu</h1>
+      </div>
+      <div class="sidebar-menu">
+        <a href="index.html" class="sidebar-item ${isIndex ? 'active' : ''}">
+          <span class="material-symbols-outlined">rss_feed</span>
+          <span>Alertes</span>
+        </a>
+        <a href="publier.html" class="sidebar-item ${isPublier ? 'active' : ''}">
+          <span class="material-symbols-outlined">add_alert</span>
+          <span>Publier</span>
+        </a>
+        <a href="stats.html" class="sidebar-item ${isStats ? 'active' : ''}">
+          <span class="material-symbols-outlined">analytics</span>
+          <span>Stats</span>
+        </a>
+        <a href="profil.html" class="sidebar-item ${isProfil ? 'active' : ''}">
+          <span class="material-symbols-outlined">person</span>
+          <span>Profil</span>
+        </a>
+        ${isAdmin ? `
+        <a href="admin.html" class="sidebar-item ${isAdminPage ? 'active' : ''}">
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+          <span>Admin</span>
+        </a>
+        ` : ''}
+      </div>
+      ${user ? `
+      <div class="sidebar-footer">
+        <div class="sidebar-user" onclick="window.location.href='profil.html'">
+          <img src="${avatarUrl}" alt="Avatar" onerror="this.src='${avatarFallback}'">
+          <div class="sidebar-user-info">
+            <h3>${escHtml(user.nom)}</h3>
+            <p>${escHtml(user.username ? '@' + user.username : user.quartier || 'Citoyen')}</p>
+          </div>
+        </div>
+        <button onclick="AB.logout()" class="btn-sidebar-logout">
+          <span class="material-symbols-outlined" style="font-size:18px;">logout</span>
+          <span>Déconnexion</span>
+        </button>
+      </div>
+      ` : ''}
+    `;
+    
+    // Wrap other body children in .main-layout container
+    const wrapper = document.createElement('div');
+    wrapper.className = 'main-layout';
+    
+    // Move all current body children to the wrapper
+    while (document.body.firstChild) {
+      wrapper.appendChild(document.body.firstChild);
+    }
+    
+    // Append sidebar and wrapper to body
+    document.body.appendChild(sidebar);
+    document.body.appendChild(wrapper);
+  }
+});
+
