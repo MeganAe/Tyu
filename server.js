@@ -422,6 +422,53 @@ app.put('/api/auth/profile', verifyToken, async (req, res) => {
   }
 });
 
+// Données fraîches de l'utilisateur connecté
+app.get('/api/auth/me', verifyToken, async (req, res) => {
+  try {
+    const { data: user, error } = await dbQuery(
+      supabase.from('users').select('id, nom, username, email, role, quartier, photo_url, nb_fausses_alertes, est_bloque, notifs_last_read').eq('id', req.user.id).maybeSingle()
+    );
+    if (error || !user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+    return res.json({ user });
+  } catch (err) {
+    return handleError(res, err, 'Erreur lors de la récupération du profil');
+  }
+});
+
+// Récupérer le timestamp de dernière lecture des notifications
+app.get('/api/auth/notifications/read-at', verifyToken, async (req, res) => {
+  try {
+    const { data: user, error } = await dbQuery(
+      supabase.from('users').select('notifs_last_read').eq('id', req.user.id).maybeSingle()
+    );
+    if (error || !user) return res.json({ readAt: null });
+    return res.json({ readAt: user.notifs_last_read || null });
+  } catch (err) {
+    // Si la colonne n'existe pas encore, retourner null sans crasher
+    console.warn('notifs_last_read column may not exist yet:', err.message);
+    return res.json({ readAt: null });
+  }
+});
+
+// Marquer les notifications comme lues (persistant en base)
+app.put('/api/auth/notifications/mark-read', verifyToken, async (req, res) => {
+  try {
+    const now = new Date().toISOString();
+    const { error } = await dbQuery(
+      supabase.from('users').update({ notifs_last_read: now }).eq('id', req.user.id)
+    );
+    if (error) {
+      // Si la colonne n'existe pas encore dans Supabase, on log mais on ne bloque pas
+      console.warn('Could not update notifs_last_read (column may not exist):', error.message);
+      return res.json({ readAt: now, warning: 'Column notifs_last_read not found in DB, add it in Supabase.' });
+    }
+    return res.json({ readAt: now });
+  } catch (err) {
+    console.warn('mark-read error (non-blocking):', err.message);
+    return res.json({ readAt: new Date().toISOString() });
+  }
+});
+
 // Mot de passe oublié (Email réinitialisation sécurisé)
 app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;

@@ -183,6 +183,44 @@
       }
     }
 
+    // Rafraîchir les données depuis le serveur (notamment photo_url) pour être toujours à jour
+    async function rafraichirProfilDepuisServeur() {
+      try {
+        const data = await AB.api('auth/me');
+        if (!data || !data.user) return;
+        const freshUser = data.user;
+        AB.saveUser({ ...user, ...freshUser });
+
+        // Mettre à jour l'interface avec les données fraîches
+        document.getElementById('nomUser').textContent = freshUser.nom || 'Utilisateur';
+        document.getElementById('usernameUser').textContent = freshUser.username ? '@' + freshUser.username : '';
+        document.getElementById('quartierBadge').textContent = freshUser.quartier || 'Bukavu';
+        document.getElementById('editNom').value = freshUser.nom || '';
+        document.getElementById('editQuartier').value = freshUser.quartier || '';
+
+        // Mettre à jour la photo avec la vraie URL depuis Supabase
+        const photo = document.getElementById('photoUser');
+        if (freshUser.photo_url) {
+          photo.src = freshUser.photo_url;
+          photo.onerror = () => { photo.src = genererAvatar(freshUser.nom || 'U', 96); };
+        }
+
+        // Avertissement fausses alertes
+        const nbFausses = freshUser.nb_fausses_alertes || 0;
+        const warningCompte = document.getElementById('warningCompte');
+        if (nbFausses >= 2) {
+          warningCompte.style.display = 'flex';
+          document.getElementById('warningCompteMsg').textContent = `Attention, vous avez déjà cumulé ${nbFausses} fausses alertes. À la 3ème fausse alerte, votre compte sera définitivement suspendu !`;
+        } else {
+          warningCompte.style.display = 'none';
+        }
+      } catch(e) {
+        // Non-bloquant : les données du localStorage sont déjà affichées
+        console.warn('Impossible de rafraîchir le profil depuis le serveur:', e.message);
+      }
+    }
+    rafraichirProfilDepuisServeur();
+
     // Mettre à jour les informations du profil
     async function mettreAJourProfil() {
       const nom = document.getElementById('editNom').value.trim();

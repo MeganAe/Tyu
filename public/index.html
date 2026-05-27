@@ -50,7 +50,7 @@
     }
   </script>
 
-  <header class="top-bar" style="position:relative;">
+  <header class="top-bar">
     <div id="headerDefaultContent" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
       <div style="display:flex;align-items:center;gap:10px;">
         <img src="logo.png" alt="Logo" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'"/>
@@ -195,6 +195,23 @@
     let limit = 20; // 20 alertes par page
     const user = AB.requireAuth();
     
+    // Timestamp de dernière lecture (depuis le serveur pour multi-navigateur)
+    let serverLastReadTime = 0;
+    async function chargerLastReadDepuisServeur() {
+      try {
+        const data = await AB.api('auth/notifications/read-at');
+        if (data && data.readAt) {
+          serverLastReadTime = new Date(data.readAt).getTime();
+          // Synchroniser localStorage avec la valeur serveur
+          localStorage.setItem('ab_last_read_notifs', data.readAt);
+        }
+      } catch(e) {
+        // Fallback sur localStorage si le serveur est indisponible
+        const local = localStorage.getItem('ab_last_read_notifs');
+        if (local) serverLastReadTime = new Date(local).getTime();
+      }
+    }
+    
     if (user) {
       const av = document.getElementById('headerAvatar');
       av.src = getPhotoUrl(user, 36);
@@ -299,8 +316,8 @@
 
     function calculerNotificationsNonLues(alertes) {
       if (!user) return;
-      const lastReadStr = localStorage.getItem('ab_last_read_notifs');
-      const lastRead = lastReadStr ? new Date(lastReadStr).getTime() : 0;
+      // Utiliser le timestamp serveur en priorité (multi-navigateur)
+      const lastRead = serverLastReadTime || 0;
       
       const quartierUser = user.quartier || '';
       const nonLues = alertes.filter(a => {
@@ -419,7 +436,8 @@
       }
     });
 
-    chargerAlertes();
+    // Charger d'abord le timestamp serveur, puis les alertes
+    chargerLastReadDepuisServeur().then(() => chargerAlertes());
     
     // Auto-refresh automatique toutes les 30s avec indicateur visuel silencieux
     setInterval(() => chargerAlertes(true), 30000);
@@ -549,9 +567,13 @@
           const times = toutesAlertes.map(a => new Date(a.created_at).getTime());
           maxTime = Math.max(...times, maxTime);
         }
-        localStorage.setItem('ab_last_read_notifs', new Date(maxTime).toISOString());
+        const nowStr = new Date(maxTime).toISOString();
+        localStorage.setItem('ab_last_read_notifs', nowStr);
+        serverLastReadTime = maxTime;
         const badge = document.getElementById('notifBadge');
         if (badge) badge.style.display = 'none';
+        // Persister en base (multi-navigateur)
+        AB.api('auth/notifications/mark-read', 'PUT').catch(() => {});
         
         // Charger les notifications dans le tiroir
         chargerNotificationsDrawer();

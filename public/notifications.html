@@ -110,12 +110,31 @@
   <script>
     const user = AB.requireAuth();
     
-    // Obtenir le timestamp du dernier marquage comme lu AVANT de mettre à jour
-    const lastReadStr = localStorage.getItem('ab_last_read_notifs');
-    const lastReadTime = lastReadStr ? new Date(lastReadStr).getTime() : 0;
+    // Timestamp de dernière lecture depuis le serveur (multi-navigateur)
+    // On garde l'ancien localStorage comme fallback immédiat
+    let lastReadTime = 0;
+    const localReadStr = localStorage.getItem('ab_last_read_notifs');
+    if (localReadStr) lastReadTime = new Date(localReadStr).getTime();
 
-    // Mettre à jour immédiatement pour effacer le badge
-    localStorage.setItem('ab_last_read_notifs', new Date().toISOString());
+    // Charger le vrai timestamp depuis le serveur, puis marquer comme lu
+    async function initialiserTimestamp() {
+      try {
+        const data = await AB.api('auth/notifications/read-at');
+        if (data && data.readAt) {
+          // Utiliser le max entre local et serveur
+          const serverTime = new Date(data.readAt).getTime();
+          lastReadTime = Math.max(lastReadTime, serverTime);
+        }
+      } catch(e) { /* fallback localStorage déjà chargé */ }
+      
+      // Mettre à jour le timestamp (les notifs actuelle seront considérées comme lues)
+      const now = new Date().toISOString();
+      localStorage.setItem('ab_last_read_notifs', now);
+      try {
+        await AB.api('auth/notifications/mark-read', 'PUT');
+      } catch(e) { /* non-bloquant */ }
+    }
+    initialiserTimestamp();
 
     if (user) {
       const qUser = user.quartier || 'votre quartier';
