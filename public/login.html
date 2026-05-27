@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://www.hCaptcha.com/1/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <link rel="stylesheet" href="style.css" />
     <style>
       html,body{min-height:100%;margin:0}
@@ -56,9 +56,9 @@
               </button>
             </div>
 
-            <!-- hCaptcha -->
+            <!-- reCAPTCHA v2 -->
             <div class="captcha-wrap" style="margin-bottom:12px">
-              <div class="h-captcha" data-sitekey="6b5a506e-395a-46d0-8bba-77941038b772" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
+              <div class="g-recaptcha" data-sitekey="6LfCfv8sAAAAAG-VWFp1wMrXch6hSxVS7JsRJh05" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
             </div>
 
             <button type="submit" id="btnLogin" class="btn-primary" style="margin-top:4px">
@@ -113,13 +113,14 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span>&nbsp;Connexion...';
         try {
-          const data = await AB.api('auth/login', 'POST', { email, password });
+          const recaptchaToken = estLocal() ? '' : grecaptcha.getResponse();
+          const data = await AB.api('auth/login', 'POST', { email, password, recaptchaToken });
           AB.saveToken(data.token);
           AB.saveUser(data.user);
           window.location.href = 'index.html';
         } catch(e) {
           showToast(e.message, 'error');
-          if (typeof hcaptcha !== 'undefined') { hcaptcha.reset(); captchaValidated = false; }
+          if (typeof grecaptcha !== 'undefined') { grecaptcha.reset(); captchaValidated = false; }
           btn.disabled = false;
           btn.innerHTML = 'SE CONNECTER <span class="btn-arrow" aria-hidden="true"></span>';
         }

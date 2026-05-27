@@ -12,7 +12,7 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-  <script src="https://www.hCaptcha.com/1/api.js" async defer></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <link rel="stylesheet" href="style.css"/>
   <style>
     .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
@@ -137,9 +137,9 @@
       </div>
     </div>
 
-    <!-- hCaptcha Manquant Intégré -->
+    <!-- reCAPTCHA v2 Intégré -->
     <div class="captcha-wrap" style="display:flex;justify-content:center;margin-bottom:16px;">
-      <div class="h-captcha" data-sitekey="10000000-ffff-ffff-ffff-000000000001" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
+      <div class="g-recaptcha" data-sitekey="6LfCfv8sAAAAAG-VWFp1wMrXch6hSxVS7JsRJh05" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
     </div>
 
     <!-- Avertissement -->
@@ -382,10 +382,12 @@
           Swal.close();
         }
 
+        const recaptchaToken = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : grecaptcha.getResponse();
         await AB.api('alertes', 'POST', {
           titre, categorie: catChoisie, quartier,
           urgence: urgChoisie, description,
-          lat: userLat, lng: userLng, photo_url
+          lat: userLat, lng: userLng, photo_url,
+          recaptchaToken
         });
 
         await showAlert('Alerte publiée !', 'Votre alerte a été envoyée à la communauté et aux autorités.', 'success');
@@ -393,7 +395,7 @@
       } catch(e) {
         Swal.close();
         showToast(e.message, 'error');
-        if (typeof hcaptcha !== 'undefined') { hcaptcha.reset(); captchaValidated = false; }
+        if (typeof grecaptcha !== 'undefined') { grecaptcha.reset(); captchaValidated = false; }
         btn.disabled = false;
         btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span> PUBLIER L\'ALERTE';
       }

@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://www.hCaptcha.com/1/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <link rel="stylesheet" href="style.css" />
     <style>
       html,body{min-height:100%;margin:0}
@@ -86,9 +86,9 @@
               <div id="pwdFill" style="height:100%;width:0%;border-radius:2px;transition:all .3s"></div>
             </div>
 
-            <!-- hCaptcha -->
+            <!-- reCAPTCHA v2 -->
             <div class="captcha-wrap">
-              <div class="h-captcha" data-sitekey="6b5a506e-395a-46d0-8bba-77941038b772" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
+              <div class="g-recaptcha" data-sitekey="6LfCfv8sAAAAAG-VWFp1wMrXch6hSxVS7JsRJh05" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
             </div>
 
             <button type="submit" id="btnReg" class="btn-primary" style="margin-top:12px">
@@ -197,7 +197,8 @@
         btn.innerHTML = '<span class="spinner"></span>&nbsp;Création...';
 
         try {
-          const data = await AB.api('auth/register', 'POST', { nom, username, email, telephone, quartier, password });
+          const recaptchaToken = estLocal() ? '' : grecaptcha.getResponse();
+          const data = await AB.api('auth/register', 'POST', { nom, username, email, telephone, quartier, password, recaptchaToken });
           AB.saveToken(data.token);
           AB.saveUser(data.user);
           await Swal.fire({ icon: 'success', title: 'Compte créé !', text: `Bienvenue sur AlertBukavu, @${username} !`, confirmButtonColor: '#840015', confirmButtonText: 'Commencer' });
@@ -205,7 +206,7 @@
         } catch(e) {
           btn.disabled = false;
           btn.innerHTML = 'CRÉER MON COMPTE <span class="btn-arrow" aria-hidden="true"></span>';
-          if (typeof hcaptcha !== 'undefined') { hcaptcha.reset(); captchaValidated = false; }
+          if (typeof grecaptcha !== 'undefined') { grecaptcha.reset(); captchaValidated = false; }
           showToast(e.message, 'error');
         }
       }

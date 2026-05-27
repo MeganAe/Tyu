@@ -17,17 +17,17 @@ const PORT = process.env.PORT || 3000;
 app.use(compression());
 app.use(morgan('dev'));
 
-// Configurer Helmet de manière sécurisée tout en autorisant Google Maps, hCaptcha et Google Fonts
+// Configurer Helmet de manière sécurisée tout en autorisant Google Maps, hCaptcha, Google reCAPTCHA et Google Fonts
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.hcaptcha.com", "https://*.hcaptcha.com", "https://cdn.jsdelivr.net"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.hcaptcha.com", "https://*.hcaptcha.com", "https://cdn.jsdelivr.net", "https://www.google.com/recaptcha/", "https://www.gstatic.com/recaptcha/"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://res.cloudinary.com", "https://api.cloudinary.com", "https://*.hcaptcha.com"],
-      frameSrc: ["'self'", "https://www.hcaptcha.com", "https://*.hcaptcha.com", "https://maps.google.com", "https://www.google.com"],
-      connectSrc: ["'self'", "https://czviftkijvzzymimqspa.supabase.co", "https://api.cloudinary.com", "https://www.hcaptcha.com", "https://*.hcaptcha.com"],
+      imgSrc: ["'self'", "data:", "https://res.cloudinary.com", "https://api.cloudinary.com", "https://*.hcaptcha.com", "https://www.google.com/recaptcha/", "https://www.gstatic.com/recaptcha/"],
+      frameSrc: ["'self'", "https://www.hcaptcha.com", "https://*.hcaptcha.com", "https://maps.google.com", "https://www.google.com", "https://www.google.com/recaptcha/", "https://recaptcha.google.com/recaptcha/"],
+      connectSrc: ["'self'", "https://czviftkijvzzymimqspa.supabase.co", "https://api.cloudinary.com", "https://www.hcaptcha.com", "https://*.hcaptcha.com", "https://www.google.com/recaptcha/", "https://www.gstatic.com/recaptcha/"],
     },
   },
   crossOriginEmbedderPolicy: false,
@@ -95,6 +95,25 @@ async function detectDbSchema() {
 // Détecter le schéma de la base de données de manière asynchrone
 detectDbSchema().catch(console.error);
 
+// Verification reCAPTCHA Google
+const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '6LfCfv8sAAAAAOiwws2GtPJbmWiAiizh__LQg7Z6';
+
+async function verifyRecaptcha(token, ip) {
+  if (!token) return false;
+  try {
+    const url = 'https://www.google.com/recaptcha/api/siteverify';
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `secret=${RECAPTCHA_SECRET_KEY}&response=${token}${ip ? `&remoteip=${ip}` : ''}`
+    });
+    const data = await response.json();
+    return !!data.success;
+  } catch (err) {
+    console.error('reCAPTCHA validation error:', err);
+    return false;
+  }
+}
 
 // Liste des quartiers autorisés pour la validation
 const ALLOWED_QUARTIERS = ['Kadutu', 'Ibanda', 'Bagira', 'Nyalukemba', 'Kasha', 'Panzi', 'Ciherano', 'Essence', 'Nyawera', 'Kasali', 'Autre'];
@@ -199,7 +218,16 @@ function buildEmailHTML(alert, auteur) {
 // Inscription (avec Rate Limiter et Validations Strictes)
 app.post('/api/auth/register', authLimiter, async (req, res) => {
   try {
-    const { nom, username, email, telephone, quartier, password } = req.body;
+    const { nom, username, email, telephone, quartier, password, recaptchaToken } = req.body;
+    
+    // Validation Captcha
+    const isLocalRequest = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
+    if (!isLocalRequest) {
+      const captchaValid = await verifyRecaptcha(recaptchaToken, req.ip);
+      if (!captchaValid) {
+        return res.status(400).json({ error: 'Validation captcha échouée. Veuillez réessayer.' });
+      }
+    }
     
     // Validations d'inputs
     if (!nom || !username || !email || !telephone || !quartier || !password) {
@@ -286,7 +314,17 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 // Connexion (avec Rate Limiter et Validations Strictes)
 app.post('/api/auth/login', authLimiter, async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, recaptchaToken } = req.body;
+    
+    // Validation Captcha
+    const isLocalRequest = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
+    if (!isLocalRequest) {
+      const captchaValid = await verifyRecaptcha(recaptchaToken, req.ip);
+      if (!captchaValid) {
+        return res.status(400).json({ error: 'Validation captcha échouée. Veuillez réessayer.' });
+      }
+    }
+    
     if (!email || !password) return res.status(400).json({ error: 'Email et mot de passe requis' });
 
     const { data: user, error } = await dbQuery(
@@ -552,7 +590,16 @@ app.post('/api/alertes', verifyToken, alertPublishLimiter, async (req, res) => {
       return res.status(403).json({ error: 'Vous ne pouvez publier plus de 5 alertes par période de 24h.' });
     }
 
-    const { titre, description, categorie, quartier, urgence, lat, lng, photo_url } = req.body;
+    const { titre, description, categorie, quartier, urgence, lat, lng, photo_url, recaptchaToken } = req.body;
+    
+    // Validation Captcha
+    const isLocalRequest = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
+    if (!isLocalRequest) {
+      const captchaValid = await verifyRecaptcha(recaptchaToken, req.ip);
+      if (!captchaValid) {
+        return res.status(400).json({ error: 'Validation captcha échouée. Veuillez réessayer.' });
+      }
+    }
     
     // 3. Valider et sanitiser tous les inputs
     if (!titre || !description || !categorie || !quartier) {
