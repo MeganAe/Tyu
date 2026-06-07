@@ -190,25 +190,338 @@ function escHtml(v = '') {
 }
 
 function buildEmailHTML(alert, auteur) {
-  const urgColors = { critique: '#FF3D71', moyen: '#FF9F43', faible: '#00C48C' };
-  const color = urgColors[alert.urgence] || '#FF9F43';
-  return `
-    <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:auto;background:#1a1a1a;color:#fff;padding:32px;border-radius:12px;">
-      <div style="background:${color};padding:4px 14px;border-radius:6px;display:inline-block;font-size:11px;font-weight:800;margin-bottom:16px;letter-spacing:.05em;">
-        ALERTE ${escHtml((alert.urgence||'MOYEN').toUpperCase())}
+  const urgStyles = {
+    critique: {
+      accent: '#ef4444',
+      badgeBg: '#fef2f2',
+      badgeText: '#ef4444',
+      badgeBorder: '#fee2e2'
+    },
+    moyen: {
+      accent: '#f59e0b',
+      badgeBg: '#fffbeb',
+      badgeText: '#d97706',
+      badgeBorder: '#fef3c7'
+    },
+    faible: {
+      accent: '#10b981',
+      badgeBg: '#f0fdf4',
+      badgeText: '#059669',
+      badgeBorder: '#bbf7d0'
+    }
+  };
+  const style = urgStyles[alert.urgence] || urgStyles.moyen;
+  const formattedDate = new Date().toLocaleDateString('fr-FR', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  let imageHtml = '';
+  if (alert.photo_url) {
+    imageHtml = `
+      <div style="margin-bottom: 24px;">
+        <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Photo jointe</span>
+        <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc; text-align: center;">
+          <img src="${alert.photo_url}" alt="Illustration de l'alerte" style="width: 100%; max-height: 380px; object-fit: cover; display: block; margin: 0 auto;" />
+        </div>
       </div>
-      <h2 style="margin:0 0 10px;font-size:20px;">${escHtml(alert.titre)}</h2>
-      <p style="color:#aaa;font-size:13px;margin:0 0 4px;">
-        Catégorie: ${escHtml(alert.categorie)} &nbsp;|&nbsp;
-        Quartier: ${escHtml(alert.quartier)} &nbsp;|&nbsp;
-        ${new Date().toLocaleString('fr-FR')}
-      </p>
-      <p style="color:#aaa;font-size:13px;margin:0 0 20px;">Publié par: ${escHtml(auteur)}</p>
-      <p style="color:#ccc;line-height:1.7;font-size:14px;">${escHtml(alert.description)}</p>
-      <p style="color:#555;margin-top:28px;font-size:11px;border-top:1px solid #2a2a2a;padding-top:16px;">
-        Alert Bukavu — Plateforme d'alerte citoyenne — Bukavu, RDC
-      </p>
-    </div>`;
+    `;
+  }
+
+  let mapHtml = '';
+  if (alert.lat && alert.lng) {
+    mapHtml = `
+      <div style="margin-top: 28px; text-align: center;">
+        <a href="https://www.google.com/maps/search/?api=1&query=${alert.lat},${alert.lng}" target="_blank" style="display: inline-block; background-color: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 2px 4px rgba(15,23,42,0.1); text-align: center;">
+          📍 Voir la localisation sur Google Maps
+        </a>
+        <div style="margin-top: 6px; font-size: 11px; color: #64748b;">
+          Coordonnées : ${alert.lat}, ${alert.lng}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div style="background-color: #f8fafc; padding: 40px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+      <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;">
+        
+        <!-- Top colored line based on urgency -->
+        <div style="height: 6px; background-color: ${style.accent};"></div>
+        
+        <div style="padding: 36px;">
+          
+          <!-- Logo / Header -->
+          <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">
+              ALERT<span style="color: #ef4444;">BUKAVU</span>
+            </span>
+            <span style="background-color: ${style.badgeBg}; color: ${style.badgeText}; border: 1px solid ${style.badgeBorder}; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              🚨 ${escHtml((alert.urgence || 'moyen').toUpperCase())}
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3; margin: 0 0 20px 0; letter-spacing: -0.01em;">
+            ${escHtml(alert.titre)}
+          </h2>
+
+          <!-- Metadata Grid -->
+          <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td width="50%" style="padding-bottom: 12px; vertical-align: top;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Quartier</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155;">${escHtml(alert.quartier)}</span>
+                </td>
+                <td width="50%" style="padding-bottom: 12px; vertical-align: top;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Catégorie</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155; text-transform: capitalize;">${escHtml(alert.categorie)}</span>
+                </td>
+              </tr>
+              <tr>
+                <td width="50%" style="vertical-align: top;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Publié Par</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155;">${escHtml(auteur)}</span>
+                </td>
+                <td width="50%" style="vertical-align: top;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Date de Signalement</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155;">${formattedDate}</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Description Section -->
+          <div style="margin-bottom: 24px;">
+            <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Description de l'incident</span>
+            <div style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; white-space: pre-line;">${escHtml(alert.description)}</div>
+          </div>
+
+          <!-- Optional Image -->
+          ${imageHtml}
+
+          <!-- Optional Location/Map Button -->
+          ${mapHtml}
+
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #f8fafc; border-top: 1px solid #f1f5f9; padding: 24px 36px; text-align: center;">
+          <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0 0 8px 0;">
+            Cet email a été envoyé automatiquement par la plateforme <strong>Alert Bukavu</strong> afin de notifier les autorités compétentes d'un incident en cours.
+          </p>
+          <p style="font-size: 10px; color: #cbd5e1; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
+            Plateforme Citoyenne — Bukavu, RDC
+          </p>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+function buildNeighborhoodNotificationHTML(alert) {
+  const urgStyles = {
+    critique: {
+      accent: '#ef4444',
+      badgeBg: '#fef2f2',
+      badgeText: '#ef4444',
+      badgeBorder: '#fee2e2'
+    },
+    moyen: {
+      accent: '#f59e0b',
+      badgeBg: '#fffbeb',
+      badgeText: '#d97706',
+      badgeBorder: '#fef3c7'
+    },
+    faible: {
+      accent: '#10b981',
+      badgeBg: '#f0fdf4',
+      badgeText: '#059669',
+      badgeBorder: '#bbf7d0'
+    }
+  };
+  const style = urgStyles[alert.urgence] || urgStyles.moyen;
+  const formattedDate = new Date().toLocaleDateString('fr-FR', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  let imageHtml = '';
+  if (alert.photo_url) {
+    imageHtml = `
+      <div style="margin-bottom: 24px;">
+        <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Photo jointe</span>
+        <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc; text-align: center;">
+          <img src="${alert.photo_url}" alt="Illustration de l'alerte" style="width: 100%; max-height: 380px; object-fit: cover; display: block; margin: 0 auto;" />
+        </div>
+      </div>
+    `;
+  }
+
+  let mapHtml = '';
+  if (alert.lat && alert.lng) {
+    mapHtml = `
+      <div style="margin-top: 28px; text-align: center;">
+        <a href="https://www.google.com/maps/search/?api=1&query=${alert.lat},${alert.lng}" target="_blank" style="display: inline-block; background-color: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 2px 4px rgba(15,23,42,0.1); text-align: center;">
+          📍 Voir la localisation sur Google Maps
+        </a>
+        <div style="margin-top: 6px; font-size: 11px; color: #64748b;">
+          Coordonnées : ${alert.lat}, ${alert.lng}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div style="background-color: #f8fafc; padding: 40px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+      <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;">
+        
+        <!-- Top colored line based on urgency -->
+        <div style="height: 6px; background-color: ${style.accent};"></div>
+        
+        <div style="padding: 36px;">
+          
+          <!-- Logo / Header -->
+          <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">
+              ALERT<span style="color: #ef4444;">BUKAVU</span>
+            </span>
+            <span style="background-color: ${style.badgeBg}; color: ${style.badgeText}; border: 1px solid ${style.badgeBorder}; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              🚨 NOTIFICATION QUARTIER
+            </span>
+          </div>
+
+          <!-- Alert Title -->
+          <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3; margin: 0 0 20px 0; letter-spacing: -0.01em;">
+            ${escHtml(alert.titre)}
+          </h2>
+
+          <!-- Crucial Alert Banner -->
+          <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 16px; margin-bottom: 24px; color: #b45309; font-size: 13px; font-weight: 500; line-height: 1.5;">
+            ⚠️ <strong>Attention résidents de ${escHtml(alert.quartier)} :</strong> Une alerte d'urgence de niveau <strong>${escHtml((alert.urgence || 'moyen').toUpperCase())}</strong> est en cours dans votre quartier. Restez extrêmement vigilants et prenez vos précautions.
+          </div>
+
+          <!-- Metadata Grid -->
+          <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td width="50%" style="padding-bottom: 12px; vertical-align: top;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Quartier Concerné</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155;">${escHtml(alert.quartier)}</span>
+                </td>
+                <td width="50%" style="padding-bottom: 12px; vertical-align: top;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Type de Risque</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155; text-transform: capitalize;">${escHtml(alert.categorie)}</span>
+                </td>
+              </tr>
+              <tr>
+                <td width="50%" style="vertical-align: top;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Niveau d'Urgence</span>
+                  <span style="font-size: 13px; font-weight: 700; color: ${style.accent}; text-transform: capitalize;">${escHtml(alert.urgence)}</span>
+                </td>
+                <td width="50%" style="vertical-align: top;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Date de Notification</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155;">${formattedDate}</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Description Section -->
+          <div style="margin-bottom: 24px;">
+            <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Détails de la situation</span>
+            <div style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; white-space: pre-line;">${escHtml(alert.description)}</div>
+          </div>
+
+          <!-- Optional Image -->
+          ${imageHtml}
+
+          <!-- Optional Location/Map Button -->
+          ${mapHtml}
+
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #f8fafc; border-top: 1px solid #f1f5f9; padding: 24px 36px; text-align: center;">
+          <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0 0 8px 0;">
+            Vous recevez cet email de sécurité car vous résidez dans le quartier <strong>${escHtml(alert.quartier)}</strong>.
+          </p>
+          <p style="font-size: 10px; color: #cbd5e1; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
+            Alert Bukavu — Plateforme Citoyenne — RDC
+          </p>
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+function buildForgotPasswordHTML(user, tempPassword) {
+  return `
+    <div style="background-color: #f8fafc; padding: 40px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+      <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;">
+        
+        <!-- Top colored line -->
+        <div style="height: 6px; background-color: #ef4444;"></div>
+        
+        <div style="padding: 36px;">
+          
+          <!-- Logo / Header -->
+          <div style="margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">
+              ALERT<span style="color: #ef4444;">BUKAVU</span>
+            </span>
+            <span style="background-color: #fee2e2; color: #ef4444; border: 1px solid #fecdd3; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              🔒 SÉCURITÉ
+            </span>
+          </div>
+
+          <!-- Title -->
+          <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.3; margin: 0 0 16px 0; letter-spacing: -0.01em;">
+            Réinitialisation de votre mot de passe
+          </h2>
+
+          <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 16px 0;">
+            Bonjour <strong>${escHtml(user.nom)}</strong>,
+          </p>
+          
+          <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 20px 0;">
+            Vous avez demandé la réinitialisation de votre mot de passe pour la plateforme Alert Bukavu. Un mot de passe de secours temporaire a été généré automatiquement pour votre compte :
+          </p>
+
+          <!-- Password Display Card -->
+          <div style="text-align: center; margin: 24px 0;">
+            <div style="background-color: #f1f5f9; border: 1px dashed #cbd5e1; padding: 16px 24px; border-radius: 12px; font-family: 'Courier New', Courier, monospace; font-size: 22px; color: #0f172a; display: inline-block; letter-spacing: 2px; font-weight: 800; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+              ${tempPassword}
+            </div>
+          </div>
+
+          <!-- Alert / Advice Box -->
+          <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 16px; margin: 24px 0; color: #b45309; font-size: 13px; font-weight: 500; line-height: 1.5;">
+            ⚠️ <strong>Conseil important :</strong> Utilisez ce mot de passe de secours pour vous connecter, puis rendez-vous immédiatement dans l'onglet <strong>Profil</strong> pour le remplacer par un nouveau mot de passe personnalisé et sécurisé.
+          </div>
+
+          <p style="font-size: 13px; line-height: 1.6; color: #64748b; margin: 0;">
+            Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email en toute sécurité. Votre mot de passe actuel restera inchangé dès lors que vous ne vous connectez pas avec ce code temporaire.
+          </p>
+
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #f8fafc; border-top: 1px solid #f1f5f9; padding: 24px 36px; text-align: center;">
+          <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0 0 8px 0;">
+            Cet email de sécurité vous a été envoyé par <strong>Alert Bukavu</strong> suite à votre demande de réinitialisation.
+          </p>
+          <p style="font-size: 10px; color: #cbd5e1; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
+            Alert Bukavu — Bukavu, RDC
+          </p>
+        </div>
+
+      </div>
+    </div>
+  `;
 }
 
 // ===========================
@@ -497,22 +810,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       from: `"Alert Bukavu" <${MAIL_USER}>`,
       to: email.toLowerCase(),
       subject: `Mot de passe temporaire — Alert Bukavu`,
-      html: `
-        <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:auto;background:#1a1a1a;color:#fff;padding:32px;border-radius:12px;">
-          <h2 style="margin:0 0 16px;font-size:20px;color:#FF3D71;border-bottom:1px solid #2a2a2a;padding-bottom:12px;">Réinitialisation du compte</h2>
-          <p style="color:#ccc;line-height:1.7;font-size:14px;">Bonjour ${escHtml(user.nom)},</p>
-          <p style="color:#ccc;line-height:1.7;font-size:14px;">Vous avez demandé la réinitialisation de votre mot de passe pour la plateforme Alert Bukavu.</p>
-          <p style="color:#ccc;line-height:1.7;font-size:14px;">Voici votre mot de passe de secours temporaire :</p>
-          <div style="background:#2a2a2a;padding:12px 20px;border-radius:6px;font-family:monospace;font-size:18px;color:#00C48C;display:inline-block;margin:10px 0;letter-spacing:1px;font-weight:bold;">
-            ${tempPassword}
-          </div>
-          <p style="color:#FF9F43;line-height:1.7;font-size:13px;font-weight:bold;margin-top:16px;">
-            ⚠️ Conseil : Connectez-vous avec ce code et modifiez immédiatement votre mot de passe depuis l'onglet profil.
-          </p>
-          <p style="color:#555;margin-top:28px;font-size:11px;border-top:1px solid #2a2a2a;padding-top:16px;">
-            Alert Bukavu — Plateforme d'alerte citoyenne — Bukavu, RDC
-          </p>
-        </div>`
+      html: buildForgotPasswordHTML(user, tempPassword)
     });
     
     return res.json({ message: 'Si cet email est enregistré, vous recevrez un mot de passe temporaire sous peu.' });
@@ -1064,28 +1362,12 @@ app.post('/api/admin/alertes/:id/notifier', verifyToken, requireAdmin, async (re
     const emails = (users || []).map(u => u.email).filter(e => e && e !== req.user.email);
     if (!emails.length) return res.json({ message: 'Aucun résident à notifier dans ce quartier' });
     
-    const color = alerte.urgence === 'critique' ? '#FF3D71' : alerte.urgence === 'moyen' ? '#FF9F43' : '#00C48C';
-    
     // Envoyer la notification email groupée
     await getTransporter().sendMail({
       from: `"Alert Bukavu" <${MAIL_USER}>`,
       to: emails,
       subject: `🚨 [NOTIFICATION QUARTIER] ${alerte.quartier.toUpperCase()} — ${alerte.titre}`,
-      html: `
-        <div style="font-family:Inter,Arial,sans-serif;max-width:600px;margin:auto;background:#1a1a1a;color:#fff;padding:32px;border-radius:12px;">
-          <div style="background:${color};padding:4px 14px;border-radius:6px;display:inline-block;font-size:11px;font-weight:800;margin-bottom:16px;">
-            DANGER - NOTIFICATION HABITANTS : ${escHtml(alerte.quartier.toUpperCase())}
-          </div>
-          <h2 style="margin:0 0 10px;font-size:20px;color:#fff;">${escHtml(alerte.titre)}</h2>
-          <p style="color:#aaa;font-size:13px;margin:0 0 20px;">Niveau d'urgence : ${escHtml(alerte.urgence.toUpperCase())} | Catégorie : ${escHtml(alerte.categorie.toUpperCase())}</p>
-          <p style="color:#ccc;line-height:1.7;font-size:14px;">${escHtml(alerte.description)}</p>
-          <p style="color:#FF9F43;margin-top:20px;font-size:13px;font-weight:bold;">
-            ⚠️ Habitants de ${escHtml(alerte.quartier)}, restez extrêmement vigilants ! Signalez toute évolution sur la plateforme.
-          </p>
-          <p style="color:#555;margin-top:28px;font-size:11px;border-top:1px solid #2a2a2a;padding-top:16px;">
-            Alert Bukavu — Plateforme d'alerte citoyenne — Bukavu, RDC
-          </p>
-        </div>`
+      html: buildNeighborhoodNotificationHTML(alerte)
     });
     
     return res.json({ message: `Notification envoyée à ${emails.length} habitant(s) du quartier ${alerte.quartier}.` });
