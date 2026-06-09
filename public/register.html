@@ -34,12 +34,12 @@
         <div class="glass-card register-card">
 
           <div class="floating-logo">
-            <img src="logo.png" alt="AlertBukavu Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-pulse\' style=\'width:100%;height:100%;border:3px solid #840015;border-radius:50%;display:flex;align-items:center;justify-content:center\'><span class=\'material-symbols-outlined\' style=\'color:#840015;font-size:46px;font-variation-settings:&quot;FILL&quot; 1,&quot;wght&quot; 700,&quot;GRAD&quot; 0,&quot;opsz&quot; 48\'>notification_important</span></div>'" />
+            <img src="logo.png" alt="AlertBukavu Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-pulse\' style=\'width:100%;height:100%;border:3px solid var(--outline);border-radius:0;display:flex;align-items:center;justify-content:center\'><span class=\'material-symbols-outlined\' style=\'color:var(--text-primary);font-size:46px;font-variation-settings:&quot;FILL&quot; 1,&quot;wght&quot; 700,&quot;GRAD&quot; 0,&quot;opsz&quot; 48\'>notification_important</span></div>'" />
           </div>
 
           <div style="text-align:center;margin-bottom:20px">
-            <h1 style="font-size:22px;font-weight:800;color:#840015;margin-bottom:4px">Créer un compte</h1>
-            <p style="font-size:13px;color:#5b403e">Rejoignez la communauté AlertBukavu</p>
+            <h1 style="font-size:22px;font-weight:800;color:var(--text-primary);margin-bottom:4px">Créer un compte</h1>
+            <p style="font-size:13px;color:var(--text-secondary)">Rejoignez la communauté AlertBukavu</p>
           </div>
 
           <form onsubmit="register(); return false;">
@@ -82,8 +82,8 @@
               </button>
             </div>
 
-            <div style="height:4px;border-radius:2px;background:#f0eded;margin-bottom:16px;overflow:hidden">
-              <div id="pwdFill" style="height:100%;width:0%;border-radius:2px;transition:all .3s"></div>
+            <div style="height:6px;background:var(--outline);margin-bottom:16px;overflow:hidden;border:1px solid var(--outline)">
+              <div id="pwdFill" style="height:100%;width:0%;transition:all .3s"></div>
             </div>
 
             <!-- reCAPTCHA v2 -->
@@ -98,7 +98,7 @@
           </form>
 
           <div style="margin-top:16px;text-align:center">
-            <a href="login.html" style="font-size:13px;font-weight:600;color:#840015;text-decoration:underline;text-underline-offset:3px">Déjà un compte ? Se connecter</a>
+            <a href="login.html" style="font-size:13px;font-weight:800;color:var(--accent-red);text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;font-family:'Space Grotesk',sans-serif">Déjà un compte ? Se connecter</a>
           </div>
         </div>
 
@@ -134,7 +134,7 @@
         if (/[A-Z]/.test(pwd)) s++;
         if (/[0-9]/.test(pwd)) s++;
         if (/[^A-Za-z0-9]/.test(pwd)) s++;
-        const cols = ['#FF3D71','#FF9F43','#FFD43B','#00C48C'];
+        const cols = ['var(--error)','var(--accent-yellow)','var(--accent-yellow)','var(--success)'];
         const w = ['25%','50%','75%','100%'];
         const f = document.getElementById('pwdFill');
         f.style.width = s > 0 ? w[s-1] : '0%';
@@ -148,10 +148,10 @@
         if (!digits.length) { status.textContent = ''; return; }
         if (digits.length === 9) {
           status.textContent = 'Numéro accepté';
-          status.style.color = '#00C48C';
+          status.style.color = 'var(--success)';
         } else {
           status.textContent = `${digits.length}/9 chiffres`;
-          status.style.color = '#906f6d';
+          status.style.color = 'var(--text-secondary)';
         }
       }
 
@@ -162,14 +162,14 @@
         if (!val) { status.textContent = ''; return; }
         if (!/^[a-zA-Z0-9_]{3,20}$/.test(val)) {
           status.textContent = '3-20 caractères, lettres/chiffres/_';
-          status.style.color = '#FF3D71'; return;
+          status.style.color = 'var(--error)'; return;
         }
-        status.textContent = 'Vérification...'; status.style.color = '#906f6d';
+        status.textContent = 'Vérification...'; status.style.color = 'var(--text-secondary)';
         usernameTimer = setTimeout(async () => {
           try {
             const data = await AB.api(`auth/check-username?username=${val}`);
             status.textContent = data.available ? '@' + val + ' est disponible' : '@' + val + ' est déjà pris';
-            status.style.color = data.available ? '#00C48C' : '#FF3D71';
+            status.style.color = data.available ? 'var(--success)' : 'var(--error)';
           } catch { status.textContent = ''; }
         }, 600);
       }
@@ -201,7 +201,7 @@
           const data = await AB.api('auth/register', 'POST', { nom, username, email, telephone, quartier, password, recaptchaToken });
           AB.saveToken(data.token);
           AB.saveUser(data.user);
-          await Swal.fire({ icon: 'success', title: 'Compte créé !', text: `Bienvenue sur AlertBukavu, @${username} !`, confirmButtonColor: '#840015', confirmButtonText: 'Commencer' });
+          await Swal.fire({ icon: 'success', title: 'Compte créé !', text: `Bienvenue sur AlertBukavu, @${username} !`, confirmButtonText: 'Commencer' });
           window.location.href = 'index.html';
         } catch(e) {
           btn.disabled = false;

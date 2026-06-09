@@ -63,21 +63,21 @@ const QUARTIERS = [
 
 // Toutes les catégories originales restaurées
 const CATEGORIES = {
-  incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#FF3D71', bg: '#FFF0F5' },
-  route:      { label: 'Route dégradée',  icon: 'construction',          color: '#FF9F43', bg: '#FFF5EC' },
-  inondation: { label: 'Inondation',      icon: 'water',                 color: '#2471A3', bg: '#E0F7FA' },
-  accident:   { label: 'Accident',        icon: 'car_crash',             color: '#8E44AD', bg: '#F5EEF8' },
-  securite:   { label: 'Sécurité',        icon: 'shield',                color: '#840015', bg: '#ffdad8' },
-  sante:      { label: 'Santé',           icon: 'medical_services',      color: '#00C48C', bg: '#E6FAF5' },
-  eau:        { label: 'Eau',             icon: 'water_drop',            color: '#0077B6', bg: '#E0F0FF' },
-  meteo:      { label: 'Météo',           icon: 'thunderstorm',          color: '#761f24', bg: '#ffdad8' },
-  autre:      { label: 'Autre',           icon: 'report',                color: '#5b403e', bg: '#f0eded' }
+  incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#e63b2e', bg: '#fff0f0' },
+  route:      { label: 'Route dégradée',  icon: 'construction',          color: '#ffcc00', bg: '#fffbeb' },
+  inondation: { label: 'Inondation',      icon: 'water',                 color: '#0055ff', bg: '#f0f5ff' },
+  accident:   { label: 'Accident',        icon: 'car_crash',             color: '#e63b2e', bg: '#fff0f0' },
+  securite:   { label: 'Sécurité',        icon: 'shield',                color: '#e63b2e', bg: '#fff0f0' },
+  sante:      { label: 'Santé',           icon: 'medical_services',      color: '#0055ff', bg: '#f0f5ff' },
+  eau:        { label: 'Eau',             icon: 'water_drop',            color: '#0055ff', bg: '#f0f5ff' },
+  meteo:      { label: 'Météo',           icon: 'thunderstorm',          color: '#ffcc00', bg: '#fffbeb' },
+  autre:      { label: 'Autre',           icon: 'report',                color: '#ffcc00', bg: '#fffbeb' }
 };
 
 const URGENCES = {
-  faible:   { label: 'FAIBLE',   color: '#00C48C', bg: '#E6FAF5' },
-  moyen:    { label: 'MOYEN',    color: '#FF9F43', bg: '#FFF5EC' },
-  critique: { label: 'CRITIQUE', color: '#FF3D71', bg: '#FFF0F5' }
+  faible:   { label: 'FAIBLE',   color: '#0055ff', bg: '#f0f5ff' },
+  moyen:    { label: 'MOYEN',    color: '#ffcc00', bg: '#fffbeb' },
+  critique: { label: 'CRITIQUE', color: '#e63b2e', bg: '#fff0f0' }
 };
 
 // ---- Utilitaires ----
@@ -98,12 +98,17 @@ function escHtml(str) {
 
 function genererAvatar(nom, taille = 40) {
   const initiales = nom ? nom.trim().split(' ').map(p => p[0]||'').join('').substring(0,2).toUpperCase() : 'U';
-  const couleurs = ['#840015','#761f24','#b00020','#5d5f5f','#906f6d'];
-  const couleur = couleurs[nom ? nom.charCodeAt(0) % couleurs.length : 0];
+  const couleurs = [
+    { bg: '#ffcc00', fg: '#1a1a1a' },
+    { bg: '#e63b2e', fg: '#ffffff' },
+    { bg: '#0055ff', fg: '#ffffff' },
+    { bg: '#1a1a1a', fg: '#f5f0e8' }
+  ];
+  const choice = couleurs[nom ? nom.charCodeAt(0) % couleurs.length : 0];
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}">
-    <circle cx="${taille/2}" cy="${taille/2}" r="${taille/2}" fill="${couleur}"/>
-    <text x="${taille/2}" y="${taille/2+taille*0.14}" text-anchor="middle" fill="white"
-      font-family="Plus Jakarta Sans,Inter,sans-serif" font-weight="800" font-size="${taille*0.38}">${initiales}</text>
+    <rect width="${taille}" height="${taille}" fill="${choice.bg}"/>
+    <text x="${taille/2}" y="${taille/2+taille*0.14}" text-anchor="middle" fill="${choice.fg}"
+      font-family="Space Grotesk,Inter,sans-serif" font-weight="800" font-size="${taille*0.38}">${initiales}</text>
   </svg>`;
   return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
 }
@@ -274,6 +279,35 @@ function afficherMenuAdmin() {
   link.innerHTML = `<span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">admin_panel_settings</span><span>Admin</span>`;
   nav.appendChild(link);
 }
+
+// ---- Theme Management (Dark/Light Mode) ----
+function initTheme() {
+  const savedTheme = localStorage.getItem('ab_theme') || 'light';
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.remove('dark');
+  }
+  updateThemeToggleIcon(savedTheme);
+}
+
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark');
+  const newTheme = isDark ? 'dark' : 'light';
+  localStorage.setItem('ab_theme', newTheme);
+  updateThemeToggleIcon(newTheme);
+}
+
+function updateThemeToggleIcon(theme) {
+  const icon = document.getElementById('themeToggleIcon');
+  if (icon) {
+    icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+  }
+}
+
+// Initialize theme immediately
+initTheme();
+document.addEventListener('DOMContentLoaded', initTheme);
 
 
 

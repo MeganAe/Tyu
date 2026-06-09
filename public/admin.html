@@ -4,39 +4,79 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AlertBukavu — Administration</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
 <link rel="stylesheet" href="style.css"/>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
-     crossorigin="anonymous"></script>
 <style>
-  body { padding-bottom:40px;background:#fcf9f8; }
-  .tab-btn { padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid #e4bdbb;background:white;color:#5b403e;font-family:'Inter',sans-serif;transition:all .2s; }
-  .tab-btn.active { background:#840015;color:white;border-color:#840015; }
-  .alerte-row { background:white;border-radius:12px;border:1px solid #e4bdbb;padding:14px 16px;margin-bottom:10px; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48 }
+  body { padding-bottom: 40px; background: var(--surface); }
+
+  /* Bauhaus tab buttons */
+  .tab-btn {
+    padding: 10px 20px;
+    font-size: 13px; font-weight: 800;
+    cursor: pointer;
+    border: var(--border-thin);
+    background: var(--surface-card);
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.1s ease;
+    border-radius: 0;
+  }
+  .tab-btn:hover { background: var(--accent-yellow); color: #1a1a1a; }
+  .tab-btn.active {
+    background: #1a1a1a;
+    color: var(--accent-yellow);
+    border-color: #1a1a1a;
+    box-shadow: var(--shadow-brutal);
+  }
+  body.dark .tab-btn.active {
+    background: var(--accent-yellow);
+    color: #1a1a1a;
+    border-color: var(--accent-yellow);
+  }
+
+  /* Bauhaus alerte row */
+  .alerte-row {
+    background: var(--surface-card);
+    border: var(--border-thick);
+    box-shadow: var(--shadow-brutal);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    border-radius: 0;
+  }
+
+  /* Bauhaus filter pills */
   .filter-pill {
     padding: 6px 14px;
-    border-radius: 100px;
-    border: 1px solid #e4bdbb;
-    background: white;
-    color: #5b403e;
+    border: var(--border-thin);
+    background: var(--surface-card);
+    color: var(--text-primary);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 800;
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.2s;
+    font-family: 'Space Grotesk', sans-serif;
+    text-transform: uppercase;
+    transition: all 0.1s ease;
     white-space: nowrap;
+    border-radius: 0;
   }
   .filter-pill:hover {
-    background: #ffdad8;
-    color: #840015;
-    border-color: #840015;
+    background: var(--accent-yellow);
+    color: #1a1a1a;
   }
   .filter-pill.active {
-    background: #840015;
-    color: white;
-    border-color: #840015;
+    background: #1a1a1a;
+    color: var(--accent-yellow);
+    border-color: #1a1a1a;
   }
+  body.dark .filter-pill.active {
+    background: var(--accent-yellow);
+    color: #1a1a1a;
+  }
+
   @keyframes blink {
     0% { opacity: 0.3; }
     50% { opacity: 1; }
@@ -48,32 +88,35 @@
 
 <header class="top-bar">
   <div style="display:flex;align-items:center;gap:10px;">
-    <a href="index.html" style="color:white;display:flex;align-items:center;">
-      <span class="material-symbols-outlined" style="font-size:22px;color:white;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
+    <a href="index.html" style="color:#f5f0e8;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:2px solid #f5f0e8;text-decoration:none;transition:all .1s ease;">
+      <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
     </a>
     <span class="material-symbols-outlined" style="font-size:20px;color:white;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">admin_panel_settings</span>
-    <h1 style="font-size:17px;font-weight:800;color:white;">Administration</h1>
+    <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Administration</h1>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
-    <span style="background:rgba(255,255,255,.2);color:white;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;">ADMIN</span>
-    <span style="background:#FF9F43;color:white;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:6px;">
-      <span style="width:6px;height:6px;background:white;border-radius:50%;animation:blink 1.2s infinite;display:inline-block;"></span>
+    <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border:2px solid #f5f0e8;border-radius:0;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
+      <span id="themeToggleIcon" class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 0;">dark_mode</span>
+    </button>
+    <span style="background:var(--accent-yellow);color:#1a1a1a;padding:4px 12px;font-size:11px;font-weight:800;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;border:2px solid #1a1a1a;">ADMIN</span>
+    <span style="background:var(--accent-red);color:white;padding:4px 12px;font-size:11px;font-weight:800;display:flex;align-items:center;gap:6px;font-family:'Space Grotesk',sans-serif;border:2px solid #1a1a1a;">
+      <span style="width:6px;height:6px;background:white;animation:blink 1.2s infinite;display:inline-block;"></span>
       <span id="activeCountText">0</span> Actives
     </span>
   </div>
 </header>
 
-<section style="background:#840015;padding:16px 20px 36px;">
-  <p style="font-size:13px;color:rgba(255,255,255,.8);">Gestion des alertes et des utilisateurs</p>
+<section class="hero-section">
+  <p>Gestion des alertes et des utilisateurs</p>
 </section>
 
 <main style="max-width:900px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
 
   <div id="accessDenied" style="display:none;text-align:center;padding:48px 20px;">
-    <span class="material-symbols-outlined" style="font-size:48px;color:#e4bdbb;font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;">lock</span>
-    <p style="font-weight:700;font-size:16px;color:#1c1b1b;margin-top:12px;">Accès restreint</p>
-    <p style="color:#5b403e;font-size:14px;margin-top:6px;">Vous n'avez pas les droits administrateur.</p>
-    <a href="index.html" style="display:inline-block;margin-top:16px;padding:10px 24px;background:#840015;color:white;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;">Retour</a>
+    <span class="material-symbols-outlined" style="font-size:48px;color:var(--outline);font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;">lock</span>
+    <p style="font-weight:800;font-size:16px;color:var(--text-primary);margin-top:12px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Accès restreint</p>
+    <p style="color:var(--text-secondary);font-size:14px;margin-top:6px;">Vous n'avez pas les droits administrateur.</p>
+    <a href="index.html" style="display:inline-block;margin-top:16px;padding:10px 24px;background:var(--accent-yellow);color:#1a1a1a;border:var(--border-thick);box-shadow:var(--shadow-brutal);font-weight:800;font-size:14px;text-decoration:none;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Retour</a>
   </div>
 
   <div id="adminContent" style="display:none;">
@@ -177,36 +220,68 @@ function switchTab(btn, id) {
 function renderAlerte(a, showSignal = false) {
   const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
   const urg = URGENCES[a.urgence] || URGENCES.moyen;
-  const statutColor = a.statut === 'suspendue' ? '#840015' : a.statut === 'resolue' ? '#00C48C' : '#FF9F43';
-  const statutBg = a.statut === 'suspendue' ? '#ffdad8' : a.statut === 'resolue' ? '#E6FAF5' : '#FFF5EC';
-  
-  // Bouton de notification seulement si alerte active
+  const statutColor = a.statut === 'suspendue' ? '#ffffff' : a.statut === 'resolue' ? '#ffffff' : '#1a1a1a';
+  const statutBg = a.statut === 'suspendue' ? 'var(--accent-red)' : a.statut === 'resolue' ? 'var(--accent-blue)' : 'var(--accent-yellow)';
   const canNotify = a.statut === 'active';
-  
+
   return `<div class="alerte-row">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
       <div style="flex:1;min-width:0;text-align:left;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
-          <span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:${urg.bg};color:${urg.color};">${urg.label}</span>
-          <span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};">${cat.label}</span>
-          ${showSignal ? `<span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#ffdad8;color:#840015;">${a.nb_signalements||0} signalement${(a.nb_signalements||0)>1?'s':''}</span>` : ''}
+          <span style="padding:2px 8px;font-size:10px;font-weight:800;background:${urg.bg};color:${urg.color};border:2px solid var(--outline);text-transform:uppercase;font-family:'Space Grotesk',sans-serif;">${urg.label}</span>
+          <span style="padding:2px 8px;font-size:10px;font-weight:800;background:${cat.bg};color:${cat.color};border:2px solid var(--outline);text-transform:uppercase;font-family:'Space Grotesk',sans-serif;">${cat.label}</span>
+          ${showSignal ? `<span style="padding:2px 8px;font-size:10px;font-weight:800;background:var(--accent-red);color:#ffffff;border:2px solid var(--outline);text-transform:uppercase;font-family:'Space Grotesk',sans-serif;">${a.nb_signalements||0} signalement${(a.nb_signalements||0)>1?'s':''}</span>` : ''}
         </div>
-        <p style="font-size:14px;font-weight:700;color:#1c1b1b;margin-bottom:2px;">${escHtml(a.titre)}</p>
-        <p style="font-size:12px;color:#906f6d;">${escHtml(a.quartier||'Bukavu')} • ${tempsRelatif(a.created_at)}</p>
+        <p style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:2px;font-family:'Space Grotesk',sans-serif;">${escHtml(a.titre)}</p>
+        <p style="font-size:12px;color:var(--text-secondary);font-weight:600;">${escHtml(a.quartier||'Bukavu')} • ${tempsRelatif(a.created_at)}</p>
       </div>
-      <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;background:${statutBg};color:${statutColor};white-space:nowrap;text-transform:capitalize;">${a.statut}</span>
+      <span style="font-size:10px;font-weight:800;padding:3px 10px;background:${statutBg};color:${statutColor};white-space:nowrap;text-transform:uppercase;border:2px solid var(--outline);font-family:'Space Grotesk',sans-serif;">${a.statut}</span>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-      ${a.statut !== 'suspendue' ? `<button onclick="changerStatut('${a.id}','suspendue')" style="padding:8px 14px;background:#ffdad8;color:#840015;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Suspendre</button>` : `<button onclick="changerStatut('${a.id}','active')" style="padding:8px 14px;background:#E6FAF5;color:#00C48C;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Restaurer</button>`}
-      ${a.statut !== 'resolue' ? `<button onclick="changerStatut('${a.id}','resolue')" style="padding:8px 14px;background:#E6FAF5;color:#00C48C;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">Marquer résolu</button>` : ''}
-      ${canNotify ? `<button onclick="notifierHabitants('${a.id}', '${escHtml(a.titre)}')" style="padding:8px 14px;background:#E6F5FF;color:#008cff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:4px;">
-        <span class="material-symbols-outlined" style="font-size:14px;">campaign</span> Notifier quartier
+      ${a.statut !== 'suspendue' ? `<button onclick="changerStatut('${a.id}','suspendue')" style="padding:7px 12px;background:var(--accent-red);color:#ffffff;border:2px solid var(--outline);font-size:11px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Suspendre</button>` : `<button onclick="changerStatut('${a.id}','active')" style="padding:7px 12px;background:var(--accent-blue);color:#ffffff;border:2px solid var(--outline);font-size:11px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Restaurer</button>`}
+      ${a.statut !== 'resolue' ? `<button onclick="changerStatut('${a.id}','resolue')" style="padding:7px 12px;background:var(--accent-yellow);color:#1a1a1a;border:2px solid var(--outline);font-size:11px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Résolu</button>` : ''}
+      ${canNotify ? `
+      <button onclick="previewNotification('${a.id}', '${escHtml(a.titre).replace(/'/g, "\\'")}')" style="padding:7px 12px;background:var(--surface-card);color:var(--text-primary);border:2px solid var(--outline);font-size:11px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Aperçu
+      </button>
+      <button onclick="notifierHabitants('${a.id}', '${escHtml(a.titre).replace(/'/g, "\\'")}')" style="padding:7px 12px;background:var(--accent-blue);color:#ffffff;border:2px solid var(--outline);font-size:11px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;">
+        <span class="material-symbols-outlined" style="font-size:14px;">campaign</span> Notifier
       </button>` : ''}
-      <button onclick="supprimerAlerteAdmin('${a.id}')" style="padding:8px 14px;background:#ffdad8;color:#840015;border:1px solid #840015;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;display:inline-flex;align-items:center;gap:4px;">
+      <button onclick="supprimerAlerteAdmin('${a.id}')" style="padding:7px 12px;background:var(--accent-red);color:#ffffff;border:2px solid var(--outline);font-size:11px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;">
         <span class="material-symbols-outlined" style="font-size:14px;">delete</span> Supprimer
       </button>
     </div>
   </div>`;
+}
+
+async function previewNotification(id, titre) {
+  try {
+    Swal.fire({ title: 'Génération de l\'aperçu...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
+    const data = await AB.api(`admin/alertes/${id}/preview-email`);
+    Swal.close();
+    
+    if (!data.html) {
+      throw new Error("L'aperçu HTML n'a pas pu être généré.");
+    }
+    
+    const iframeSrcdoc = data.html.replace(/"/g, '&quot;');
+    
+    Swal.fire({
+      title: `Aperçu de l'email : ${titre}`,
+      html: `
+        <div style="text-align: left; margin-bottom: 12px; font-size: 13px; color: #5b403e;">
+          <strong>Sujet :</strong> 🚨 [NOTIFICATION QUARTIER] — ${titre}
+        </div>
+        <iframe srcdoc="${iframeSrcdoc}" style="width:100%;height:450px;border:1px solid #e4bdbb;border-radius:12px;background:white;"></iframe>
+      `,
+      width: 680,
+      confirmButtonColor: '#840015',
+      confirmButtonText: 'Fermer'
+    });
+  } catch(e) {
+    Swal.close();
+    showToast(e.message, 'error');
+  }
 }
 
 async function notifierHabitants(id, titre) {
@@ -270,39 +345,38 @@ async function chargerUsers() {
     const data = await AB.api('admin/users');
     const users = data.users || [];
     const userSession = AB.getUser();
-    
     document.getElementById('listUsers').innerHTML = users.length ? users.map(u => {
       const photoSrc = u.photo_url ? u.photo_url : genererAvatar(u.nom||'U', 44);
       const isSelf = userSession && userSession.id === u.id;
-      
+
       return `
-      <div style="background:white;border-radius:12px;border:1px solid #e4bdbb;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;text-align:left;">
-        <img src="${photoSrc}" style="width:44px;height:44px;border-radius:50%;flex-shrink:0;object-fit:cover;" onerror="this.src='${genererAvatar(u.nom||'U', 44)}'"/>
+      <div style="background:var(--surface-card);border:var(--border-thick);box-shadow:var(--shadow-brutal);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;text-align:left;">
+        <img src="${photoSrc}" style="width:44px;height:44px;flex-shrink:0;object-fit:cover;border:var(--border-thin);" onerror="this.src='${genererAvatar(u.nom||'U', 44)}'"/>
         <div style="flex:1;min-width:0;">
-          <p style="font-size:14px;font-weight:700;color:#1c1b1b;margin-bottom:2px;">${escHtml(u.nom)}</p>
-          <p style="font-size:12px;color:#906f6d;margin-bottom:2px;">${escHtml(u.email)} • <b style="color:#840015;text-transform:uppercase;font-size:10px;">${u.role}</b> • ${escHtml(u.quartier||'Non spécifié')}</p>
-          <p style="font-size:11px;color:#5b403e;">Compte créé le : ${new Date(u.created_at).toLocaleDateString('fr-FR')} • Fausses : <b>${u.nb_fausses_alertes || 0}</b> • Publications : <b>${u.nb_alertes || 0}</b></p>
+          <p style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:2px;font-family:'Space Grotesk',sans-serif;">${escHtml(u.nom)}</p>
+          <p style="font-size:12px;color:var(--text-secondary);margin-bottom:2px;font-weight:600;">${escHtml(u.email)} • <b style="color:var(--accent-red);text-transform:uppercase;font-size:10px;">${u.role}</b> • ${escHtml(u.quartier||'Non spécifié')}</p>
+          <p style="font-size:11px;color:var(--text-secondary);font-weight:600;">Créé le : ${new Date(u.created_at).toLocaleDateString('fr-FR')} • Fausses : <b>${u.nb_fausses_alertes || 0}</b> • Publications : <b>${u.nb_alertes || 0}</b></p>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
           ${isSelf ? `
-            <span style="font-size:11px;font-weight:700;padding:6px 12px;background:#f5e2e1;color:#840015;border-radius:8px;">Vous</span>
+            <span style="font-size:11px;font-weight:800;padding:6px 12px;background:var(--accent-yellow);color:#1a1a1a;border:2px solid var(--outline);font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Vous</span>
           ` : `
             ${u.role !== 'admin' ? `
-              <button onclick="promouvoirAdmin('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:white;color:#00C48C;border:1.5px solid #00C48C;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s;" onmouseover="this.style.background='#E6FAF5'" onmouseout="this.style.background='white'">
+              <button onclick="promouvoirAdmin('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:var(--surface-card);color:var(--accent-blue);border:2px solid var(--accent-blue);font-size:11px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;transition:all 0.1s;" onmouseover="this.style.background='var(--accent-blue)';this.style.color='#fff'" onmouseout="this.style.background='var(--surface-card)';this.style.color='var(--accent-blue)'">
                 Promouvoir admin
               </button>
             ` : ''}
-            <button onclick="toggleBlock('${u.id}',${!u.est_bloque})" style="padding:6px 12px;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;background:${u.est_bloque?'#E6FAF5':'#ffdad8'};color:${u.est_bloque?'#00C48C':'#840015'};">
+            <button onclick="toggleBlock('${u.id}',${!u.est_bloque})" style="padding:6px 12px;border:2px solid var(--outline);font-size:11px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;background:${u.est_bloque?'var(--accent-blue)':'var(--accent-red)'};color:#ffffff;">
               ${u.est_bloque ? 'Débloquer' : 'Bloquer'}
             </button>
-            <button onclick="supprimerUtilisateur('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:#ffdad8;color:#840015;border:1px solid #840015;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;">
+            <button onclick="supprimerUtilisateur('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:var(--accent-red);color:#ffffff;border:2px solid var(--outline);font-size:11px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">
               Supprimer
             </button>
           `}
         </div>
       </div>`;
     }).join('')
-      : '<p style="color:#906f6d;text-align:center;padding:28px 0;">Aucun utilisateur</p>';
+      : '<p style="color:var(--text-secondary);text-align:center;padding:28px 0;font-weight:600;">Aucun utilisateur</p>';
   } catch(e) { showToast('Erreur de chargement', 'error'); }
 }
 
@@ -419,13 +493,13 @@ async function chargerStatistiquesOnglet() {
 
 function renderProgressBar(label, val, pct, color) {
   return `
-    <div style="margin-bottom:8px;">
-      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:#5b403e;margin-bottom:4px;">
+    <div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--text-primary);margin-bottom:4px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">
         <span>${label} (${val})</span>
         <span>${pct}%</span>
       </div>
-      <div style="width:100%;height:8px;background:#f5e2e1;border-radius:100px;overflow:hidden;border:1.5px solid #e4bdbb;">
-        <div style="width: ${pct}%;height:100%;background:${color};border-radius:100px;transition:width 0.8s ease-out;"></div>
+      <div style="width:100%;height:8px;background:var(--surface-variant);border:2px solid var(--outline);overflow:hidden;">
+        <div style="width: ${pct}%;height:100%;background:${color};transition:width 0.8s ease-out;"></div>
       </div>
     </div>
   `;
