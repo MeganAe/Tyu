@@ -66,7 +66,7 @@
         </button>
         
         <!-- Bouton Notifications -->
-        <button onclick="toggleNotifications(event)" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Notifications">
+        <button onclick="window.location.href='notifications.html'" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Notifications">
           <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">notifications</span>
           <span id="notifBadge" style="position:absolute;top:-6px;right:-6px;background:var(--primary);color:white;font-size:10px;font-weight:800;border-radius: var(--radius-default) ;padding:2px 6px;border: 1px solid var(--outline-variant);display:none;min-width:18px;box-sizing:border-box;text-align:center;line-height:1;">0</span>
         </button>
@@ -92,15 +92,9 @@
     </div>
   </header>
 
-  <section class="hero-section">
-    <div style="max-width:600px;margin:0 auto;position:relative;z-index:2;text-align:center;">
-      <h2>Alertes citoyennes en temps réel</h2>
-      <p>Suivez et signalez les incidents pour protéger votre communauté à Bukavu.</p>
-    </div>
-  </section>
 
   <!-- Filtres (Catégorie + Quartier en un seul bloc sticky) -->
-  <div class="filter-bar-sticky" style="position:sticky;top:60px;z-index:30;background:var(--surface);border-bottom: 1px solid var(--outline-variant);padding:12px 16px;">
+  <div class="filter-bar-sticky" style="position:sticky;top:64px;z-index:30;background:var(--surface);border-bottom: 1px solid var(--outline-variant);padding:12px 16px;">
     <div style="display:flex;gap:10px;align-items:center;overflow-x:auto;" class="no-scrollbar">
       
       <!-- Sélecteur de quartier moderne -->
@@ -264,8 +258,15 @@
       const estNouvelle = ageMs < 10 * 60 * 1000;
       const badgeNouvelle = estNouvelle ? `<span class="badge urgence-critique" style="margin-right:6px;font-size:9px;">NOUVELLE</span>` : '';
 
+      let borderLeftColor = '#ff9f43'; // Default: Moyen
+      if (a.urgence === 'critique') {
+        borderLeftColor = '#e53935';
+      } else if (a.urgence === 'faible') {
+        borderLeftColor = '#10b981';
+      }
+
       return `
-      <div class="card card-anim" style="animation-delay:${(i%20)*40}ms;">
+      <div class="card card-anim" style="animation-delay:${(i%20)*40}ms; border-left: 5px solid ${borderLeftColor} !important;">
         <div style="padding:16px 16px 12px;cursor:pointer;" onclick="voirDetailsAlerte('${a.id}')">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
             ${badgeNouvelle}

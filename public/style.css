@@ -206,9 +206,17 @@ p {
   100% { transform: scale(1.15); opacity: 1; }
 }
 
+@keyframes header-bg-pulse {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 /* ── TOP BAR ── */
 .top-bar {
-  background: var(--surface-card);
+  background: linear-gradient(-45deg, #840015, #b00020, #761f24, #953639) !important;
+  background-size: 400% 400% !important;
+  animation: header-bg-pulse 8s ease infinite !important;
   height: 64px;
   display: flex;
   align-items: center;
@@ -217,19 +225,28 @@ p {
   position: sticky;
   top: 0;
   z-index: 50;
-  border-bottom: 1px solid var(--outline-variant);
-  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
   transition: padding var(--transition);
+}
+body.dark .top-bar {
+  background: linear-gradient(-45deg, #3d0008, #61000f, #410006, #761f24) !important;
+  background-size: 400% 400% !important;
+  animation: header-bg-pulse 8s ease infinite !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 @media (min-width: 900px) {
   .top-bar {
     padding: 0 calc((100% - 900px) / 2 + 20px) !important;
   }
 }
+.top-bar h1 {
+  color: #ffffff !important;
+}
 .top-bar button {
-  border: 1px solid var(--outline-variant) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
   background: transparent !important;
-  color: var(--text-primary) !important;
+  color: #ffffff !important;
   border-radius: var(--radius-default) !important;
   width: 38px !important;
   height: 38px !important;
@@ -240,9 +257,9 @@ p {
   transition: all var(--transition);
 }
 .top-bar button:hover {
-  background: var(--surface-container-high) !important;
-  color: var(--primary) !important;
-  border-color: var(--outline) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
 }
 
 /* ── HERO SECTION ── */
@@ -611,8 +628,9 @@ body.dark .cat-btn.active {
 .cat-btn:hover:not(.active) {
   transform: translateY(-2px);
   box-shadow: var(--shadow-hover);
-  background: var(--surface-container-high);
-  border-color: var(--outline);
+  background: var(--surface-container-low) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
 }
 
 /* ── URGENCE BUTTONS ── */
@@ -977,22 +995,29 @@ body.dark .notif-row.unread {
 
 /* ── WARNING & ALERTS BOX ── */
 .warning-box {
-  background: var(--error-container);
-  border: 1px solid var(--error) !important;
+  background: #e53935 !important;
+  border: 1px solid #c62828 !important;
   border-radius: var(--radius-md) !important;
   padding: 16px;
   margin-bottom: 20px;
   display: flex;
   gap: 12px;
   align-items: flex-start;
-  color: var(--on-error-container);
+  color: #ffffff !important;
   box-shadow: var(--shadow-ambient);
 }
-body.dark .warning-box {
-  background: var(--error-container);
-  border-color: var(--error) !important;
-  color: var(--on-error-container);
+.warning-box * {
+  color: #ffffff !important;
 }
+body.dark .warning-box {
+  background: #b71c1c !important;
+  border-color: #8e0000 !important;
+  color: #ffffff !important;
+}
+body.dark .warning-box * {
+  color: #ffffff !important;
+}
+
 
 /* ── MAP IFRAME DARK FILTER ── */
 body.dark iframe {

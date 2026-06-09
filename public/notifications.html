@@ -71,9 +71,7 @@
     </div>
   </header>
 
-  <section class="hero-section">
-    <p id="notifIntro">Alertes importantes et incidents récents dans votre quartier</p>
-  </section>
+
 
   <main style="max-width:760px;margin:24px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
 
@@ -147,7 +145,8 @@
         <span class="material-symbols-outlined" style="color:var(--primary);">location_on</span>
         Dans mon quartier (${escHtml(qUser)})
       `;
-      document.getElementById('notifIntro').textContent = `Alertes importantes de Bukavu et incidents à ${qUser}.`;
+      const intro = document.getElementById('notifIntro');
+      if (intro) intro.textContent = `Alertes importantes de Bukavu et incidents à ${qUser}.`;
     }
 
     async function chargerNotifications() {
