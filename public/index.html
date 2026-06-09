@@ -53,39 +53,39 @@
   <header class="top-bar">
     <div id="headerDefaultContent" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
       <div style="display:flex;align-items:center;gap:10px;">
-        <img src="logo.png" alt="Logo" style="width:30px;height:30px;border-radius:0;border:2px solid #f5f0e8;object-fit:cover;" onerror="this.style.display='none'"/>
-        <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">AlertBukavu</h1>
+        <img src="logo.png" alt="Logo" style="width:30px;height:30px;border-radius: var(--radius-default) ;border: 1px solid var(--outline-variant);object-fit:cover;" onerror="this.style.display='none'"/>
+        <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Inter', sans-serif;text-transform:uppercase;">AlertBukavu</h1>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
         <!-- Indicateur de rafraîchissement visuel -->
         <span id="refreshIndicator" style="color:rgba(255,255,255,.8);font-size:11px;font-weight:600;margin-right:4px;transition:all .4s ease;opacity:0;display:none;">Mise à jour...</span>
         
         <!-- Bouton Recherche -->
-        <button onclick="toggleHeaderSearch()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border:2px solid #f5f0e8;border-radius:0;transition:all .1s ease;cursor:pointer;" title="Rechercher">
+        <button onclick="toggleHeaderSearch()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Rechercher">
           <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">search</span>
         </button>
         
         <!-- Bouton Notifications -->
-        <button onclick="toggleNotifications(event)" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border:2px solid #f5f0e8;border-radius:0;transition:all .1s ease;cursor:pointer;" title="Notifications">
+        <button onclick="toggleNotifications(event)" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Notifications">
           <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">notifications</span>
-          <span id="notifBadge" style="position:absolute;top:-6px;right:-6px;background:var(--accent-red);color:white;font-size:10px;font-weight:800;border-radius:0;padding:2px 6px;border:2px solid #f5f0e8;display:none;min-width:18px;box-sizing:border-box;text-align:center;line-height:1;">0</span>
+          <span id="notifBadge" style="position:absolute;top:-6px;right:-6px;background:var(--primary);color:white;font-size:10px;font-weight:800;border-radius: var(--radius-default) ;padding:2px 6px;border: 1px solid var(--outline-variant);display:none;min-width:18px;box-sizing:border-box;text-align:center;line-height:1;">0</span>
         </button>
         
         <!-- Bouton Thème Sombre/Clair -->
-        <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border:2px solid #f5f0e8;border-radius:0;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
+        <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
           <span id="themeToggleIcon" class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">dark_mode</span>
         </button>
         
-        <img id="headerAvatar" src="" alt="" style="width:38px;height:38px;border-radius:0;border:2px solid #f5f0e8;cursor:pointer;object-fit:cover;" onclick="window.location.href='profil.html'"/>
+        <img id="headerAvatar" src="" alt="" style="width:38px;height:38px;border-radius: var(--radius-default) ;border: 1px solid var(--outline-variant);cursor:pointer;object-fit:cover;" onclick="window.location.href='profil.html'"/>
       </div>
     </div>
 
     <!-- Sleek Search Overlay -->
-    <div id="headerSearchOverlay" style="display:none;position:absolute;inset:0;background:#1a1a1a;padding:0 20px;align-items:center;z-index:51;border-radius:inherit;border-bottom:4px solid var(--accent-yellow);">
+    <div id="headerSearchOverlay" style="display:none;position:absolute;inset:0;background:#1a1a1a;padding:0 20px;align-items:center;z-index:51;border-radius:inherit;border-bottom: 1px solid var(--outline-variant);">
       <div style="width:100%;max-width:600px;margin:0 auto;position:relative;display:flex;align-items:center;gap:12px;">
         <span class="material-symbols-outlined" style="color:rgba(255,255,255,.6);font-size:22px;pointer-events:none;">search</span>
-        <input id="headerSearchInput" type="text" placeholder="Rechercher des alertes..." oninput="filtrerAlertesRecherche(this.value)" style="flex:1;height:40px;padding:0 40px 0 10px;background:rgba(255,255,255,.1);border:2px solid #f5f0e8;border-radius:0;font-size:14px;color:white;outline:none;transition:all .2s ease;font-family:'Inter',sans-serif;"/>
-        <button onclick="closeHeaderSearch()" style="background:none;border:none;color:white;opacity:0.7;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:4px;border-radius:0;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+        <input id="headerSearchInput" type="text" placeholder="Rechercher des alertes..." oninput="filtrerAlertesRecherche(this.value)" style="flex:1;height:40px;padding:0 40px 0 10px;background:rgba(255,255,255,.1);border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;font-size:14px;color:white;outline:none;transition:all .2s ease;font-family:'Inter',sans-serif;"/>
+        <button onclick="closeHeaderSearch()" style="background:none;border:none;color:white;opacity:0.7;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:4px;border-radius: var(--radius-default) ;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
           <span class="material-symbols-outlined" style="font-size:22px;">close</span>
         </button>
       </div>
@@ -100,12 +100,12 @@
   </section>
 
   <!-- Filtres (Catégorie + Quartier en un seul bloc sticky) -->
-  <div class="filter-bar-sticky" style="position:sticky;top:60px;z-index:30;background:var(--surface);border-bottom:3px solid var(--outline);padding:12px 16px;">
+  <div class="filter-bar-sticky" style="position:sticky;top:60px;z-index:30;background:var(--surface);border-bottom: 1px solid var(--outline-variant);padding:12px 16px;">
     <div style="display:flex;gap:10px;align-items:center;overflow-x:auto;" class="no-scrollbar">
       
       <!-- Sélecteur de quartier moderne -->
       <div style="position:relative;flex-shrink:0;display:flex;align-items:center;">
-        <select id="filtreQuartier" onchange="filtrerParQuartier(this.value)" class="pill" style="padding-right:32px;background:var(--surface-card);color:var(--text-primary);border-radius:0;">
+        <select id="filtreQuartier" onchange="filtrerParQuartier(this.value)" class="pill" style="padding-right:32px;background:var(--surface-card);color:var(--text-primary);border-radius: var(--radius-default) ;">
           <option value="tous">Tous les quartiers</option>
         </select>
         <span class="material-symbols-outlined" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-primary);pointer-events:none;">expand_more</span>
@@ -269,15 +269,15 @@
         <div style="padding:16px 16px 12px;cursor:pointer;" onclick="voirDetailsAlerte('${a.id}')">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
             ${badgeNouvelle}
-            <span style="padding:3px 10px;border:2px solid var(--outline);font-size:10px;font-weight:800;background:${urg.bg};color:${urg.color};text-transform:uppercase;font-family:'Space Grotesk',sans-serif;">${urg.label}</span>
-            <span style="padding:3px 10px;border:2px solid var(--outline);font-size:10px;font-weight:800;background:${cat.bg};color:${cat.color};text-transform:uppercase;font-family:'Space Grotesk',sans-serif;">${cat.label}</span>
+            <span style="padding:3px 10px;border: 1px solid var(--outline-variant);font-size:10px;font-weight:800;background:${urg.bg};color:${urg.color};text-transform:uppercase;font-family:'Inter', sans-serif;">${urg.label}</span>
+            <span style="padding:3px 10px;border: 1px solid var(--outline-variant);font-size:10px;font-weight:800;background:${cat.bg};color:${cat.color};text-transform:uppercase;font-family:'Inter', sans-serif;">${cat.label}</span>
             <span style="margin-left:auto;font-size:11px;color:var(--text-secondary);font-weight:600;">${tempsRelatif(a.created_at)}</span>
           </div>
-          <h3 style="font-size:16px;font-weight:800;color:var(--text-primary);margin-bottom:6px;line-height:1.4;font-family:'Space Grotesk',sans-serif;">${escHtml(a.titre)}</h3>
+          <h3 style="font-size:16px;font-weight:800;color:var(--text-primary);margin-bottom:6px;line-height:1.4;font-family:'Inter', sans-serif;">${escHtml(a.titre)}</h3>
           <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escHtml(a.description)}</p>
           <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-secondary);font-weight:600;">
             <span style="display:flex;align-items:center;gap:4px;">
-              <span class="material-symbols-outlined" style="font-size:14px;color:var(--accent-red);">location_on</span>
+              <span class="material-symbols-outlined" style="font-size:14px;color:var(--primary);">location_on</span>
               ${escHtml(a.quartier || 'Bukavu')}
             </span>
             <span style="display:flex;align-items:center;gap:8px;">
@@ -287,19 +287,19 @@
           </div>
         </div>
         ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" class="alerte-img" alt="Photo alerte" loading="lazy" onerror="this.style.display='none'"/>` : ''}
-        <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border-top:3px solid var(--outline);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--surface);border-top: 1px solid var(--outline-variant);">
           <img src="${photoAuteur}" class="author-img" onerror="this.src='${genererAvatar(a.auteur_nom||'U',36)}'"/>
           <div style="flex:1;">
             <p style="font-size:13px;font-weight:800;color:var(--text-primary);line-height:1.2;">${escHtml(a.auteur_nom || 'Habitant')}</p>
             <p style="font-size:11px;color:var(--text-secondary);font-weight:600;">${a.auteur_username ? '@'+escHtml(a.auteur_username) : escHtml(a.auteur_quartier||'Bukavu')}</p>
           </div>
-          ${a.statut === 'resolue' ? '<span style="font-size:10px;font-weight:800;background:var(--accent-blue);color:#ffffff;padding:3px 10px;border:2px solid var(--outline);font-family:\'Space Grotesk\',sans-serif;">RÉSOLUE</span>' : ''}
+          ${a.statut === 'resolue' ? '<span style="font-size:10px;font-weight:800;background:var(--primary);color:#ffffff;padding:3px 10px;border: 1px solid var(--outline-variant);font-family:\'Inter\',sans-serif;">RÉSOLUE</span>' : ''}
         </div>
-        <div style="border-top:3px solid var(--outline);padding:12px 16px;display:flex;gap:12px;background:var(--surface-card);">
-          <button onclick="confirmer('${a.id}','${a.user_id}')" style="flex:1;padding:10px;border:3px solid var(--outline);background:var(--accent-blue);color:#ffffff;font-size:12px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.1s ease;box-shadow:2px 2px 0px var(--outline);" onmousedown="this.style.transform='translate(1px,1px)';this.style.boxShadow='1px 1px 0px var(--outline)'" onmouseup="this.style.transform='';this.style.boxShadow='2px 2px 0px var(--outline)'">
+        <div style="border-top: 1px solid var(--outline-variant);padding:12px 16px;display:flex;gap:12px;background:var(--surface-card);">
+          <button onclick="confirmer('${a.id}','${a.user_id}')" style="flex:1;padding:10px;border: 1px solid var(--outline-variant);background:var(--primary);color:#ffffff;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.1s ease;box-shadow: var(--shadow-ambient);"  >
             <span class="material-symbols-outlined" style="font-size:15px;">check_circle</span>Confirmer
           </button>
-          <button onclick="signalerFausse('${a.id}','${a.user_id}')" style="padding:10px 16px;border:3px solid var(--outline);background:var(--accent-red);color:#ffffff;font-size:12px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.1s ease;box-shadow:2px 2px 0px var(--outline);" onmousedown="this.style.transform='translate(1px,1px)';this.style.boxShadow='1px 1px 0px var(--outline)'" onmouseup="this.style.transform='';this.style.boxShadow='2px 2px 0px var(--outline)'">
+          <button onclick="signalerFausse('${a.id}','${a.user_id}')" style="padding:10px 16px;border: 1px solid var(--outline-variant);background:var(--primary);color:#ffffff;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.1s ease;box-shadow: var(--shadow-ambient);"  >
             <span class="material-symbols-outlined" style="font-size:15px;">flag</span>Signaler
           </button>
         </div>
@@ -491,26 +491,26 @@
         let html = `
           <div style="text-align:left;font-family:'Inter',sans-serif;margin-top:12px;">
             <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-              <span style="padding:4px 12px;border:2px solid var(--outline);font-size:11px;font-weight:800;background:${urg.bg};color:${urg.color};text-transform:uppercase;font-family:'Space Grotesk',sans-serif;">${urg.label}</span>
-              <span style="padding:4px 12px;border:2px solid var(--outline);font-size:11px;font-weight:800;background:${cat.bg};color:${cat.color};text-transform:uppercase;font-family:'Space Grotesk',sans-serif;">${cat.label}</span>
+              <span style="padding:4px 12px;border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;background:${urg.bg};color:${urg.color};text-transform:uppercase;font-family:'Inter', sans-serif;">${urg.label}</span>
+              <span style="padding:4px 12px;border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;background:${cat.bg};color:${cat.color};text-transform:uppercase;font-family:'Inter', sans-serif;">${cat.label}</span>
             </div>
-            <h3 style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:8px;font-family:'Space Grotesk',sans-serif;">${escHtml(a.titre)}</h3>
+            <h3 style="font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:8px;font-family:'Inter', sans-serif;">${escHtml(a.titre)}</h3>
             <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;display:flex;align-items:center;gap:4px;font-weight:600;">
-              <span class="material-symbols-outlined" style="font-size:16px;color:var(--accent-red);">location_on</span>
+              <span class="material-symbols-outlined" style="font-size:16px;color:var(--primary);">location_on</span>
               Quartier <strong>${escHtml(a.quartier || 'Bukavu')}</strong>
             </p>
-            <p style="font-size:14px;color:var(--text-primary);line-height:1.6;background:var(--surface);padding:12px;border:3px solid var(--outline);border-left:8px solid var(--accent-yellow);margin-bottom:16px;">
+            <p style="font-size:14px;color:var(--text-primary);line-height:1.6;background:var(--surface);padding:12px;border: 1px solid var(--outline-variant);border-left:8px solid var(--primary);margin-bottom:16px;">
               ${escHtml(a.description)}
             </p>
-            ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" style="width:100%;max-height:220px;object-fit:cover;border:3px solid var(--outline);margin-bottom:16px;" />` : ''}
+            ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" style="width:100%;max-height:220px;object-fit:cover;border: 1px solid var(--outline-variant);margin-bottom:16px;" />` : ''}
             
             ${(a.lat && a.lng) ? `
-            <div style="margin-bottom:16px;border:3px solid var(--outline);overflow:hidden;">
+            <div style="margin-bottom:16px;border: 1px solid var(--outline-variant);overflow:hidden;">
               <iframe width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy" src="https://maps.google.com/maps?q=${a.lat},${a.lng}&z=15&output=embed"></iframe>
             </div>
             ` : ''}
 
-            <div style="border-top:3px solid var(--outline);padding-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-secondary);font-weight:600;">
+            <div style="border-top: 1px solid var(--outline-variant);padding-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-secondary);font-weight:600;">
               <div style="flex:1;min-width:0;">
                 <p>Publié par <strong>${escHtml(a.auteur_nom || 'Habitant')}</strong></p>
                 <p style="margin-top:2px;">Le ${new Date(a.created_at).toLocaleString('fr-FR')}</p>

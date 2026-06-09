@@ -25,14 +25,14 @@
   <header class="top-bar">
     <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
       <div style="display:flex;align-items:center;gap:10px;">
-        <button onclick="history.back()" style="background:none;border:2px solid #f5f0e8;border-radius:0;cursor:pointer;display:flex;align-items:center;width:38px;height:38px;justify-content:center;">
+        <button onclick="history.back()" style="background:none;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;cursor:pointer;display:flex;align-items:center;width:38px;height:38px;justify-content:center;">
           <span class="material-symbols-outlined" style="font-size:22px;color:#f5f0e8;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
         </button>
-        <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Publier une alerte</h1>
+        <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Inter', sans-serif;text-transform:uppercase;">Publier une alerte</h1>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
         <!-- Bouton Thème Sombre/Clair -->
-        <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border:2px solid #f5f0e8;border-radius:0;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
+        <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
           <span id="themeToggleIcon" class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">dark_mode</span>
         </button>
       </div>
@@ -87,8 +87,8 @@
       <label class="field-label">Photo <span style="color:var(--text-secondary);font-weight:400;">(optionnel)</span></label>
       <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;font-weight:600;">Ajoutez une photo. Elle sera automatiquement optimisée.</p>
       <div id="photoPreviewWrap" style="display:none;margin-bottom:12px;">
-        <img id="photoPreview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border:3px solid var(--outline);"/>
-        <button onclick="supprimerPhoto()" style="margin-top:8px;padding:10px 16px;background:var(--accent-red);color:#ffffff;border:3px solid var(--outline);border-radius:0;font-size:12px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;box-shadow:var(--shadow-brutal);">Supprimer la photo</button>
+        <img id="photoPreview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border: 1px solid var(--outline-variant);"/>
+        <button onclick="supprimerPhoto()" style="margin-top:8px;padding:10px 16px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;box-shadow: var(--shadow-ambient) ;">Supprimer la photo</button>
       </div>
       <label for="photoInput" class="photo-upload-btn">
         <span class="material-symbols-outlined" style="font-size:18px;">add_photo_alternate</span>
@@ -121,11 +121,11 @@
           <label class="field-label" style="font-size:11px;margin-bottom:4px;">Longitude</label>
           <input id="manualLng" type="number" step="any" class="field-input no-icon" placeholder="Ex: 28.8623"/>
         </div>
-        <button onclick="validerManuelGps()" style="height:48px;padding:0 16px;background:var(--accent-yellow);color:#1a1a1a;border:3px solid var(--outline);border-radius:0;font-size:12px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;box-shadow:var(--shadow-brutal);">Valider</button>
+        <button onclick="validerManuelGps()" style="height:48px;padding:0 16px;background: var(--surface-container-high);color:#1a1a1a;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;box-shadow: var(--shadow-ambient) ;">Valider</button>
       </div>
 
       <!-- Google Maps Iframe preview -->
-      <div id="mapPreviewWrap" style="display:none;margin-top:12px;border:3px solid var(--outline);overflow:hidden;">
+      <div id="mapPreviewWrap" style="display:none;margin-top:12px;border: 1px solid var(--outline-variant);overflow:hidden;">
         <iframe id="mapPreview" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
       </div>
     </div>
@@ -139,7 +139,7 @@
     <div class="warning-box">
       <span class="material-symbols-outlined" style="color:#ffffff;font-size:20px;flex-shrink:0;">warning</span>
       <div>
-        <p style="font-size:13px;color:#ffffff;font-weight:800;margin-bottom:4px;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Responsabilité</p>
+        <p style="font-size:13px;color:#ffffff;font-weight:800;margin-bottom:4px;font-family:'Inter', sans-serif;text-transform:uppercase;">Responsabilité</p>
         <p style="font-size:12px;color:#ffffff;line-height:1.5;font-weight:500;">Toute fausse alerte entraîne la suspension de votre compte. Après 3 fausses alertes, le compte est définitivement bloqué.</p>
       </div>
     </div>

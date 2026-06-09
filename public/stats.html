@@ -15,8 +15,8 @@
     /* Bauhaus stat big boxes */
     .stat-big {
       background: var(--surface-card);
-      border: var(--border-thick);
-      box-shadow: var(--shadow-brutal);
+      border: 1px solid var(--outline-variant) ;
+      box-shadow: var(--shadow-ambient) ;
       padding: 20px 12px;
       text-align: center;
     }
@@ -25,7 +25,7 @@
       font-weight: 800;
       line-height: 1;
       margin-bottom: 6px;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
     .stat-big .lbl {
       font-size: 11px;
@@ -33,7 +33,7 @@
       color: var(--text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     /* Bauhaus progress row */
@@ -43,13 +43,13 @@
       font-size: 12px; font-weight: 700;
       color: var(--text-primary);
       width: 110px; flex-shrink: 0;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Inter', sans-serif;
       text-transform: uppercase;
     }
     .progress-track {
       flex: 1; height: 8px;
       background: var(--surface-variant);
-      border: 2px solid var(--outline);
+      border: 1px solid var(--outline-variant);
       overflow: hidden;
     }
     .progress-fill { height: 100%; transition: width .7s ease; }
@@ -57,7 +57,7 @@
       font-size: 13px; font-weight: 800;
       color: var(--text-secondary);
       width: 28px; text-align: right; flex-shrink: 0;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
   </style>
 </head>
@@ -66,10 +66,10 @@
   <header class="top-bar">
     <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
       <div style="display:flex;align-items:center;gap:10px;">
-        <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Space Grotesk',sans-serif;text-transform:uppercase;">Statistiques</h1>
+        <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Inter', sans-serif;text-transform:uppercase;">Statistiques</h1>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
-        <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border:2px solid #f5f0e8;border-radius:0;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
+        <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
           <span id="themeToggleIcon" class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">dark_mode</span>
         </button>
       </div>
@@ -85,48 +85,48 @@
     <!-- 4 stats en grille -->
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px;">
       <div class="stat-big">
-        <div class="num" id="statTotal" style="color:var(--accent-red);">—</div>
+        <div class="num" id="statTotal" style="color:var(--primary);">—</div>
         <div class="lbl">Total alertes</div>
       </div>
       <div class="stat-big">
-        <div class="num" id="statResolues" style="color:var(--accent-blue);">—</div>
+        <div class="num" id="statResolues" style="color: var(--primary);">—</div>
         <div class="lbl">Résolues</div>
       </div>
       <div class="stat-big">
-        <div class="num" id="statCritiques" style="color:var(--accent-red);">—</div>
+        <div class="num" id="statCritiques" style="color:var(--primary);">—</div>
         <div class="lbl">Critiques</div>
       </div>
       <div class="stat-big">
-        <div class="num" id="statConfirmations" style="color:var(--accent-yellow);font-size:32px;">—</div>
+        <div class="num" id="statConfirmations" style="color: var(--primary);font-size:32px;">—</div>
         <div class="lbl">Confirmations</div>
       </div>
     </div>
 
     <!-- Zone la plus active -->
     <div class="section-card" style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
-      <div style="width:48px;height:48px;background:var(--accent-yellow);border:var(--border-thick);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <div style="width:48px;height:48px;background: var(--surface-container-high);border: 1px solid var(--outline-variant) ;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <span class="material-symbols-outlined" style="font-size:24px;color:#1a1a1a;">location_on</span>
       </div>
       <div>
-        <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;font-family:'Space Grotesk',sans-serif;">Zone la plus active</p>
-        <p id="statTopQ" style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:'Space Grotesk',sans-serif;">—</p>
+        <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;font-family:'Inter', sans-serif;">Zone la plus active</p>
+        <p id="statTopQ" style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:'Inter', sans-serif;">—</p>
       </div>
     </div>
 
     <!-- Performance de résolution -->
     <div class="section-card" style="margin-bottom:14px;">
       <h2 style="font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent-red);">speed</span>
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">speed</span>
         Performance de Résolution
       </h2>
       <div style="display:flex;gap:12px;">
-        <div style="flex:1;background:var(--surface-card);border:var(--border-thick);box-shadow:var(--shadow-brutal);padding:16px;text-align:center;">
-          <p id="txResolutionVal" style="font-size:28px;font-weight:800;color:var(--accent-blue);margin-bottom:4px;font-family:'Space Grotesk',sans-serif;">0%</p>
-          <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;font-family:'Space Grotesk',sans-serif;">Taux de résolution</p>
+        <div style="flex:1;background:var(--surface-card);border: 1px solid var(--outline-variant) ;box-shadow: var(--shadow-ambient) ;padding:16px;text-align:center;">
+          <p id="txResolutionVal" style="font-size:28px;font-weight:800;color: var(--primary);margin-bottom:4px;font-family:'Inter', sans-serif;">0%</p>
+          <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;font-family:'Inter', sans-serif;">Taux de résolution</p>
         </div>
-        <div style="flex:1;background:var(--surface-card);border:var(--border-thick);box-shadow:var(--shadow-brutal);padding:16px;text-align:center;">
-          <p id="tpsResolutionVal" style="font-size:28px;font-weight:800;color:var(--accent-yellow);margin-bottom:4px;font-family:'Space Grotesk',sans-serif;">0h</p>
-          <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;font-family:'Space Grotesk',sans-serif;">Temps moyen</p>
+        <div style="flex:1;background:var(--surface-card);border: 1px solid var(--outline-variant) ;box-shadow: var(--shadow-ambient) ;padding:16px;text-align:center;">
+          <p id="tpsResolutionVal" style="font-size:28px;font-weight:800;color: var(--primary);margin-bottom:4px;font-family:'Inter', sans-serif;">0h</p>
+          <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;font-family:'Inter', sans-serif;">Temps moyen</p>
         </div>
       </div>
     </div>
@@ -134,10 +134,10 @@
     <!-- Historique des 7 derniers jours -->
     <div class="section-card" style="margin-bottom:14px;">
       <h2 style="font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent-red);">calendar_today</span>
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">calendar_today</span>
         Activité des 7 derniers jours
       </h2>
-      <div id="timelineChart" style="display:flex;justify-content:space-between;align-items:flex-end;height:120px;padding:10px 10px 20px;border-bottom:var(--border-thin);margin-bottom:14px;">
+      <div id="timelineChart" style="display:flex;justify-content:space-between;align-items:flex-end;height:120px;padding:10px 10px 20px;border-bottom: 1px solid var(--outline-variant);margin-bottom:14px;">
         <!-- CSS vertical bars populated dynamically -->
       </div>
       <p style="font-size:11px;color:var(--text-secondary);text-align:center;font-weight:600;">Nombre de nouvelles alertes quotidiennes</p>
@@ -146,7 +146,7 @@
     <!-- Par catégorie -->
     <div class="section-card">
       <h2 style="font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent-red);">category</span>
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">category</span>
         Par catégorie
       </h2>
       <div id="catStats"></div>
@@ -155,7 +155,7 @@
     <!-- Par urgence -->
     <div class="section-card">
       <h2 style="font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent-red);">warning</span>
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">warning</span>
         Par niveau d'urgence
       </h2>
       <div id="urgStats"></div>
@@ -164,7 +164,7 @@
     <!-- Par quartier -->
     <div class="section-card">
       <h2 style="font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:var(--accent-red);">apartment</span>
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">apartment</span>
         Top quartiers
       </h2>
       <div id="quartierStats"></div>
@@ -243,9 +243,9 @@
           const heightPct = Math.round((t.count / maxTimelineCount) * 100);
           return `
             <div style="display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;min-width:30px;">
-              <span style="font-size:11px;font-weight:800;color:var(--accent-red);margin-bottom:4px;font-family:'Space Grotesk',sans-serif;">${t.count}</span>
-              <div style="width:16px;height:${heightPct}%;background:var(--accent-red);border:2px solid var(--outline);transition:height .7s ease;min-height:3px;" title="${t.count} alerte(s) le ${t.label}"></div>
-              <span style="font-size:10px;font-weight:800;color:var(--text-secondary);margin-top:6px;text-transform:uppercase;font-family:'Space Grotesk',sans-serif;">${t.label}</span>
+              <span style="font-size:11px;font-weight:800;color:var(--primary);margin-bottom:4px;font-family:'Inter', sans-serif;">${t.count}</span>
+              <div style="width:16px;height:${heightPct}%;background:var(--primary);border: 1px solid var(--outline-variant);transition:height .7s ease;min-height:3px;" title="${t.count} alerte(s) le ${t.label}"></div>
+              <span style="font-size:10px;font-weight:800;color:var(--text-secondary);margin-top:6px;text-transform:uppercase;font-family:'Inter', sans-serif;">${t.label}</span>
             </div>
           `;
         }).join('');

@@ -62,22 +62,23 @@ const QUARTIERS = [
 ];
 
 // Toutes les catégories originales restaurées
+// Toutes les catégories adaptées au Emergency Response Framework
 const CATEGORIES = {
-  incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#e63b2e', bg: '#fff0f0' },
-  route:      { label: 'Route dégradée',  icon: 'construction',          color: '#ffcc00', bg: '#fffbeb' },
-  inondation: { label: 'Inondation',      icon: 'water',                 color: '#0055ff', bg: '#f0f5ff' },
-  accident:   { label: 'Accident',        icon: 'car_crash',             color: '#e63b2e', bg: '#fff0f0' },
-  securite:   { label: 'Sécurité',        icon: 'shield',                color: '#e63b2e', bg: '#fff0f0' },
-  sante:      { label: 'Santé',           icon: 'medical_services',      color: '#0055ff', bg: '#f0f5ff' },
-  eau:        { label: 'Eau',             icon: 'water_drop',            color: '#0055ff', bg: '#f0f5ff' },
-  meteo:      { label: 'Météo',           icon: 'thunderstorm',          color: '#ffcc00', bg: '#fffbeb' },
-  autre:      { label: 'Autre',           icon: 'report',                color: '#ffcc00', bg: '#fffbeb' }
+  incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#840015', bg: '#ffdad8' },
+  route:      { label: 'Route dégradée',  icon: 'construction',          color: '#761f24', bg: '#ffdad8' },
+  inondation: { label: 'Inondation',      icon: 'water',                 color: '#5d5f5f', bg: '#dfe0e0' },
+  accident:   { label: 'Accident',        icon: 'car_crash',             color: '#840015', bg: '#ffdad8' },
+  securite:   { label: 'Sécurité',        icon: 'shield',                color: '#840015', bg: '#ffdad8' },
+  sante:      { label: 'Santé',           icon: 'medical_services',      color: '#5d5f5f', bg: '#dfe0e0' },
+  eau:        { label: 'Eau',             icon: 'water_drop',            color: '#5d5f5f', bg: '#dfe0e0' },
+  meteo:      { label: 'Météo',           icon: 'thunderstorm',          color: '#761f24', bg: '#ffdad8' },
+  autre:      { label: 'Autre',           icon: 'report',                color: '#761f24', bg: '#ffdad8' }
 };
 
 const URGENCES = {
-  faible:   { label: 'FAIBLE',   color: '#0055ff', bg: '#f0f5ff' },
-  moyen:    { label: 'MOYEN',    color: '#ffcc00', bg: '#fffbeb' },
-  critique: { label: 'CRITIQUE', color: '#e63b2e', bg: '#fff0f0' }
+  faible:   { label: 'FAIBLE',   color: '#5d5f5f', bg: '#dfe0e0' },
+  moyen:    { label: 'MOYEN',    color: '#761f24', bg: '#ffdad8' },
+  critique: { label: 'CRITIQUE', color: '#840015', bg: '#ffdad8' }
 };
 
 // ---- Utilitaires ----
@@ -99,16 +100,16 @@ function escHtml(str) {
 function genererAvatar(nom, taille = 40) {
   const initiales = nom ? nom.trim().split(' ').map(p => p[0]||'').join('').substring(0,2).toUpperCase() : 'U';
   const couleurs = [
-    { bg: '#ffcc00', fg: '#1a1a1a' },
-    { bg: '#e63b2e', fg: '#ffffff' },
-    { bg: '#0055ff', fg: '#ffffff' },
-    { bg: '#1a1a1a', fg: '#f5f0e8' }
+    { bg: '#840015', fg: '#ffffff' }, // Primary Deep Red
+    { bg: '#761f24', fg: '#ffffff' }, // Tertiary
+    { bg: '#5d5f5f', fg: '#ffffff' }, // Secondary
+    { bg: '#bc1127', fg: '#ffffff' }  // Surface Tint
   ];
   const choice = couleurs[nom ? nom.charCodeAt(0) % couleurs.length : 0];
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}">
     <rect width="${taille}" height="${taille}" fill="${choice.bg}"/>
     <text x="${taille/2}" y="${taille/2+taille*0.14}" text-anchor="middle" fill="${choice.fg}"
-      font-family="Space Grotesk,Inter,sans-serif" font-weight="800" font-size="${taille*0.38}">${initiales}</text>
+      font-family="Inter,sans-serif" font-weight="800" font-size="${taille*0.38}">${initiales}</text>
   </svg>`;
   return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
 }
