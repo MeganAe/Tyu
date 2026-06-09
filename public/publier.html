@@ -87,7 +87,7 @@
       <label class="field-label">Photo <span style="color:var(--text-secondary);font-weight:400;">(optionnel)</span></label>
       <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;font-weight:600;">Ajoutez une photo. Elle sera automatiquement optimisée.</p>
       <div id="photoPreviewWrap" style="display:none;margin-bottom:12px;">
-        <img id="photoPreview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border: 1px solid var(--outline-variant);"/>
+        <img id="photoPreview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);"/>
         <button onclick="supprimerPhoto()" style="margin-top:8px;padding:10px 16px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;font-size:12px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;box-shadow: var(--shadow-ambient) ;">Supprimer la photo</button>
       </div>
       <label for="photoInput" class="photo-upload-btn">
@@ -125,7 +125,7 @@
       </div>
 
       <!-- Google Maps Iframe preview -->
-      <div id="mapPreviewWrap" style="display:none;margin-top:12px;border: 1px solid var(--outline-variant);overflow:hidden;">
+      <div id="mapPreviewWrap" style="display:none;margin-top:12px;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);overflow:hidden;">
         <iframe id="mapPreview" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
       </div>
     </div>

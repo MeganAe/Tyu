@@ -58,7 +58,7 @@
   <header class="top-bar">
     <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
       <div style="display:flex;align-items:center;gap:12px;">
-        <a href="index.html" style="color:#f5f0e8;text-decoration:none;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border: 1px solid var(--outline-variant);transition:all .1s ease;">
+        <a href="index.html" style="color:#f5f0e8;text-decoration:none;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);transition:all .1s ease;">
           <span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'FILL' 0;">arrow_back</span>
         </a>
         <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Inter', sans-serif;text-transform:uppercase;">Notifications</h1>
@@ -194,7 +194,7 @@
 
         return `
           <div class="notif-row ${unreadClass}" onclick="voirDetailsAlerte('${a.id}')">
-            <div style="width:10px;height:10px;border: 1px solid var(--outline-variant);background:${urg.color};margin-top:5px;flex-shrink:0;"></div>
+            <div style="width:10px;height:10px;border: 1px solid var(--outline-variant);background:${urg.bg};border-radius: 50%;margin-top:5px;flex-shrink:0;"></div>
             <div style="flex:1;min-width:0;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px;">
                 <p style="font-size:14px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Inter', sans-serif;">${escHtml(a.titre)}</p>
@@ -235,8 +235,8 @@
         let html = `
           <div style="text-align:left;font-family:'Inter',sans-serif;margin-top:12px;">
             <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-              <span style="padding:4px 12px;font-size:11px;font-weight:800;background:${urg.bg};color:${urg.color};border: 1px solid var(--outline-variant);text-transform:uppercase;font-family:'Inter', sans-serif;">${urg.label}</span>
-              <span style="padding:4px 12px;font-size:11px;font-weight:800;background:${cat.bg};color:${cat.color};border: 1px solid var(--outline-variant);text-transform:uppercase;font-family:'Inter', sans-serif;">${cat.label}</span>
+              <span style="padding:4px 12px;font-size:11px;font-weight:800;background:${urg.bg};color:${urg.color};border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);text-transform:uppercase;font-family:'Inter', sans-serif;">${urg.label}</span>
+              <span style="padding:4px 12px;font-size:11px;font-weight:800;background:${cat.bg};color:${cat.color};border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);text-transform:uppercase;font-family:'Inter', sans-serif;">${cat.label}</span>
             </div>
             <h3 style="font-size:18px;font-weight:800;color:#1a1a1a;margin-bottom:8px;font-family:'Inter', sans-serif;text-transform:uppercase;">${escHtml(a.titre)}</h3>
             <p style="font-size:13px;color:#555;margin-bottom:12px;display:flex;align-items:center;gap:4px;font-weight:600;">
@@ -246,7 +246,7 @@
             <p style="font-size:14px;color:#1a1a1a;line-height:1.6;background:#f5f0e8;padding:12px;border: 1px solid var(--outline-variant);border-left:6px solid #ffcc00;margin-bottom:16px;">
               ${escHtml(a.description)}
             </p>
-            ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" style="width:100%;max-height:220px;object-fit:cover;border: 1px solid var(--outline-variant);margin-bottom:16px;" />` : ''}
+            ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" style="width:100%;max-height:220px;object-fit:cover;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);margin-bottom:16px;" />` : ''}
             <div style="border-top: 1px solid var(--outline-variant);padding-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#555;">
               <div style="flex:1;">
                 <p style="font-weight:600;">Publié par <strong>${escHtml(a.auteur_nom || 'Habitant')}</strong> (${a.auteur_username ? '@'+escHtml(a.auteur_username) : 'Habitant'})</p>

@@ -20,6 +20,7 @@
       border: 1px solid var(--outline-variant) ;
       box-shadow: var(--shadow-ambient) ;
       display: block;
+      border-radius: var(--radius-full) !important;
     }
     .photo-edit-btn {
       position: absolute; bottom: 0; right: 0;
@@ -27,6 +28,7 @@
       border: 1px solid var(--outline-variant) ;
       width: 30px; height: 30px;
       display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-full) !important;
     }
     .photo-edit-btn .material-symbols-outlined { font-size: 16px; color: #1a1a1a; }
 
@@ -67,13 +69,13 @@
     <h2 id="nomUser" style="font-size:24px;color:inherit;margin-bottom:2px;"></h2>
     <p id="usernameUser" style="font-size:14px;color:inherit;margin-bottom:6px;font-weight:600;"></p>
     <p id="emailUser" style="font-size:13px;color:inherit;margin-bottom:12px;opacity:0.8;"></p>
-    <span id="quartierBadge" style="background:var(--outline);color:var(--surface);padding:4px 16px;font-size:12px;font-weight:800;border: 1px solid var(--outline-variant);font-family:'Inter', sans-serif;text-transform:uppercase;display:inline-block;box-shadow: var(--shadow-ambient);"></span>
+    <span id="quartierBadge" style="background:var(--outline);color:var(--surface);padding:4px 16px;font-size:12px;font-weight:800;border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);font-family:'Inter', sans-serif;text-transform:uppercase;display:inline-block;box-shadow: var(--shadow-ambient);"></span>
   </section>
 
   <main style="max-width:640px;margin:24px auto 0;padding:0 16px;position:relative;z-index:1;">
 
     <!-- Avertissement de compte si nb_fausses_alertes >= 2 -->
-    <div id="warningCompte" style="display:none;background:var(--primary);border: 1px solid var(--outline-variant);padding:14px 16px;margin-bottom:14px;gap:10px;align-items:flex-start;color:#ffffff;box-shadow: var(--shadow-ambient) ;">
+    <div id="warningCompte" style="display:none;background:var(--primary);border: 1px solid var(--outline-variant);border-radius: var(--radius-default);padding:14px 16px;margin-bottom:14px;gap:10px;align-items:flex-start;color:#ffffff;box-shadow: var(--shadow-ambient);">
       <span class="material-symbols-outlined" style="color:#ffffff;font-size:20px;flex-shrink:0;">warning</span>
       <div>
         <p style="font-size:13px;color:#ffffff;font-weight:800;margin-bottom:4px;font-family:'Inter', sans-serif;text-transform:uppercase;">Compte en sursis (Averti)</p>
@@ -370,7 +372,7 @@
           const urg = URGENCES[a.urgence] || URGENCES.moyen;
           const st = statutStyle(a.statut);
           return `<div class="alerte-row" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-            <div style="width:10px;height:10px;border: 1px solid var(--outline-variant);background:${urg.color};margin-top:2px;flex-shrink:0;margin-right:12px;"></div>
+            <div style="width:10px;height:10px;border: 1px solid var(--outline-variant);background:${urg.bg};border-radius: 50%;margin-top:2px;flex-shrink:0;margin-right:12px;"></div>
             <div style="flex:1;min-width:0;text-align:left;">
               <p style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Inter', sans-serif;">${escHtml(a.titre)}</p>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -380,7 +382,7 @@
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:12px;">
-              <span style="font-size:10px;font-weight:800;padding:3px 10px;border: 1px solid var(--outline-variant);background:${st.bg};color:${st.color};white-space:nowrap;text-transform:uppercase;font-family:'Inter', sans-serif;">${st.label}</span>
+              <span style="font-size:10px;font-weight:800;padding:3px 10px;border: 1px solid var(--outline-variant);background:${st.bg};color:${st.color};border-radius: var(--radius-sm);white-space:nowrap;text-transform:uppercase;font-family:'Inter', sans-serif;">${st.label}</span>
               <button onclick="supprimerAlerte('${a.id}')" style="background:none;border:none;color:var(--primary);cursor:pointer;display:inline-flex;align-items:center;padding:4px;border-radius: var(--radius-default) ;transition:background 0.2s;" title="Supprimer l'alerte" onmouseover="this.style.background='var(--outline)';this.style.color='var(--surface)';" onmouseout="this.style.background='none';this.style.color='var(--primary)';">
                 <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 0;">delete</span>
               </button>

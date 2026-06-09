@@ -639,21 +639,21 @@ body.dark .cat-btn.active {
   border-color: var(--outline) !important;
 }
 .urg-btn.faible.active {
-  background: var(--secondary) !important;
-  color: var(--on-secondary) !important;
-  border-color: var(--secondary) !important;
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
   box-shadow: var(--shadow-ambient) !important;
 }
 .urg-btn.moyen.active {
-  background: var(--tertiary) !important;
-  color: var(--on-tertiary) !important;
-  border-color: var(--tertiary) !important;
+  background: #ff9f43 !important;
+  color: #ffffff !important;
+  border-color: #ff9f43 !important;
   box-shadow: var(--shadow-ambient) !important;
 }
 .urg-btn.critique.active {
-  background: var(--primary) !important;
-  color: var(--on-primary) !important;
-  border-color: var(--primary) !important;
+  background: #e53935 !important;
+  color: #ffffff !important;
+  border-color: #e53935 !important;
   box-shadow: var(--shadow-ambient) !important;
 }
 

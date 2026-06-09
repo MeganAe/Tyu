@@ -88,7 +88,7 @@
 
 <header class="top-bar">
   <div style="display:flex;align-items:center;gap:10px;">
-    <a href="index.html" style="color:#f5f0e8;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border: 1px solid var(--outline-variant);text-decoration:none;transition:all .1s ease;">
+    <a href="index.html" style="color:#f5f0e8;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);text-decoration:none;transition:all .1s ease;">
       <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
     </a>
     <span class="material-symbols-outlined" style="font-size:20px;color:white;font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48;">admin_panel_settings</span>
@@ -98,8 +98,8 @@
     <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
       <span id="themeToggleIcon" class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 0;">dark_mode</span>
     </button>
-    <span style="background: var(--surface-container-high);color:#1a1a1a;padding:4px 12px;font-size:11px;font-weight:800;font-family:'Inter', sans-serif;text-transform:uppercase;border: 1px solid var(--outline-variant);">ADMIN</span>
-    <span style="background:var(--primary);color:white;padding:4px 12px;font-size:11px;font-weight:800;display:flex;align-items:center;gap:6px;font-family:'Inter', sans-serif;border: 1px solid var(--outline-variant);">
+    <span style="background: var(--surface-container-high);color:#1a1a1a;padding:4px 12px;font-size:11px;font-weight:800;font-family:'Inter', sans-serif;text-transform:uppercase;border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);">ADMIN</span>
+    <span style="background:var(--primary);color:white;padding:4px 12px;font-size:11px;font-weight:800;display:flex;align-items:center;gap:6px;font-family:'Inter', sans-serif;border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);">
       <span style="width:6px;height:6px;background:white;animation:blink 1.2s infinite;display:inline-block;"></span>
       <span id="activeCountText">0</span> Actives
     </span>
@@ -116,7 +116,7 @@
     <span class="material-symbols-outlined" style="font-size:48px;color:var(--outline);font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 48;">lock</span>
     <p style="font-weight:800;font-size:16px;color:var(--text-primary);margin-top:12px;font-family:'Inter', sans-serif;text-transform:uppercase;">Accès restreint</p>
     <p style="color:var(--text-secondary);font-size:14px;margin-top:6px;">Vous n'avez pas les droits administrateur.</p>
-    <a href="index.html" style="display:inline-block;margin-top:16px;padding:10px 24px;background: var(--surface-container-high);color:#1a1a1a;border: 1px solid var(--outline-variant) ;box-shadow: var(--shadow-ambient) ;font-weight:800;font-size:14px;text-decoration:none;font-family:'Inter', sans-serif;text-transform:uppercase;">Retour</a>
+    <a href="index.html" style="display:inline-block;margin-top:16px;padding:10px 24px;background: var(--surface-container-high);color:#1a1a1a;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);box-shadow: var(--shadow-ambient);font-weight:800;font-size:14px;text-decoration:none;font-family:'Inter', sans-serif;text-transform:uppercase;">Retour</a>
   </div>
 
   <div id="adminContent" style="display:none;">
@@ -228,26 +228,26 @@ function renderAlerte(a, showSignal = false) {
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
       <div style="flex:1;min-width:0;text-align:left;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap;">
-          <span style="padding:2px 8px;font-size:10px;font-weight:800;background:${urg.bg};color:${urg.color};border: 1px solid var(--outline-variant);text-transform:uppercase;font-family:'Inter', sans-serif;">${urg.label}</span>
-          <span style="padding:2px 8px;font-size:10px;font-weight:800;background:${cat.bg};color:${cat.color};border: 1px solid var(--outline-variant);text-transform:uppercase;font-family:'Inter', sans-serif;">${cat.label}</span>
-          ${showSignal ? `<span style="padding:2px 8px;font-size:10px;font-weight:800;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);text-transform:uppercase;font-family:'Inter', sans-serif;">${a.nb_signalements||0} signalement${(a.nb_signalements||0)>1?'s':''}</span>` : ''}
+          <span style="padding:2px 8px;font-size:10px;font-weight:800;background:${urg.bg};color:${urg.color};border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);text-transform:uppercase;font-family:'Inter', sans-serif;">${urg.label}</span>
+          <span style="padding:2px 8px;font-size:10px;font-weight:800;background:${cat.bg};color:${cat.color};border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);text-transform:uppercase;font-family:'Inter', sans-serif;">${cat.label}</span>
+          ${showSignal ? `<span style="padding:2px 8px;font-size:10px;font-weight:800;background:var(--primary);color:#ffffff;border-radius: var(--radius-sm);border: 1px solid var(--outline-variant);text-transform:uppercase;font-family:'Inter', sans-serif;">${a.nb_signalements||0} signalement${(a.nb_signalements||0)>1?'s':''}</span>` : ''}
         </div>
         <p style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:2px;font-family:'Inter', sans-serif;">${escHtml(a.titre)}</p>
         <p style="font-size:12px;color:var(--text-secondary);font-weight:600;">${escHtml(a.quartier||'Bukavu')} • ${tempsRelatif(a.created_at)}</p>
       </div>
-      <span style="font-size:10px;font-weight:800;padding:3px 10px;background:${statutBg};color:${statutColor};white-space:nowrap;text-transform:uppercase;border: 1px solid var(--outline-variant);font-family:'Inter', sans-serif;">${a.statut}</span>
+      <span style="font-size:10px;font-weight:800;padding:3px 10px;background:${statutBg};color:${statutColor};border-radius: var(--radius-sm);white-space:nowrap;text-transform:uppercase;border: 1px solid var(--outline-variant);font-family:'Inter', sans-serif;">${a.statut}</span>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-      ${a.statut !== 'suspendue' ? `<button onclick="changerStatut('${a.id}','suspendue')" style="padding:7px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;">Suspendre</button>` : `<button onclick="changerStatut('${a.id}','active')" style="padding:7px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;">Restaurer</button>`}
-      ${a.statut !== 'resolue' ? `<button onclick="changerStatut('${a.id}','resolue')" style="padding:7px 12px;background: var(--surface-container-high);color:#1a1a1a;border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;">Résolu</button>` : ''}
+      ${a.statut !== 'suspendue' ? `<button onclick="changerStatut('${a.id}','suspendue')" style="padding:7px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;">Suspendre</button>` : `<button onclick="changerStatut('${a.id}','active')" style="padding:7px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;">Restaurer</button>`}
+      ${a.statut !== 'resolue' ? `<button onclick="changerStatut('${a.id}','resolue')" style="padding:7px 12px;background: var(--surface-container-high);color:#1a1a1a;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;">Résolu</button>` : ''}
       ${canNotify ? `
-      <button onclick="previewNotification('${a.id}', '${escHtml(a.titre).replace(/'/g, "\\'")}')" style="padding:7px 12px;background:var(--surface-card);color:var(--text-primary);border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;">
+      <button onclick="previewNotification('${a.id}', '${escHtml(a.titre).replace(/'/g, "\\'")}')" style="padding:7px 12px;background:var(--surface-card);color:var(--text-primary);border: 1px solid var(--outline-variant);border-radius: var(--radius-default);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;">
         <span class="material-symbols-outlined" style="font-size:14px;">visibility</span> Aperçu
       </button>
-      <button onclick="notifierHabitants('${a.id}', '${escHtml(a.titre).replace(/'/g, "\\'")}')" style="padding:7px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;">
+      <button onclick="notifierHabitants('${a.id}', '${escHtml(a.titre).replace(/'/g, "\\'")}')" style="padding:7px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;">
         <span class="material-symbols-outlined" style="font-size:14px;">campaign</span> Notifier
       </button>` : ''}
-      <button onclick="supprimerAlerteAdmin('${a.id}')" style="padding:7px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;">
+      <button onclick="supprimerAlerteAdmin('${a.id}')" style="padding:7px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;">
         <span class="material-symbols-outlined" style="font-size:14px;">delete</span> Supprimer
       </button>
     </div>
@@ -350,8 +350,8 @@ async function chargerUsers() {
       const isSelf = userSession && userSession.id === u.id;
 
       return `
-      <div style="background:var(--surface-card);border: 1px solid var(--outline-variant) ;box-shadow: var(--shadow-ambient) ;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;text-align:left;">
-        <img src="${photoSrc}" style="width:44px;height:44px;flex-shrink:0;object-fit:cover;border: 1px solid var(--outline-variant) ;" onerror="this.src='${genererAvatar(u.nom||'U', 44)}'"/>
+      <div style="background:var(--surface-card);border: 1px solid var(--outline-variant);border-radius: var(--radius-default);box-shadow: var(--shadow-ambient);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;text-align:left;">
+        <img src="${photoSrc}" style="width:44px;height:44px;flex-shrink:0;object-fit:cover;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);" onerror="this.src='${genererAvatar(u.nom||'U', 44)}'"/>
         <div style="flex:1;min-width:0;">
           <p style="font-size:14px;font-weight:800;color:var(--text-primary);margin-bottom:2px;font-family:'Inter', sans-serif;">${escHtml(u.nom)}</p>
           <p style="font-size:12px;color:var(--text-secondary);margin-bottom:2px;font-weight:600;">${escHtml(u.email)} • <b style="color:var(--primary);text-transform:uppercase;font-size:10px;">${u.role}</b> • ${escHtml(u.quartier||'Non spécifié')}</p>
@@ -359,17 +359,17 @@ async function chargerUsers() {
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
           ${isSelf ? `
-            <span style="font-size:11px;font-weight:800;padding:6px 12px;background: var(--surface-container-high);color:#1a1a1a;border: 1px solid var(--outline-variant);font-family:'Inter', sans-serif;text-transform:uppercase;">Vous</span>
+            <span style="font-size:11px;font-weight:800;padding:6px 12px;background: var(--surface-container-high);color:#1a1a1a;border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);font-family:'Inter', sans-serif;text-transform:uppercase;">Vous</span>
           ` : `
             ${u.role !== 'admin' ? `
-              <button onclick="promouvoirAdmin('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:var(--surface-card);color: var(--primary);border: 1px solid var(--primary);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;transition:all 0.1s;" onmouseover="this.style.background='var(--primary)';this.style.color='#fff'" onmouseout="this.style.background='var(--surface-card)';this.style.color='var(--primary)'">
+              <button onclick="promouvoirAdmin('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:var(--surface-card);color: var(--primary);border: 1px solid var(--primary);border-radius: var(--radius-default);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;transition:all 0.1s;" onmouseover="this.style.background='var(--primary)';this.style.color='#fff'" onmouseout="this.style.background='var(--surface-card)';this.style.color='var(--primary)'">
                 Promouvoir admin
               </button>
             ` : ''}
-            <button onclick="toggleBlock('${u.id}',${!u.est_bloque})" style="padding:6px 12px;border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;background:${u.est_bloque?'var(--primary)':'var(--primary)'};color:#ffffff;">
+            <button onclick="toggleBlock('${u.id}',${!u.est_bloque})" style="padding:6px 12px;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;background:${u.est_bloque?'var(--primary)':'var(--primary)'};color:#ffffff;">
               ${u.est_bloque ? 'Débloquer' : 'Bloquer'}
             </button>
-            <button onclick="supprimerUtilisateur('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;">
+            <button onclick="supprimerUtilisateur('${u.id}','${escHtml(u.nom)}')" style="padding:6px 12px;background:var(--primary);color:#ffffff;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);font-size:11px;font-weight:800;cursor:pointer;font-family:'Inter', sans-serif;text-transform:uppercase;">
               Supprimer
             </button>
           `}
@@ -498,7 +498,7 @@ function renderProgressBar(label, val, pct, color) {
         <span>${label} (${val})</span>
         <span>${pct}%</span>
       </div>
-      <div style="width:100%;height:8px;background:var(--surface-variant);border: 1px solid var(--outline-variant);overflow:hidden;">
+      <div style="width:100%;height:8px;background:var(--surface-variant);border: 1px solid var(--outline-variant);border-radius: 4px;overflow:hidden;">
         <div style="width: ${pct}%;height:100%;background:${color};transition:width 0.8s ease-out;"></div>
       </div>
     </div>

@@ -64,21 +64,21 @@ const QUARTIERS = [
 // Toutes les catégories originales restaurées
 // Toutes les catégories adaptées au Emergency Response Framework
 const CATEGORIES = {
-  incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#840015', bg: '#ffdad8' },
-  route:      { label: 'Route dégradée',  icon: 'construction',          color: '#761f24', bg: '#ffdad8' },
-  inondation: { label: 'Inondation',      icon: 'water',                 color: '#5d5f5f', bg: '#dfe0e0' },
-  accident:   { label: 'Accident',        icon: 'car_crash',             color: '#840015', bg: '#ffdad8' },
-  securite:   { label: 'Sécurité',        icon: 'shield',                color: '#840015', bg: '#ffdad8' },
-  sante:      { label: 'Santé',           icon: 'medical_services',      color: '#5d5f5f', bg: '#dfe0e0' },
-  eau:        { label: 'Eau',             icon: 'water_drop',            color: '#5d5f5f', bg: '#dfe0e0' },
-  meteo:      { label: 'Météo',           icon: 'thunderstorm',          color: '#761f24', bg: '#ffdad8' },
-  autre:      { label: 'Autre',           icon: 'report',                color: '#761f24', bg: '#ffdad8' }
+  incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#b91c1c', bg: '#fee2e2' },
+  route:      { label: 'Route dégradée',  icon: 'construction',          color: '#b45309', bg: '#fef3c7' },
+  inondation: { label: 'Inondation',      icon: 'water',                 color: '#0369a1', bg: '#e0f2fe' },
+  accident:   { label: 'Accident',        icon: 'car_crash',             color: '#c2410c', bg: '#ffedd5' },
+  securite:   { label: 'Sécurité',        icon: 'shield',                color: '#6b21a8', bg: '#f3e8ff' },
+  sante:      { label: 'Santé',           icon: 'medical_services',      color: '#047857', bg: '#d1fae5' },
+  eau:        { label: 'Eau',             icon: 'water_drop',            color: '#0284c7', bg: '#e0f2fe' },
+  meteo:      { label: 'Météo',           icon: 'thunderstorm',          color: '#86198f', bg: '#fae8ff' },
+  autre:      { label: 'Autre',           icon: 'report',                color: '#374151', bg: '#f3f4f6' }
 };
 
 const URGENCES = {
-  faible:   { label: 'FAIBLE',   color: '#5d5f5f', bg: '#dfe0e0' },
-  moyen:    { label: 'MOYEN',    color: '#761f24', bg: '#ffdad8' },
-  critique: { label: 'CRITIQUE', color: '#840015', bg: '#ffdad8' }
+  faible:   { label: 'FAIBLE',   color: '#ffffff', bg: '#10b981' }, // Emerald Green
+  moyen:    { label: 'MOYEN',    color: '#ffffff', bg: '#ff9f43' }, // Bright Orange
+  critique: { label: 'CRITIQUE', color: '#ffffff', bg: '#e53935' }  // Vivid Red
 };
 
 // ---- Utilitaires ----

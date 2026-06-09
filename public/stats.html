@@ -19,6 +19,7 @@
       box-shadow: var(--shadow-ambient) ;
       padding: 20px 12px;
       text-align: center;
+      border-radius: var(--radius-md) !important;
     }
     .stat-big .num {
       font-size: 38px;
@@ -51,6 +52,7 @@
       background: var(--surface-variant);
       border: 1px solid var(--outline-variant);
       overflow: hidden;
+      border-radius: var(--radius-full) !important;
     }
     .progress-fill { height: 100%; transition: width .7s ease; }
     .progress-count {
@@ -104,7 +106,7 @@
 
     <!-- Zone la plus active -->
     <div class="section-card" style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
-      <div style="width:48px;height:48px;background: var(--surface-container-high);border: 1px solid var(--outline-variant) ;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+      <div style="width:48px;height:48px;background: var(--surface-container-high);border: 1px solid var(--outline-variant);border-radius: var(--radius-default);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <span class="material-symbols-outlined" style="font-size:24px;color:#1a1a1a;">location_on</span>
       </div>
       <div>
@@ -120,11 +122,11 @@
         Performance de Résolution
       </h2>
       <div style="display:flex;gap:12px;">
-        <div style="flex:1;background:var(--surface-card);border: 1px solid var(--outline-variant) ;box-shadow: var(--shadow-ambient) ;padding:16px;text-align:center;">
+        <div style="flex:1;background:var(--surface-card);border: 1px solid var(--outline-variant);border-radius: var(--radius-default);box-shadow: var(--shadow-ambient);padding:16px;text-align:center;">
           <p id="txResolutionVal" style="font-size:28px;font-weight:800;color: var(--primary);margin-bottom:4px;font-family:'Inter', sans-serif;">0%</p>
           <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;font-family:'Inter', sans-serif;">Taux de résolution</p>
         </div>
-        <div style="flex:1;background:var(--surface-card);border: 1px solid var(--outline-variant) ;box-shadow: var(--shadow-ambient) ;padding:16px;text-align:center;">
+        <div style="flex:1;background:var(--surface-card);border: 1px solid var(--outline-variant);border-radius: var(--radius-default);box-shadow: var(--shadow-ambient);padding:16px;text-align:center;">
           <p id="tpsResolutionVal" style="font-size:28px;font-weight:800;color: var(--primary);margin-bottom:4px;font-family:'Inter', sans-serif;">0h</p>
           <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;font-family:'Inter', sans-serif;">Temps moyen</p>
         </div>
@@ -244,7 +246,7 @@
           return `
             <div style="display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;min-width:30px;">
               <span style="font-size:11px;font-weight:800;color:var(--primary);margin-bottom:4px;font-family:'Inter', sans-serif;">${t.count}</span>
-              <div style="width:16px;height:${heightPct}%;background:var(--primary);border: 1px solid var(--outline-variant);transition:height .7s ease;min-height:3px;" title="${t.count} alerte(s) le ${t.label}"></div>
+              <div style="width:16px;height:${heightPct}%;background:var(--primary);border: 1px solid var(--outline-variant);border-top-left-radius: 4px;border-top-right-radius: 4px;transition:height .7s ease;min-height:3px;" title="${t.count} alerte(s) le ${t.label}"></div>
               <span style="font-size:10px;font-weight:800;color:var(--text-secondary);margin-top:6px;text-transform:uppercase;font-family:'Inter', sans-serif;">${t.label}</span>
             </div>
           `;
