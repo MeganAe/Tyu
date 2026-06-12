@@ -10,38 +10,49 @@
   <meta property="og:title" content="AlertBukavu — Publier une alerte"/>
   <meta property="og:description" content="Signalez un danger, une inondation, un incendie ou un autre incident à Bukavu en temps réel."/>
   
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
+     crossorigin="anonymous"></script>
   <link rel="stylesheet" href="style.css"/>
   <style>
     .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
-    body{padding-bottom:90px; scroll-behavior: smooth;}
+    body{padding-bottom:80px; scroll-behavior: smooth;}
     html { scroll-behavior: smooth; }
+    
+    .cat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px;border-radius:10px;border:1.5px solid #ddb8b6;background:white;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:#5b403e;font-weight:600;font-size:12px;transition:all .2s;}
+    .cat-btn:hover{border-color:#840015;background:#ffdad8;}
+    .cat-btn.active{border-color:#840015;background:#ffdad8;color:#840015;}
+    
+    .urg-btn{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid #ddb8b6;background:white;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
+    .urg-btn.faible.active{background:#E6FAF5;color:#00C48C;border-color:#00C48C;}
+    .urg-btn.moyen.active{background:#FFF5EC;color:#FF9F43;border-color:#FF9F43;}
+    .urg-btn.critique.active{background:#FFF0F5;color:#FF3D71;border-color:#FF3D71;}
+    
+    .photo-upload-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s;}
+    .photo-upload-btn:hover{background:#ffb3af;}
+    
+    .warning-box{background:#ffdad8;border-left:4px solid #840015;border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;}
+    .char-count{font-size:11px;color:#906f6d;text-align:right;margin-top:4px;margin-bottom:0;}
   </style>
 </head>
 <body>
 
   <header class="top-bar">
-    <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <button onclick="history.back()" style="background:none;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;cursor:pointer;display:flex;align-items:center;width:38px;height:38px;justify-content:center;">
-          <span class="material-symbols-outlined" style="font-size:22px;color:#f5f0e8;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
-        </button>
-        <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Plus Jakarta Sans', sans-serif;text-transform:uppercase;">Publier une alerte</h1>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <!-- Bouton Thème Sombre/Clair -->
-        <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
-          <span id="themeToggleIcon" class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">dark_mode</span>
-        </button>
-      </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="history.back()" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;">
+        <span class="material-symbols-outlined" style="font-size:22px;color:white;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
+      </button>
+      <h1 style="font-size:17px;font-weight:800;color:white;">Publier une alerte</h1>
     </div>
   </header>
 
+  <section class="hero-section" style="padding:16px 20px 36px;">
+    <p style="font-size:13px;color:rgba(255,255,255,.85);">Signalez un incident à la communauté de Bukavu</p>
+  </section>
 
-
-  <main style="max-width:640px;margin:24px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
+  <main style="max-width:640px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
 
     <!-- Titre -->
     <div class="section-card">
@@ -82,11 +93,11 @@
 
     <!-- Photo avec compression Client-side -->
     <div class="section-card">
-      <label class="field-label">Photo <span style="color:var(--text-secondary);font-weight:400;">(optionnel)</span></label>
-      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;font-weight:600;">Ajoutez une photo. Elle sera automatiquement optimisée.</p>
+      <label class="field-label">Photo <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
+      <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Ajoutez une photo. Elle sera automatiquement optimisée.</p>
       <div id="photoPreviewWrap" style="display:none;margin-bottom:12px;">
-        <img id="photoPreview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);"/>
-        <button onclick="supprimerPhoto()" class="btn-primary" style="margin-top:8px;padding:10px 16px;font-size:12px;font-weight:800;height:40px;width:auto;text-transform:uppercase;box-shadow: var(--shadow-ambient) ;">Supprimer la photo</button>
+        <img id="photoPreview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid #ddb8b6;"/>
+        <button onclick="supprimerPhoto()" style="margin-top:8px;padding:6px 14px;background:#ffdad8;color:#840015;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Supprimer la photo</button>
       </div>
       <label for="photoInput" class="photo-upload-btn">
         <span class="material-symbols-outlined" style="font-size:18px;">add_photo_alternate</span>
@@ -97,14 +108,14 @@
 
     <!-- GPS avec Google Maps preview & Saisie manuelle -->
     <div class="section-card">
-      <label class="field-label">Localisation GPS <span style="color:var(--text-secondary);font-weight:400;">(optionnel)</span></label>
-      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;font-weight:600;">Aide à localiser l'alerte sur la carte</p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <button onclick="getLocation()" id="btnGps" class="btn-primary" style="flex:1;min-width:180px;margin:0;">
+      <label class="field-label">Localisation GPS <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
+      <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Aide à localiser l'alerte sur la carte</p>
+      <div style="display:flex;gap:10px;">
+        <button onclick="getLocation()" id="btnGps" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;">
           <span class="material-symbols-outlined" style="font-size:18px;">my_location</span>
           <span id="gpsLabel">Obtenir ma position</span>
         </button>
-        <button onclick="toggleManualGps()" id="btnManualGps" class="btn-outline" style="flex:1;min-width:180px;margin:0;">
+        <button onclick="toggleManualGps()" id="btnManualGps" style="padding:10px 14px;background:white;color:#906f6d;border:1px solid #ddb8b6;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
           Saisie manuelle
         </button>
       </div>
@@ -113,17 +124,17 @@
       <div id="manualGpsWrap" style="display:none;margin-top:12px;align-items:flex-end;gap:10px;">
         <div style="flex:1;">
           <label class="field-label" style="font-size:11px;margin-bottom:4px;">Latitude</label>
-          <input id="manualLat" type="number" step="any" class="field-input no-icon" placeholder="Ex: -2.5012"/>
+          <input id="manualLat" type="number" step="any" class="field-input no-icon" style="height:40px;font-size:13px;" placeholder="Ex: -2.5012"/>
         </div>
         <div style="flex:1;">
           <label class="field-label" style="font-size:11px;margin-bottom:4px;">Longitude</label>
-          <input id="manualLng" type="number" step="any" class="field-input no-icon" placeholder="Ex: 28.8623"/>
+          <input id="manualLng" type="number" step="any" class="field-input no-icon" style="height:40px;font-size:13px;" placeholder="Ex: 28.8623"/>
         </div>
-        <button onclick="validerManuelGps()" class="btn-outline" style="height:48px;padding:0 16px;font-size:12px;font-weight:800;width:auto;text-transform:uppercase;box-shadow: var(--shadow-ambient) ;">Valider</button>
+        <button onclick="validerManuelGps()" style="height:40px;padding:0 16px;background:#840015;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Valider</button>
       </div>
 
       <!-- Google Maps Iframe preview -->
-      <div id="mapPreviewWrap" style="display:none;margin-top:12px;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);overflow:hidden;">
+      <div id="mapPreviewWrap" style="display:none;margin-top:12px;border-radius:8px;overflow:hidden;border:1px solid #ddb8b6;">
         <iframe id="mapPreview" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
       </div>
     </div>
@@ -135,47 +146,31 @@
 
     <!-- Avertissement -->
     <div class="warning-box">
-      <span class="material-symbols-outlined" style="color:#ffffff;font-size:20px;flex-shrink:0;">warning</span>
+      <span class="material-symbols-outlined" style="color:#840015;font-size:20px;flex-shrink:0;">warning</span>
       <div>
-        <p style="font-size:13px;color:#ffffff;font-weight:800;margin-bottom:4px;font-family:'Plus Jakarta Sans', sans-serif;text-transform:uppercase;">Responsabilité</p>
-        <p style="font-size:12px;color:#ffffff;line-height:1.5;font-weight:500;">Toute fausse alerte entraîne la suspension de votre compte. Après 3 fausses alertes, le compte est définitivement bloqué.</p>
+        <p style="font-size:13px;color:#410006;font-weight:700;margin-bottom:4px;">Responsabilité</p>
+        <p style="font-size:12px;color:#410006;line-height:1.5;">Toute fausse alerte entraîne la suspension de votre compte. Après 3 fausses alertes, le compte est définitivement bloqué.</p>
       </div>
     </div>
 
     <!-- Bouton Soumission -->
-    <button id="btnPublier" class="btn-primary" onclick="publier()" style="margin-bottom:20px;">
-      <span class="material-symbols-outlined" style="font-size:20px;color:inherit;">add_alert</span>
+    <button id="btnPublier" class="btn-primary" onclick="publier()" style="height:52px;margin-bottom:20px;">
+      <span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span>
       PUBLIER L'ALERTE
     </button>
 
   </main>
 
   <!-- Bouton Scroll to top -->
-  <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fab" style="bottom:88px;left:16px;right:auto;display:none;">
-    <span class="material-symbols-outlined" style="font-size:22px;">arrow_upward</span>
+  <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="position:fixed;bottom:88px;left:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid #ddb8b6;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:99;transition:all .3s;">
+    <span class="material-symbols-outlined" style="color:#840015;font-size:22px;">arrow_upward</span>
   </button>
 
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item">
-      <span class="material-symbols-outlined">rss_feed</span>
-      <span>Alertes</span>
-    </a>
-    <a href="stats.html" class="nav-item">
-      <span class="material-symbols-outlined">analytics</span>
-      <span>Stats</span>
-    </a>
-    <div class="nav-fab-placeholder"></div>
-    <a href="publier.html" class="nav-fab-btn" title="Publier une alerte" style="background:#8b7300;box-shadow:0 8px 24px rgba(114,92,0,0.5);transform:translateX(-50%) translateY(-4px) scale(1.05);">
-      <span class="material-symbols-outlined">add_alert</span>
-    </a>
-    <a href="notifications.html" class="nav-item">
-      <span class="material-symbols-outlined">notifications</span>
-      <span>Notifs</span>
-    </a>
-    <a href="profil.html" class="nav-item">
-      <span class="material-symbols-outlined">person</span>
-      <span>Profil</span>
-    </a>
+    <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;">rss_feed</span><span>Alertes</span></a>
+    <a href="publier.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">add_alert</span><span>Publier</span></a>
+    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;">analytics</span><span>Stats</span></a>
+    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;">person</span><span>Profil</span></a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -322,8 +317,8 @@
       
       document.getElementById('gpsLabel').textContent = `${userLat}, ${userLng}`;
       const btn = document.getElementById('btnGps');
-      btn.style.background = 'var(--success)';
-      btn.style.color = '#ffffff';
+      btn.style.background = '#E6FAF5';
+      btn.style.color = '#00C48C';
       
       updateMapPreview(userLat, userLng);
       showToast('Position manuelle enregistrée');
@@ -345,8 +340,8 @@
         userLat = pos.lat;
         userLng = pos.lng;
         lbl.textContent = `${userLat}, ${userLng}`;
-        btn.style.background = 'var(--success)';
-        btn.style.color = '#ffffff';
+        btn.style.background = '#E6FAF5';
+        btn.style.color = '#00C48C';
         
         updateMapPreview(userLat, userLng);
         showToast('Position obtenue avec succès');
