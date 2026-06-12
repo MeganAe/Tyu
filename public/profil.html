@@ -5,112 +5,132 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AlertBukavu — Mon Profil</title>
   <link rel="icon" type="image/png" href="logo.png"/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
-     crossorigin="anonymous"></script>
   <link rel="stylesheet" href="style.css"/>
   <style>
-    .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
-    body{padding-bottom:80px;}
+    .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48 }
+    body { padding-bottom: 90px; }
 
-    /* Photo de profil */
-    .profile-photo-wrap{position:relative;display:inline-block;margin-bottom:14px;z-index:2;}
-    .profile-photo{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 4px 20px rgba(0,0,0,.25);display:block;}
-    .photo-edit-btn{position:absolute;bottom:2px;right:2px;width:30px;height:30px;background:#840015;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .2s;}
-    .photo-edit-btn:hover{transform:scale(1.1);}
-    .photo-edit-btn .material-symbols-outlined{font-size:15px;color:white;}
+    /* Profile Photo — Bauhaus square */
+    .profile-photo-wrap { display: inline-block; position: relative; z-index: 2; cursor: pointer; }
+    .profile-photo {
+      width: 96px; height: 96px;
+      object-fit: cover;
+      border: 1px solid var(--outline-variant) ;
+      box-shadow: var(--shadow-ambient) ;
+      display: block;
+      border-radius: var(--radius-full) !important;
+    }
+    .photo-edit-btn {
+      position: absolute; bottom: 0; right: 0;
+      background: var(--surface-container-high);
+      border: 1px solid var(--outline-variant) ;
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-full) !important;
+    }
+    .photo-edit-btn .material-symbols-outlined { font-size: 16px; color: #1a1a1a; }
 
-    .stat-mini{flex:1;background:white;border-radius:12px;border:1px solid #ddb8b6;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(132,0,21,.05);}
-    .alerte-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #efecea;}
-    .alerte-row:last-child{border-bottom:none;padding-bottom:0;}
-    .section-card{background:white;border-radius:14px;border:1px solid #ddb8b6;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(132,0,21,.04);}
-    .btn-outline{width:100%;height:50px;background:white;border:1.5px solid #ddb8b6;border-radius:10px;color:#5b403e;font-size:14px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-bottom:20px;}
-    .btn-outline:hover{border-color:#840015;color:#840015;background:#ffdad8;}
+    /* Alert rows in profile list */
+    .alerte-row {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--outline-variant);
+    }
+    .alerte-row:last-child { border-bottom: none; padding-bottom: 0; }
   </style>
 </head>
 <body>
 
   <header class="top-bar">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <h1 style="font-size:17px;font-weight:800;color:white;">Mon Profil</h1>
+    <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Plus Jakarta Sans', sans-serif;text-transform:uppercase;">Mon Profil</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <!-- Bouton Thème Sombre/Clair -->
+        <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
+          <span id="themeToggleIcon" class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">dark_mode</span>
+        </button>
+      </div>
     </div>
   </header>
 
   <!-- Hero avec photo -->
-  <section class="hero-section" style="padding:24px 20px 56px;text-align:center;">
-    <label for="photoInput" class="profile-photo-wrap" style="cursor:pointer; display:inline-block; position:relative; z-index:2;">
+  <section class="hero-section">
+    <label for="photoInput" class="profile-photo-wrap">
       <img id="photoUser" class="profile-photo" src="" alt="Photo de profil"/>
       <div class="photo-edit-btn" title="Changer la photo">
         <span class="material-symbols-outlined">photo_camera</span>
       </div>
     </label>
     <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="changerPhoto(event)"/>
-    <h2 id="nomUser" style="font-size:20px;font-weight:800;color:white;margin-bottom:2px;"></h2>
-    <p id="usernameUser" style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:6px;"></p>
-    <p id="emailUser" style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:10px;"></p>
-    <span id="quartierBadge" style="background:rgba(255,255,255,.15);color:white;padding:4px 16px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3);"></span>
+    <h2 id="nomUser" style="font-size:24px;color:inherit;margin-bottom:2px;"></h2>
+    <p id="usernameUser" style="font-size:14px;color:inherit;margin-bottom:6px;font-weight:600;"></p>
+    <p id="emailUser" style="font-size:13px;color:inherit;margin-bottom:12px;opacity:0.8;"></p>
+    <span id="quartierBadge" style="background:var(--outline);color:var(--surface);padding:4px 16px;font-size:12px;font-weight:800;border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);font-family:'Plus Jakarta Sans', sans-serif;text-transform:uppercase;display:inline-block;box-shadow: var(--shadow-ambient);"></span>
   </section>
 
-  <main style="max-width:640px;margin:-32px auto 0;padding:0 16px;position:relative;z-index:1;">
+  <main style="max-width:640px;margin:24px auto 0;padding:0 16px;position:relative;z-index:1;">
 
     <!-- Avertissement de compte si nb_fausses_alertes >= 2 -->
-    <div id="warningCompte" style="display:none;background:#ffdad8;border-left:4px solid #840015;border-radius:8px;padding:14px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start;">
-      <span class="material-symbols-outlined" style="color:#840015;font-size:20px;flex-shrink:0;">warning</span>
+    <div id="warningCompte" style="display:none;background:var(--primary);border: 1px solid var(--outline-variant);border-radius: var(--radius-default);padding:14px 16px;margin-bottom:14px;gap:10px;align-items:flex-start;color:#ffffff;box-shadow: var(--shadow-ambient);">
+      <span class="material-symbols-outlined" style="color:#ffffff;font-size:20px;flex-shrink:0;">warning</span>
       <div>
-        <p style="font-size:13px;color:#410006;font-weight:700;margin-bottom:4px;">Compte en sursis (Averti)</p>
-        <p id="warningCompteMsg" style="font-size:12px;color:#410006;line-height:1.5;">Attention, vous avez déjà cumulé des fausses alertes. À la 3ème fausse alerte, votre compte sera définitivement suspendu !</p>
+        <p style="font-size:13px;color:#ffffff;font-weight:800;margin-bottom:4px;font-family:'Inter', sans-serif;text-transform:uppercase;">Compte en sursis (Averti)</p>
+        <p id="warningCompteMsg" style="font-size:12px;color:#ffffff;line-height:1.5;"></p>
       </div>
     </div>
 
     <!-- Stats mini -->
     <div style="display:flex;gap:12px;margin-bottom:14px;">
       <div class="stat-mini">
-        <p id="nbAlertes" style="font-size:28px;font-weight:800;color:#840015;line-height:1;margin-bottom:4px;">0</p>
-        <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Alertes</p>
+        <p id="nbAlertes" style="font-size:28px;font-weight:800;color:var(--primary);line-height:1;margin-bottom:4px;font-family:'Inter', sans-serif;">0</p>
+        <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;font-family:'Inter', sans-serif;">Alertes</p>
       </div>
       <div class="stat-mini">
-        <p id="nbConfirmations" style="font-size:28px;font-weight:800;color:#00c48c;line-height:1;margin-bottom:4px;">0</p>
-        <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Confirmées</p>
+        <p id="nbConfirmations" style="font-size:28px;font-weight:800;color:var(--success);line-height:1;margin-bottom:4px;font-family:'Inter', sans-serif;">0</p>
+        <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;font-family:'Inter', sans-serif;">Confirmées</p>
       </div>
       <div class="stat-mini">
-        <p id="nbFausses" style="font-size:28px;font-weight:800;color:#ff3d71;line-height:1;margin-bottom:4px;">0</p>
-        <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Fausses</p>
+        <p id="nbFausses" style="font-size:28px;font-weight:800;color: var(--primary);line-height:1;margin-bottom:4px;font-family:'Inter', sans-serif;">0</p>
+        <p style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.05em;font-family:'Inter', sans-serif;">Fausses</p>
       </div>
     </div>
 
     <!-- Modifier mon profil -->
     <div class="section-card">
-      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">manage_accounts</span>
+      <h2 style="font-size:16px;font-weight:800;color:var(--text-primary);margin-bottom:4px;display:flex;align-items:center;gap:8px;font-family:'Inter', sans-serif;">
+        <span class="material-symbols-outlined" style="font-size:18px;color: var(--primary);">manage_accounts</span>
         Modifier mes informations
       </h2>
-      <p style="font-size:12px;color:#906f6d;margin-bottom:14px;">Mettez à jour vos informations publiques</p>
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;font-weight:600;">Mettez à jour vos informations publiques</p>
       
       <div style="margin-bottom:12px;">
-        <label class="field-label" style="font-size:12px;font-weight:700;color:#5b403e;display:block;margin-bottom:6px;">Nom complet *</label>
-        <input id="editNom" type="text" class="field-input no-icon" style="height:44px;font-size:14px;" placeholder="Ex: Jean Mukengere" />
+        <label class="field-label" style="font-size:12px;font-weight:800;color:var(--text-primary);display:block;margin-bottom:6px;font-family:'Inter', sans-serif;text-transform:uppercase;">Nom complet *</label>
+        <input id="editNom" type="text" class="field-input no-icon" placeholder="Ex: Jean Mukengere" />
       </div>
 
       <div style="margin-bottom:12px;">
-        <label class="field-label" style="font-size:12px;font-weight:700;color:#5b403e;display:block;margin-bottom:6px;">Quartier de résidence *</label>
+        <label class="field-label" style="font-size:12px;font-weight:800;color:var(--text-primary);display:block;margin-bottom:6px;font-family:'Inter', sans-serif;text-transform:uppercase;">Quartier de résidence *</label>
         <div style="position:relative;">
-          <select id="editQuartier" class="field-input no-icon" style="height:44px;font-size:14px;appearance:none;padding-right:36px;">
+          <select id="editQuartier" class="field-input no-icon">
             <option value="">Sélectionner votre quartier...</option>
           </select>
-          <span class="material-symbols-outlined" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">expand_more</span>
+          <span class="material-symbols-outlined" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--text-primary);pointer-events:none;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">expand_more</span>
         </div>
       </div>
 
       <div style="margin-bottom:16px;">
-        <label class="field-label" style="font-size:12px;font-weight:700;color:#5b403e;display:block;margin-bottom:6px;">Numéro de téléphone * (9 chiffres)</label>
-        <div style="display:flex;align-items:center;position:relative;">
-          <span style="position:absolute;left:14px;font-size:14px;color:#906f6d;font-weight:600;">+243</span>
-          <input id="editTelephone" type="text" class="field-input no-icon" style="height:44px;font-size:14px;padding-left:55px;" placeholder="991234567" maxlength="9" />
+        <label class="field-label" style="font-size:12px;font-weight:800;color:var(--text-primary);display:block;margin-bottom:6px;font-family:'Inter', sans-serif;text-transform:uppercase;">Numéro de téléphone * (9 chiffres)</label>
+        <div style="display:flex;align-items:center;position:relative;width:100%;">
+          <span style="position:absolute;left:0;top:0;bottom:0;width:76px;display:flex;align-items:center;justify-content:center;background: var(--surface-container-high);border: 1px solid var(--outline-variant);border-right:none;font-size:14px;font-weight:800;color:#1a1a1a;">+243</span>
+          <input id="editTelephone" type="text" class="field-input no-icon" style="padding-left:92px !important;border: 1px solid var(--outline-variant) !important;" placeholder="991234567" maxlength="9" />
         </div>
       </div>
 
-      <button onclick="mettreAJourProfil()" id="btnSaveProfil" class="btn-primary" style="height:44px;font-size:13px;width:100%;margin:0;display:flex;align-items:center;justify-content:center;gap:8px;">
+      <button onclick="mettreAJourProfil()" id="btnSaveProfil" class="btn-primary">
         <span class="material-symbols-outlined" style="font-size:18px;">save</span>
         Enregistrer les modifications
       </button>
@@ -118,15 +138,15 @@
 
     <!-- Mes alertes -->
     <div class="section-card">
-      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">history</span>
+      <h2 style="font-size:16px;font-weight:800;color:var(--text-primary);margin-bottom:4px;display:flex;align-items:center;gap:8px;font-family:'Inter', sans-serif;">
+        <span class="material-symbols-outlined" style="font-size:18px;color:var(--primary);">history</span>
         Mes alertes récentes
       </h2>
-      <p style="font-size:12px;color:#906f6d;margin-bottom:14px;">Vos 10 dernières publications (avec option de suppression)</p>
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;font-weight:600;">Vos 10 dernières publications (avec option de suppression)</p>
       <div id="mesAlertesList">
-        <div class="skeleton" style="height:56px;margin-bottom:10px;border-radius:8px;"></div>
-        <div class="skeleton" style="height:56px;margin-bottom:10px;border-radius:8px;"></div>
-        <div class="skeleton" style="height:56px;border-radius:8px;"></div>
+        <div class="skeleton" style="height:56px;margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:56px;margin-bottom:10px;"></div>
+        <div class="skeleton" style="height:56px;"></div>
       </div>
     </div>
 
@@ -138,10 +158,26 @@
   </main>
 
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
-    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
-    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
-    <a href="profil.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">person</span><span>Profil</span></a>
+    <a href="index.html" class="nav-item">
+      <span class="material-symbols-outlined">rss_feed</span>
+      <span>Alertes</span>
+    </a>
+    <a href="stats.html" class="nav-item">
+      <span class="material-symbols-outlined">analytics</span>
+      <span>Stats</span>
+    </a>
+    <div class="nav-fab-placeholder"></div>
+    <a href="publier.html" class="nav-fab-btn" title="Publier une alerte">
+      <span class="material-symbols-outlined">add_alert</span>
+    </a>
+    <a href="notifications.html" class="nav-item">
+      <span class="material-symbols-outlined">notifications</span>
+      <span>Notifs</span>
+    </a>
+    <a href="profil.html" class="nav-item active">
+      <span class="material-symbols-outlined">person</span>
+      <span>Profil</span>
+    </a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -335,42 +371,42 @@
         const list = document.getElementById('mesAlertesList');
         if (!alertes.length) {
           list.innerHTML = `<div style="text-align:center;padding:28px 0;">
-            <span class="material-symbols-outlined" style="font-size:36px;color:#ddb8b6;">inbox</span>
-            <p style="color:#906f6d;font-size:13px;margin-top:8px;">Aucune alerte publiée</p>
+            <span class="material-symbols-outlined" style="font-size:36px;color:var(--outline);">inbox</span>
+            <p style="color:var(--text-secondary);font-size:13px;margin-top:8px;font-weight:600;">Aucune alerte publiée</p>
           </div>`;
           return;
         }
 
         const statutStyle = s => ({
-          active:    { label: 'Active',    bg: '#FFF5EC', color: '#FF9F43' },
-          resolue:   { label: 'Résolue',   bg: '#efecea', color: '#906f6d' },
-          suspendue: { label: 'Suspendue', bg: '#ffdad8', color: '#840015' }
-        }[s] || { label: 'Active', bg: '#FFF5EC', color: '#FF9F43' });
+          active:    { label: 'Active',    bg: 'var(--primary)', color: '#1a1a1a' },
+          resolue:   { label: 'Résolue',   bg: 'var(--primary)', color: '#ffffff' },
+          suspendue: { label: 'Suspendue', bg: 'var(--primary)', color: '#ffffff' }
+        }[s] || { label: 'Active', bg: 'var(--primary)', color: '#1a1a1a' });
 
         list.innerHTML = alertes.slice(0, 10).map(a => {
           const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
           const urg = URGENCES[a.urgence] || URGENCES.moyen;
           const st = statutStyle(a.statut);
           return `<div class="alerte-row" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-            <div style="width:10px;height:10px;border-radius:50%;background:${urg.color};margin-top:2px;flex-shrink:0;margin-right:12px;"></div>
+            <div style="width:10px;height:10px;border: 1px solid var(--outline-variant);background:${urg.bg};border-radius: 50%;margin-top:2px;flex-shrink:0;margin-right:12px;"></div>
             <div style="flex:1;min-width:0;text-align:left;">
-              <p style="font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(a.titre)}</p>
+              <p style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Inter', sans-serif;">${escHtml(a.titre)}</p>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                <span style="font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};padding:2px 8px;border-radius:4px;">${cat.label}</span>
-                <span style="font-size:11px;color:#906f6d;">${tempsRelatif(a.created_at)}</span>
-                <span style="font-size:11px;color:#906f6d;">${a.nb_confirmations || 0} confirmation${(a.nb_confirmations || 0) > 1 ? 's' : ''}</span>
+                <span style="font-size:10px;font-weight:800;background:${cat.bg};color:${cat.color};padding:2px 8px;border: 1px solid var(--outline-variant);text-transform:uppercase;font-family:'Inter', sans-serif;">${cat.label}</span>
+                <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">${tempsRelatif(a.created_at)}</span>
+                <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">${a.nb_confirmations || 0} confirmation${(a.nb_confirmations || 0) > 1 ? 's' : ''}</span>
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:12px;">
-              <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;background:${st.bg};color:${st.color};white-space:nowrap;">${st.label}</span>
-              <button onclick="supprimerAlerte('${a.id}')" style="background:none;border:none;color:#840015;cursor:pointer;display:inline-flex;align-items:center;padding:4px;border-radius:4px;transition:background 0.2s;" title="Supprimer l'alerte" onmouseover="this.style.background='#ffdad8'" onmouseout="this.style.background='none'">
+              <span style="font-size:10px;font-weight:800;padding:3px 10px;border: 1px solid var(--outline-variant);background:${st.bg};color:${st.color};border-radius: var(--radius-sm);white-space:nowrap;text-transform:uppercase;font-family:'Inter', sans-serif;">${st.label}</span>
+              <button onclick="supprimerAlerte('${a.id}')" style="background:none;border:none;color:var(--primary);cursor:pointer;display:inline-flex;align-items:center;padding:4px;border-radius: var(--radius-default) ;transition:background 0.2s;" title="Supprimer l'alerte" onmouseover="this.style.background='var(--outline)';this.style.color='var(--surface)';" onmouseout="this.style.background='none';this.style.color='var(--primary)';">
                 <span class="material-symbols-outlined" style="font-size:18px;font-variation-settings:'FILL' 0;">delete</span>
               </button>
             </div>
           </div>`;
         }).join('');
       } catch(e) {
-        document.getElementById('mesAlertesList').innerHTML = '<p style="color:#906f6d;font-size:13px;text-align:center;padding:20px 0;">Impossible de charger les alertes</p>';
+        document.getElementById('mesAlertesList').innerHTML = '<p style="color:var(--text-secondary);font-size:13px;text-align:center;padding:20px 0;font-weight:600;">Impossible de charger les alertes</p>';
       }
     }
 

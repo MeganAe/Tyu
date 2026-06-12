@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Page introuvable — AlertBukavu</title>
     <link rel="icon" type="image/png" href="logo.png" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
-     crossorigin="anonymous"></script>
     <style>
       html,body{min-height:100%;margin:0;overflow:hidden;}
       .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 600,'GRAD' 0,'opsz' 24}
@@ -21,28 +19,28 @@
       .error-icon-container {
         width: 80px;
         height: 80px;
-        background: rgba(255, 218, 216, 0.15);
-        border: 2px solid #840015;
+        background: var(--surface-container-high);
+        border: 2px solid var(--primary);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 auto 24px;
         animation: pulse-icon 2.5s infinite;
-        box-shadow: 0 0 15px rgba(132, 0, 21, 0.2);
+        box-shadow: 0 0 15px rgba(114, 92, 0, 0.2);
       }
       
       @keyframes pulse-icon {
-        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(132, 0, 21, 0.4); }
-        70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(132, 0, 21, 0); }
-        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(132, 0, 21, 0); }
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(114, 92, 0, 0.4); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(114, 92, 0, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(114, 92, 0, 0); }
       }
       
       .error-code {
         font-size: 80px;
         font-weight: 800;
         line-height: 1;
-        color: #ba1a1a;
+        color: var(--error);
         margin-bottom: 12px;
         letter-spacing: -0.02em;
         text-shadow: 0 2px 10px rgba(186, 26, 26, 0.15);
@@ -51,13 +49,13 @@
       .error-title {
         font-size: 22px;
         font-weight: 800;
-        color: #1a1a1a;
+        color: var(--on-surface);
         margin-bottom: 12px;
       }
       
       .error-desc {
         font-size: 14px;
-        color: #5b403e;
+        color: var(--text-secondary);
         line-height: 1.6;
         margin-bottom: 32px;
       }
@@ -96,7 +94,7 @@
         <div class="glass-card error-card">
           
           <div class="error-icon-container">
-            <span class="material-symbols-outlined" style="color:#840015;font-size:38px;">wrong_location</span>
+            <span class="material-symbols-outlined" style="color:var(--primary);font-size:38px;">wrong_location</span>
           </div>
 
           <div class="error-code">404</div>

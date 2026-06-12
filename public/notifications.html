@@ -5,104 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AlertBukavu — Notifications</title>
   <link rel="icon" type="image/png" href="logo.png"/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <style>
-    .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
-    body{padding-bottom:80px;}
-    
+    .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48 }
+    body { padding-bottom: 80px; }
+
+    /* Bauhaus notification section card */
     .notif-section {
-      background: white;
-      border-radius: 14px;
-      border: 1px solid #ddb8b6;
+      background: var(--surface-card);
+      border: 1px solid var(--outline-variant) ;
+      box-shadow: var(--shadow-ambient) ;
       padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(132,0,21,.04);
+      margin-bottom: 16px;
     }
     .notif-section h2 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 800;
-      color: #1a1a1a;
+      color: var(--text-primary);
       margin-bottom: 14px;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-family: 'Inter', sans-serif;
+      text-transform: uppercase;
     }
-    
+
+    /* Bauhaus notification row */
     .notif-row {
       display: flex;
       align-items: flex-start;
       gap: 12px;
       padding: 14px 12px;
-      border-radius: 10px;
-      border-bottom: 1px solid #efecea;
+      border-bottom: 2px solid var(--outline);
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: background 0.1s ease, transform 0.1s ease;
     }
-    .notif-row:last-child {
-      border-bottom: none;
-    }
+    .notif-row:last-child { border-bottom: none; }
     .notif-row:hover {
-      background: #faf8f7;
-      transform: translateX(2px);
+      background: rgba(0, 85, 255, 0.05);
+      transform: translateX(3px);
     }
     .notif-row.unread {
-      background: #ffdad8;
-      border-left: 4px solid #840015;
+      background: rgba(255, 204, 0, 0.15);
+      border-left: 3px solid var(--primary);
     }
   </style>
 </head>
 <body>
 
   <header class="top-bar">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <a href="index.html" style="color:white;text-decoration:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;background:rgba(255,255,255,.15);border-radius:50%;transition:background .2s;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
-        <span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'FILL' 0;">arrow_back</span>
-      </a>
-      <h1 style="font-size:17px;font-weight:800;color:white;">Notifications</h1>
+    <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <a href="index.html" style="color:#f5f0e8;text-decoration:none;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);transition:all .1s ease;">
+          <span class="material-symbols-outlined" style="font-size:20px;font-variation-settings:'FILL' 0;">arrow_back</span>
+        </a>
+        <h1 style="font-size:20px;font-weight:800;color:#f5f0e8;font-family:'Plus Jakarta Sans', sans-serif;text-transform:uppercase;">Notifications</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button onclick="toggleTheme()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:38px;height:38px;background:transparent;border: 1px solid var(--outline-variant);border-radius: var(--radius-default) ;transition:all .1s ease;cursor:pointer;" title="Changer de thème">
+          <span id="themeToggleIcon" class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">dark_mode</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <section class="hero-section" style="padding:16px 20px 36px;">
-    <p id="notifIntro" style="font-size:13px;color:rgba(255,255,255,.85);">Alertes importantes et incidents récents dans votre quartier</p>
-  </section>
 
-  <main style="max-width:760px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
+
+  <main style="max-width:760px;margin:24px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
 
     <!-- Section 1 : Alertes Critiques de la Ville -->
     <div class="notif-section">
       <h2>
-        <span class="material-symbols-outlined" style="color:#ba1a1a;">campaign</span>
+        <span class="material-symbols-outlined" style="color:var(--primary);">campaign</span>
         Alertes Critiques (Bukavu)
       </h2>
       <div id="critiqueList">
-        <!-- Skeleton -->
-        <div class="skeleton" style="height:60px;margin-bottom:8px;border-radius:8px;"></div>
-        <div class="skeleton" style="height:60px;border-radius:8px;"></div>
+        <div class="skeleton" style="height:60px;margin-bottom:8px;"></div>
+        <div class="skeleton" style="height:60px;"></div>
       </div>
     </div>
 
     <!-- Section 2 : Alertes du Quartier de l'Utilisateur -->
     <div class="notif-section">
       <h2 id="quartierTitle">
-        <span class="material-symbols-outlined" style="color:#840015;">location_on</span>
+        <span class="material-symbols-outlined" style="color:var(--primary);">location_on</span>
         Dans mon quartier (Chargement...)
       </h2>
       <div id="quartierList">
-        <!-- Skeleton -->
-        <div class="skeleton" style="height:60px;margin-bottom:8px;border-radius:8px;"></div>
-        <div class="skeleton" style="height:60px;border-radius:8px;"></div>
+        <div class="skeleton" style="height:60px;margin-bottom:8px;"></div>
+        <div class="skeleton" style="height:60px;"></div>
       </div>
     </div>
 
   </main>
 
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
-    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
-    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
-    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">person</span><span>Profil</span></a>
+    <a href="index.html" class="nav-item">
+      <span class="material-symbols-outlined">rss_feed</span>
+      <span>Alertes</span>
+    </a>
+    <a href="stats.html" class="nav-item">
+      <span class="material-symbols-outlined">analytics</span>
+      <span>Stats</span>
+    </a>
+    <div class="nav-fab-placeholder"></div>
+    <a href="publier.html" class="nav-fab-btn" title="Publier une alerte">
+      <span class="material-symbols-outlined">add_alert</span>
+    </a>
+    <a href="notifications.html" class="nav-item active">
+      <span class="material-symbols-outlined">notifications</span>
+      <span>Notifs</span>
+    </a>
+    <a href="profil.html" class="nav-item">
+      <span class="material-symbols-outlined">person</span>
+      <span>Profil</span>
+    </a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -139,10 +158,11 @@
     if (user) {
       const qUser = user.quartier || 'votre quartier';
       document.getElementById('quartierTitle').innerHTML = `
-        <span class="material-symbols-outlined" style="color:#840015;">location_on</span>
+        <span class="material-symbols-outlined" style="color:var(--primary);">location_on</span>
         Dans mon quartier (${escHtml(qUser)})
       `;
-      document.getElementById('notifIntro').textContent = `Alertes importantes de Bukavu et incidents à ${qUser}.`;
+      const intro = document.getElementById('notifIntro');
+      if (intro) intro.textContent = `Alertes importantes de Bukavu et incidents à ${qUser}.`;
     }
 
     async function chargerNotifications() {
@@ -174,8 +194,8 @@
       const container = document.getElementById(containerId);
       if (!liste.length) {
         container.innerHTML = `<div style="text-align:center;padding:24px 0;">
-          <span class="material-symbols-outlined" style="font-size:32px;color:#ddb8b6;">notifications_off</span>
-          <p style="color:#906f6d;font-size:13px;margin-top:6px;">${emptyMsg}</p>
+          <span class="material-symbols-outlined" style="font-size:32px;color:var(--outline);">notifications_off</span>
+          <p style="color:var(--text-secondary);font-size:13px;margin-top:6px;font-weight:600;">${emptyMsg}</p>
         </div>`;
         return;
       }
@@ -183,28 +203,26 @@
       container.innerHTML = liste.slice(0, 15).map(a => {
         const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
         const urg = URGENCES[a.urgence] || URGENCES.moyen;
-        
-        // Déterminer si l'alerte a été créée après le dernier moment de lecture
         const createdTime = new Date(a.created_at).getTime();
         const estNouveau = createdTime > lastReadTime;
         const unreadClass = estNouveau ? 'unread' : '';
 
         return `
           <div class="notif-row ${unreadClass}" onclick="voirDetailsAlerte('${a.id}')">
-            <div style="width:10px;height:10px;border-radius:50%;background:${urg.color};margin-top:5px;flex-shrink:0;"></div>
+            <div style="width:10px;height:10px;border: 1px solid var(--outline-variant);background:${urg.bg};border-radius: 50%;margin-top:5px;flex-shrink:0;"></div>
             <div style="flex:1;min-width:0;">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px;">
-                <p style="font-size:14px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(a.titre)}</p>
-                <span style="font-size:11px;color:#906f6d;flex-shrink:0;">${tempsRelatif(a.created_at)}</span>
+                <p style="font-size:14px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Inter', sans-serif;">${escHtml(a.titre)}</p>
+                <span style="font-size:11px;color:var(--text-secondary);flex-shrink:0;font-weight:600;">${tempsRelatif(a.created_at)}</span>
               </div>
-              <p style="font-size:12px;color:#5b403e;line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escHtml(a.description)}</p>
+              <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escHtml(a.description)}</p>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                <span style="font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};padding:2px 8px;border-radius:4px;">${cat.label}</span>
-                <span style="font-size:11px;color:#906f6d;display:flex;align-items:center;gap:3px;">
-                  <span class="material-symbols-outlined" style="font-size:12px;color:#840015;">location_on</span>
+                <span style="font-size:10px;font-weight:800;background:${cat.bg};color:${cat.color};padding:2px 8px;border: 1px solid var(--outline-variant);text-transform:uppercase;font-family:'Inter', sans-serif;">${cat.label}</span>
+                <span style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:3px;font-weight:600;">
+                  <span class="material-symbols-outlined" style="font-size:12px;color:var(--primary);">location_on</span>
                   ${escHtml(a.quartier || 'Bukavu')}
                 </span>
-                <span style="font-size:11px;color:#906f6d;">${a.nb_confirmations || 0} confirmation${(a.nb_confirmations || 0) > 1 ? 's' : ''}</span>
+                <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">${a.nb_confirmations || 0} confirmation${(a.nb_confirmations || 0) > 1 ? 's' : ''}</span>
               </div>
             </div>
           </div>
@@ -230,27 +248,27 @@
         const formatStyle = styleVal => a.statut === 'resolue' ? '<span style="color:#00C48C;font-weight:800;">RÉSOLUE</span>' : `<span style="color:${urg.color};font-weight:800;">ACTIVE (${urg.label})</span>`;
 
         let html = `
-          <div style="text-align:left;font-family:'Plus Jakarta Sans',sans-serif;margin-top:12px;">
+          <div style="text-align:left;font-family:'Inter',sans-serif;margin-top:12px;">
             <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-              <span style="padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;background:${urg.bg};color:${urg.color};">${urg.label}</span>
-              <span style="padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;background:${cat.bg};color:${cat.color};">${cat.label}</span>
+              <span style="padding:4px 12px;font-size:11px;font-weight:800;background:${urg.bg};color:${urg.color};border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);text-transform:uppercase;font-family:'Inter', sans-serif;">${urg.label}</span>
+              <span style="padding:4px 12px;font-size:11px;font-weight:800;background:${cat.bg};color:${cat.color};border: 1px solid var(--outline-variant);border-radius: var(--radius-sm);text-transform:uppercase;font-family:'Inter', sans-serif;">${cat.label}</span>
             </div>
-            <h3 style="font-size:18px;font-weight:800;color:#1a1a1a;margin-bottom:8px;">${escHtml(a.titre)}</h3>
-            <p style="font-size:13px;color:#906f6d;margin-bottom:12px;display:flex;align-items:center;gap:4px;">
-              <span class="material-symbols-outlined" style="font-size:16px;color:#840015;">location_on</span>
+            <h3 style="font-size:18px;font-weight:800;color:#1a1a1a;margin-bottom:8px;font-family:'Inter', sans-serif;text-transform:uppercase;">${escHtml(a.titre)}</h3>
+            <p style="font-size:13px;color:#555;margin-bottom:12px;display:flex;align-items:center;gap:4px;font-weight:600;">
+              <span class="material-symbols-outlined" style="font-size:16px;color:#e63b2e;">location_on</span>
               Quartier <strong>${escHtml(a.quartier || 'Bukavu')}</strong>
             </p>
-            <p style="font-size:14px;color:#5b403e;line-height:1.6;background:#faf8f7;padding:12px;border-radius:8px;border-left:3px solid #ddb8b6;margin-bottom:16px;">
+            <p style="font-size:14px;color:#1a1a1a;line-height:1.6;background:#f5f0e8;padding:12px;border: 1px solid var(--outline-variant);border-left:6px solid #ffcc00;margin-bottom:16px;">
               ${escHtml(a.description)}
             </p>
-            ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.1);" />` : ''}
-            <div style="border-top:1px solid #efecea;padding-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#906f6d;">
+            ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" style="width:100%;max-height:220px;object-fit:cover;border: 1px solid var(--outline-variant);border-radius: var(--radius-default);margin-bottom:16px;" />` : ''}
+            <div style="border-top: 1px solid var(--outline-variant);padding-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#555;">
               <div style="flex:1;">
-                <p>Publié par <strong>${escHtml(a.auteur_nom || 'Habitant')}</strong> (${a.auteur_username ? '@'+escHtml(a.auteur_username) : 'Habitant'})</p>
+                <p style="font-weight:600;">Publié par <strong>${escHtml(a.auteur_nom || 'Habitant')}</strong> (${a.auteur_username ? '@'+escHtml(a.auteur_username) : 'Habitant'})</p>
                 <p style="margin-top:2px;">Le ${new Date(a.created_at).toLocaleString('fr-FR')}</p>
               </div>
               <div style="text-align:right;">
-                <p>Statut: ${formatStyle()}</p>
+                <p style="font-weight:600;">Statut: ${formatStyle()}</p>
                 <p style="margin-top:2px;">${a.nb_confirmations || 0} confirmation(s)</p>
               </div>
             </div>

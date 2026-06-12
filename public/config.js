@@ -62,22 +62,23 @@ const QUARTIERS = [
 ];
 
 // Toutes les catégories originales restaurées
+// Toutes les catégories adaptées au Emergency Response Framework
 const CATEGORIES = {
-  incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#FF3D71', bg: '#FFF0F5' },
-  route:      { label: 'Route dégradée',  icon: 'construction',          color: '#FF9F43', bg: '#FFF5EC' },
-  inondation: { label: 'Inondation',      icon: 'water',                 color: '#2471A3', bg: '#E0F7FA' },
-  accident:   { label: 'Accident',        icon: 'car_crash',             color: '#8E44AD', bg: '#F5EEF8' },
-  securite:   { label: 'Sécurité',        icon: 'shield',                color: '#840015', bg: '#ffdad8' },
-  sante:      { label: 'Santé',           icon: 'medical_services',      color: '#00C48C', bg: '#E6FAF5' },
-  eau:        { label: 'Eau',             icon: 'water_drop',            color: '#0077B6', bg: '#E0F0FF' },
-  meteo:      { label: 'Météo',           icon: 'thunderstorm',          color: '#761f24', bg: '#ffdad8' },
-  autre:      { label: 'Autre',           icon: 'report',                color: '#5b403e', bg: '#f0eded' }
+  incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#9c1a1a', bg: '#ffd8d6' },
+  route:      { label: 'Route dégradée',  icon: 'construction',          color: '#745e00', bg: '#ffeeb5' },
+  inondation: { label: 'Inondation',      icon: 'water',                 color: '#1a598c', bg: '#d4ebff' },
+  accident:   { label: 'Accident',        icon: 'car_crash',             color: '#8c476e', bg: '#ffd8e9' },
+  securite:   { label: 'Sécurité',        icon: 'shield',                color: '#533c8c', bg: '#f1e6ff' },
+  sante:      { label: 'Santé',           icon: 'medical_services',      color: '#1a5c20', bg: '#bae7b9' },
+  eau:        { label: 'Eau',             icon: 'water_drop',            color: '#10647c', bg: '#daf2fa' },
+  meteo:      { label: 'Météo',           icon: 'thunderstorm',          color: '#7c2864', bg: '#fbd4f2' },
+  autre:      { label: 'Autre',           icon: 'report',                color: '#4c4637', bg: '#f0eded' }
 };
 
 const URGENCES = {
-  faible:   { label: 'FAIBLE',   color: '#00C48C', bg: '#E6FAF5' },
-  moyen:    { label: 'MOYEN',    color: '#FF9F43', bg: '#FFF5EC' },
-  critique: { label: 'CRITIQUE', color: '#FF3D71', bg: '#FFF0F5' }
+  faible:   { label: 'FAIBLE',   color: '#ffffff', bg: '#10b981' }, // Emerald Green
+  moyen:    { label: 'MOYEN',    color: '#ffffff', bg: '#ff9f43' }, // Bright Orange
+  critique: { label: 'CRITIQUE', color: '#ffffff', bg: '#e53935' }  // Vivid Red
 };
 
 // ---- Utilitaires ----
@@ -98,12 +99,17 @@ function escHtml(str) {
 
 function genererAvatar(nom, taille = 40) {
   const initiales = nom ? nom.trim().split(' ').map(p => p[0]||'').join('').substring(0,2).toUpperCase() : 'U';
-  const couleurs = ['#840015','#761f24','#b00020','#5d5f5f','#906f6d'];
-  const couleur = couleurs[nom ? nom.charCodeAt(0) % couleurs.length : 0];
+  const couleurs = [
+    { bg: '#725c00', fg: '#ffffff' }, // Mustard Gold
+    { bg: '#8c476e', fg: '#ffffff' }, // Berry Violet
+    { bg: '#406743', fg: '#ffffff' }, // Mint Forest Green
+    { bg: '#745e00', fg: '#ffffff' }  // Primary Dark Variant
+  ];
+  const choice = couleurs[nom ? nom.charCodeAt(0) % couleurs.length : 0];
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${taille}" height="${taille}" viewBox="0 0 ${taille} ${taille}">
-    <circle cx="${taille/2}" cy="${taille/2}" r="${taille/2}" fill="${couleur}"/>
-    <text x="${taille/2}" y="${taille/2+taille*0.14}" text-anchor="middle" fill="white"
-      font-family="Plus Jakarta Sans,Inter,sans-serif" font-weight="800" font-size="${taille*0.38}">${initiales}</text>
+    <rect width="${taille}" height="${taille}" rx="${taille/2}" fill="${choice.bg}"/>
+    <text x="${taille/2}" y="${taille/2+taille*0.12}" text-anchor="middle" fill="${choice.fg}"
+      font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="${taille*0.38}">${initiales}</text>
   </svg>`;
   return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
 }
@@ -246,7 +252,7 @@ function showToast(msg, type = 'success') {
 
 function showConfirm(title, text, confirmText = 'Confirmer', icon = 'question') {
   if (!isSwalFallback) {
-    return Swal.fire({ title, text, icon, showCancelButton: true, confirmButtonColor: '#840015', cancelButtonColor: '#906f6d', confirmButtonText: confirmText, cancelButtonText: 'Annuler' });
+    return Swal.fire({ title, text, icon, showCancelButton: true, confirmButtonColor: '#725c00', cancelButtonColor: '#8c476e', confirmButtonText: confirmText, cancelButtonText: 'Annuler' });
   } else {
     const res = confirm(`${title}\n\n${text}`);
     return Promise.resolve({ isConfirmed: res });
@@ -255,7 +261,7 @@ function showConfirm(title, text, confirmText = 'Confirmer', icon = 'question') 
 
 function showAlert(title, text, icon = 'info') {
   if (!isSwalFallback) {
-    return Swal.fire({ title, text, icon, confirmButtonColor: '#840015' });
+    return Swal.fire({ title, text, icon, confirmButtonColor: '#725c00' });
   } else {
     alert(`${title}\n\n${text}`);
     return Promise.resolve();
@@ -274,6 +280,35 @@ function afficherMenuAdmin() {
   link.innerHTML = `<span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">admin_panel_settings</span><span>Admin</span>`;
   nav.appendChild(link);
 }
+
+// ---- Theme Management (Dark/Light Mode) ----
+function initTheme() {
+  const savedTheme = localStorage.getItem('ab_theme') || 'light';
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark');
+  } else {
+    document.body.classList.remove('dark');
+  }
+  updateThemeToggleIcon(savedTheme);
+}
+
+function toggleTheme() {
+  const isDark = document.body.classList.toggle('dark');
+  const newTheme = isDark ? 'dark' : 'light';
+  localStorage.setItem('ab_theme', newTheme);
+  updateThemeToggleIcon(newTheme);
+}
+
+function updateThemeToggleIcon(theme) {
+  const icon = document.getElementById('themeToggleIcon');
+  if (icon) {
+    icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+  }
+}
+
+// Initialize theme immediately
+initTheme();
+document.addEventListener('DOMContentLoaded', initTheme);
 
 
 
