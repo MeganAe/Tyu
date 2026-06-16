@@ -87,7 +87,7 @@
               <div id="pwdFill" style="height:100%;width:0%;border-radius:2px;transition:all .3s"></div>
             </div>
 
-            <!-- reCAPTCHA v2 -->
+            
             <div class="captcha-wrap">
               <div class="g-recaptcha" data-sitekey="6LfCfv8sAAAAAG-VWFp1wMrXch6hSxVS7JsRJh05" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
             </div>
@@ -115,7 +115,7 @@
       function onCaptchaSuccess(token) { captchaValidated = true; }
       function onCaptchaExpire() { captchaValidated = false; }
 
-      // Désactiver le captcha en local pour faciliter le développement
+      
       if (estLocal()) {
         captchaValidated = true;
       }

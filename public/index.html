@@ -121,9 +121,9 @@
           <span class="material-symbols-outlined" style="color:#840015; font-size:20px;">map</span>
           Carte de vigilance interactive
         </h3>
-        <button onclick="toggleMapVisibility()" id="btnToggleMap" style="background:none; border:none; color:#840015; font-size:12px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;">Masquer la carte</button>
+        <button onclick="toggleMapVisibility()" id="btnToggleMap" style="background:none; border:none; color:#840015; font-size:12px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;">Afficher la carte</button>
       </div>
-      <div id="map" style="height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddb8b6; position: relative;"></div>
+      <div id="map" style="height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddb8b6; position: relative; display: none;"></div>
     </div>
 
     <div id="alertesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
@@ -275,7 +275,8 @@
       const btn = document.getElementById('btnToggleMap');
       const mapContainer = document.getElementById('map');
       
-      if (mapContainer.style.display === 'none') {
+      const isClosed = getComputedStyle(mapContainer).display === 'none';
+      if (isClosed) {
         mapContainer.style.display = 'block';
         btn.textContent = 'Masquer la carte';
         if (map) {

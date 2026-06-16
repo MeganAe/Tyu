@@ -40,7 +40,7 @@
 
   <main style="max-width:900px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
 
-    <!-- 4 stats en grille -->
+    
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px;">
       <div class="stat-big">
         <div class="num" id="statTotal" style="color:#840015;">—</div>
@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <!-- Zone la plus active -->
+    
     <div class="section-card" style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
       <div style="width:48px;height:48px;background:#ffdad8;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
         <span class="material-symbols-outlined" style="font-size:24px;color:#840015;">location_on</span>
@@ -71,7 +71,7 @@
       </div>
     </div>
 
-    <!-- Performance de résolution -->
+    
     <div class="section-card" style="margin-bottom:14px;">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
         <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">speed</span>
@@ -89,19 +89,19 @@
       </div>
     </div>
 
-    <!-- Historique des 7 derniers jours -->
+    
     <div class="section-card" style="margin-bottom:14px;">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
         <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">calendar_today</span>
         Activité des 7 derniers jours
       </h2>
       <div id="timelineChart" style="display:flex;justify-content:space-between;align-items:flex-end;height:120px;padding:10px 10px 20px;border-bottom:1px solid #efecea;margin-bottom:14px;">
-        <!-- CSS vertical bars populated dynamically -->
+        
       </div>
       <p style="font-size:11px;color:#906f6d;text-align:center;">Nombre de nouvelles alertes quotidiennes</p>
     </div>
 
-    <!-- Par catégorie -->
+    
     <div class="section-card">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
         <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">category</span>
@@ -110,7 +110,7 @@
       <div id="catStats"></div>
     </div>
 
-    <!-- Par urgence -->
+    
     <div class="section-card">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
         <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">warning</span>
@@ -119,7 +119,7 @@
       <div id="urgStats"></div>
     </div>
 
-    <!-- Par quartier -->
+    
     <div class="section-card">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
         <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">apartment</span>
@@ -167,7 +167,7 @@
         document.getElementById('statCritiques').textContent = critiques;
         document.getElementById('statConfirmations').textContent = totalConfirmations;
 
-        // Taux de résolution et temps moyen de résolution
+        
         document.getElementById('txResolutionVal').textContent = `${data.txResolution || 0}%`;
         
         const tpsHours = parseFloat(data.tempsMoyenResolution || 0);
@@ -183,7 +183,7 @@
         }
         document.getElementById('tpsResolutionVal').textContent = tpsStr;
 
-        // Zone la plus active
+        
         const parQ = data.parQuartier || {};
         let topQ = '—', maxQ = 0;
         Object.entries(parQ).forEach(([q, n]) => {
@@ -194,7 +194,7 @@
         });
         document.getElementById('statTopQ').textContent = topQ;
 
-        // Activité des 7 derniers jours (Timeline dynamique)
+        
         const timeline = data.timeline || [];
         const maxTimelineCount = Math.max(...timeline.map(t => t.count), 1);
         const chartHtml = timeline.map(t => {
@@ -209,7 +209,7 @@
         }).join('');
         document.getElementById('timelineChart').innerHTML = chartHtml || '<p style="color:#906f6d;font-size:13px;text-align:center;width:100%;">Aucune donnée</p>';
 
-        // Par catégorie
+        
         const parCat = data.parCat || {};
         document.getElementById('catStats').innerHTML = Object.entries(CATEGORIES)
           .filter(([k]) => parCat[k] > 0)
@@ -217,12 +217,12 @@
           .map(([k, c]) => barre(c.label, parCat[k] || 0, total, c.color)).join('') ||
           '<p style="color:#906f6d;font-size:13px;text-align:center;padding:12px 0;">Aucune donnée</p>';
 
-        // Par urgence
+        
         const parUrg = data.parUrgence || {};
         document.getElementById('urgStats').innerHTML = Object.entries(URGENCES)
           .map(([k, u]) => barre(u.label, parUrg[k] || 0, total, u.color)).join('');
 
-        // Par quartier — top 6
+        
         const sortedQ = Object.entries(parQ).sort((a, b) => b[1] - a[1]).slice(0, 6);
         document.getElementById('quartierStats').innerHTML = sortedQ.length
           ? sortedQ.map(([q, n]) => barre(q, n, total, '#840015')).join('')

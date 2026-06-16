@@ -15,7 +15,7 @@
     .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
     body{padding-bottom:80px;}
 
-    /* Photo de profil */
+    
     .profile-photo-wrap{position:relative;display:inline-block;margin-bottom:14px;z-index:2;}
     .profile-photo{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 4px 20px rgba(0,0,0,.25);display:block;}
     .photo-edit-btn{position:absolute;bottom:2px;right:2px;width:30px;height:30px;background:#840015;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .2s;}
@@ -38,7 +38,7 @@
     </div>
   </header>
 
-  <!-- Hero avec photo -->
+  
   <section class="hero-section" style="padding:24px 20px 56px;text-align:center;">
     <label for="photoInput" class="profile-photo-wrap" style="cursor:pointer; display:inline-block; position:relative; z-index:2;">
       <img id="photoUser" class="profile-photo" src="" alt="Photo de profil"/>
@@ -55,7 +55,7 @@
 
   <main style="max-width:640px;margin:-32px auto 0;padding:0 16px;position:relative;z-index:1;">
 
-    <!-- Avertissement de compte si nb_fausses_alertes >= 2 -->
+    
     <div id="warningCompte" style="display:none;background:#ffdad8;border-left:4px solid #840015;border-radius:8px;padding:14px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start;">
       <span class="material-symbols-outlined" style="color:#840015;font-size:20px;flex-shrink:0;">warning</span>
       <div>
@@ -64,7 +64,7 @@
       </div>
     </div>
 
-    <!-- Stats mini -->
+    
     <div style="display:flex;gap:12px;margin-bottom:14px;">
       <div class="stat-mini">
         <p id="nbAlertes" style="font-size:28px;font-weight:800;color:#840015;line-height:1;margin-bottom:4px;">0</p>
@@ -80,7 +80,7 @@
       </div>
     </div>
 
-    <!-- Modifier mon profil -->
+    
     <div class="section-card">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
         <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">manage_accounts</span>
@@ -117,7 +117,7 @@
       </button>
     </div>
 
-    <!-- Mes alertes -->
+    
     <div class="section-card">
       <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
         <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">history</span>
@@ -150,7 +150,7 @@
   <script>
     const user = AB.requireAuth();
 
-    // Remplir la sélection de quartiers dans le formulaire
+    
     QUARTIERS.forEach(q => {
       const o = document.createElement('option');
       o.value = q; o.textContent = q;
@@ -166,16 +166,16 @@
       photo.src = getPhotoUrl(user, 96);
       photo.onerror = () => { photo.src = genererAvatar(user.nom || 'U', 96); };
 
-      // Pré-remplir le formulaire de modification
+      
       document.getElementById('editNom').value = user.nom || '';
       document.getElementById('editQuartier').value = user.quartier || '';
       if (user.telephone) {
         const cleaned = user.telephone.replace(/\D/g, '');
-        // Garder les 9 derniers chiffres si préfixe +243 présent
+        
         document.getElementById('editTelephone').value = cleaned.slice(-9);
       }
 
-      // Gérer l'avertissement de fausses alertes
+      
       const nbFausses = user.nb_fausses_alertes || 0;
       const warningCompte = document.getElementById('warningCompte');
       if (nbFausses >= 2) {
@@ -186,7 +186,7 @@
       }
     }
 
-    // Rafraîchir les données depuis le serveur (notamment photo_url) pour être toujours à jour
+    
     async function rafraichirProfilDepuisServeur() {
       try {
         const data = await AB.api('auth/me');
@@ -194,21 +194,21 @@
         const freshUser = data.user;
         AB.saveUser({ ...user, ...freshUser });
 
-        // Mettre à jour l'interface avec les données fraîches
+        
         document.getElementById('nomUser').textContent = freshUser.nom || 'Utilisateur';
         document.getElementById('usernameUser').textContent = freshUser.username ? '@' + freshUser.username : '';
         document.getElementById('quartierBadge').textContent = freshUser.quartier || 'Bukavu';
         document.getElementById('editNom').value = freshUser.nom || '';
         document.getElementById('editQuartier').value = freshUser.quartier || '';
 
-        // Mettre à jour la photo avec la vraie URL depuis Supabase
+        
         const photo = document.getElementById('photoUser');
         if (freshUser.photo_url) {
           photo.src = freshUser.photo_url;
           photo.onerror = () => { photo.src = genererAvatar(freshUser.nom || 'U', 96); };
         }
 
-        // Avertissement fausses alertes
+        
         const nbFausses = freshUser.nb_fausses_alertes || 0;
         const warningCompte = document.getElementById('warningCompte');
         if (nbFausses >= 2) {
@@ -218,13 +218,13 @@
           warningCompte.style.display = 'none';
         }
       } catch(e) {
-        // Non-bloquant : les données du localStorage sont déjà affichées
+        
         console.warn('Impossible de rafraîchir le profil depuis le serveur:', e.message);
       }
     }
     rafraichirProfilDepuisServeur();
 
-    // Mettre à jour les informations du profil
+    
     async function mettreAJourProfil() {
       const nom = document.getElementById('editNom').value.trim();
       const quartier = document.getElementById('editQuartier').value;
@@ -248,7 +248,7 @@
       try {
         const res = await AB.api('auth/profile', 'PUT', { nom, quartier, telephone: digits });
         
-        // Mettre à jour l'utilisateur local
+        
         AB.saveUser(res.user);
         if (res.token) {
           localStorage.setItem('ab_token', res.token);
@@ -266,14 +266,14 @@
       }
     }
 
-    // Upload photo de profil
+    
     async function changerPhoto(event) {
       const file = event.target.files[0];
       if (!file) return;
       if (!file.type.startsWith('image/')) { showToast('Choisissez une image', 'error'); return; }
       if (file.size > 8 * 1024 * 1024) { showToast('Image trop lourde (max 8 Mo)', 'error'); return; }
 
-      // Preview immédiate
+      
       const previewUrl = URL.createObjectURL(file);
       document.getElementById('photoUser').src = previewUrl;
 
@@ -297,7 +297,7 @@
       event.target.value = '';
     }
 
-    // Supprimer une alerte
+    
     async function supprimerAlerte(id) {
       const confirm = await showConfirm(
         'Supprimer l\'alerte ?',
@@ -319,18 +319,18 @@
       }
     }
 
-    // Charger mes alertes
+    
     async function chargerMesAlertes() {
       try {
         const data = await AB.api('alertes/mes-alertes');
         const alertes = data.alertes || [];
         document.getElementById('nbAlertes').textContent = alertes.length;
 
-        // Total confirmations reçues
+        
         const totalConf = alertes.reduce((sum, a) => sum + (a.nb_confirmations || 0), 0);
         document.getElementById('nbConfirmations').textContent = totalConf;
 
-        // Fausses alertes depuis le profil user
+        
         document.getElementById('nbFausses').textContent = user?.nb_fausses_alertes || 0;
 
         const list = document.getElementById('mesAlertesList');

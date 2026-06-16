@@ -71,27 +71,27 @@
 
   <main style="max-width:760px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
 
-    <!-- Section 1 : Alertes Critiques de la Ville -->
+    
     <div class="notif-section">
       <h2>
         <span class="material-symbols-outlined" style="color:#ba1a1a;">campaign</span>
         Alertes Critiques (Bukavu)
       </h2>
       <div id="critiqueList">
-        <!-- Skeleton -->
+        
         <div class="skeleton" style="height:60px;margin-bottom:8px;border-radius:8px;"></div>
         <div class="skeleton" style="height:60px;border-radius:8px;"></div>
       </div>
     </div>
 
-    <!-- Section 2 : Alertes du Quartier de l'Utilisateur -->
+    
     <div class="notif-section">
       <h2 id="quartierTitle">
         <span class="material-symbols-outlined" style="color:#840015;">location_on</span>
         Dans mon quartier (Chargement...)
       </h2>
       <div id="quartierList">
-        <!-- Skeleton -->
+        
         <div class="skeleton" style="height:60px;margin-bottom:8px;border-radius:8px;"></div>
         <div class="skeleton" style="height:60px;border-radius:8px;"></div>
       </div>
@@ -111,29 +111,29 @@
   <script>
     const user = AB.requireAuth();
     
-    // Timestamp de dernière lecture depuis le serveur (multi-navigateur)
-    // On garde l'ancien localStorage comme fallback immédiat
+    
+    
     let lastReadTime = 0;
     const localReadStr = localStorage.getItem('ab_last_read_notifs');
     if (localReadStr) lastReadTime = new Date(localReadStr).getTime();
 
-    // Charger le vrai timestamp depuis le serveur, puis marquer comme lu
+    
     async function initialiserTimestamp() {
       try {
         const data = await AB.api('auth/notifications/read-at');
         if (data && data.readAt) {
-          // Utiliser le max entre local et serveur
+          
           const serverTime = new Date(data.readAt).getTime();
           lastReadTime = Math.max(lastReadTime, serverTime);
         }
-      } catch(e) { /* fallback localStorage déjà chargé */ }
+      } catch(e) {  }
       
-      // Mettre à jour le timestamp (les notifs actuelle seront considérées comme lues)
+      
       const now = new Date().toISOString();
       localStorage.setItem('ab_last_read_notifs', now);
       try {
         await AB.api('auth/notifications/mark-read', 'PUT');
-      } catch(e) { /* non-bloquant */ }
+      } catch(e) {  }
     }
     initialiserTimestamp();
 
@@ -153,7 +153,7 @@
         
         const quartierUser = user?.quartier || '';
         
-        // Trier les alertes par date décroissante
+        
         const critiques = alertes.filter(a => a.urgence === 'critique');
         const quartierAlertes = alertes.filter(a => 
           quartierUser && 
@@ -185,7 +185,7 @@
         const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
         const urg = URGENCES[a.urgence] || URGENCES.moyen;
         
-        // Déterminer si l'alerte a été créée après le dernier moment de lecture
+        
         const createdTime = new Date(a.created_at).getTime();
         const estNouveau = createdTime > lastReadTime;
         const unreadClass = estNouveau ? 'unread' : '';
@@ -216,7 +216,7 @@
     async function voirDetailsAlerte(id) {
       try {
         Swal.fire({ title: 'Chargement...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
-        // Charger les détails en récupérant l'alerte spécifique
+        
         const data = await AB.api(`alertes/${id}`);
         Swal.close();
         
@@ -270,7 +270,7 @@
           }
         }).then((result) => {
           if (result.isConfirmed) {
-            window.location.href = `index.html`; // Retourner et scroller
+            window.location.href = `index.html`; 
           }
         });
 

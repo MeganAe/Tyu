@@ -2,26 +2,24 @@ const fs = require('fs');
 
 const filePath = 'index.html';
 
-// Lire le fichier
+
 let content = fs.readFileSync(filePath, 'utf-8');
 
-// 1. Ajouter le bouton de recherche dans le header
-const headerSearchBtn = `      <!-- Bouton Recherche -->
-      <button onclick="toggleHeaderSearch()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:50%;transition:background .2s;border:none;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'" title="Rechercher">
+
+const headerSearchBtn = `      <button onclick="toggleHeaderSearch()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:50%;transition:background .2s;border:none;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'" title="Rechercher">
         <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">search</span>
       </button>
       
       `;
 
-// Trouver l'endroit où insérer le bouton (avant "Bouton Notifications")
+
 content = content.replace(
-  /      <!-- Bouton Notifications -->/,
-  headerSearchBtn + '<!-- Bouton Notifications -->'
+  /<button onclick="toggleNotifications/,
+  headerSearchBtn + '<button onclick="toggleNotifications'
 );
 
-// 2. Ajouter la barre de recherche mobile après le header
+
 const headerSearch = `
-  <!-- Barre de recherche mobile expandable -->
   <div id="headerSearchBar" style="display:none;position:fixed;top:60px;left:0;right:0;background:var(--header-gradient);padding:16px 20px;z-index:49;box-shadow:0 2px 12px rgba(132,0,21,0.3);">
     <div style="max-width:600px;margin:0 auto;position:relative;display:flex;align-items:center;">
       <span class="material-symbols-outlined" style="position:absolute;left:16px;color:rgba(255,255,255,.6);font-size:22px;pointer-events:none;">search</span>
@@ -38,7 +36,7 @@ content = content.replace(
   '  </header>' + headerSearch
 );
 
-// 3. Ajouter les fonctions JavaScript avant la fin du script
+
 const searchFunctions = `
     function toggleHeaderSearch() {
       const bar = document.getElementById('headerSearchBar');
@@ -65,6 +63,6 @@ content = content.replace(
   '    afficherMenuAdmin();' + searchFunctions
 );
 
-// Écrire le fichier
+
 fs.writeFileSync(filePath, content, 'utf-8');
 console.log('✓ Le fichier index.html a été mis à jour avec succès!');
