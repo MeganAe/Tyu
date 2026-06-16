@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="fr">
 <head>
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   
   <title>AlertBukavu — Alertes en cours</title>
-  <link rel="icon" type="image/png" href="logo.png"/>
   
-  <!-- Open Graph Meta Tags pour partage sur réseaux sociaux -->
   <meta property="og:title" content="AlertBukavu — Plateforme d'alertes citoyennes"/>
   <meta property="og:description" content="Signalez et suivez les incidents en temps réel à Bukavu (RDC) pour protéger votre communauté."/>
   <meta property="og:image" content="/logo.png"/>
@@ -15,15 +15,15 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css"/>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
-     crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559" crossorigin="anonymous"></script>
   <style>
     .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
     body{padding-bottom:90px; scroll-behavior: smooth;}
     html { scroll-behavior: smooth; }
     
-    /* Skeleton loader modern */
     .skeleton-card {
       background: white;
       border-radius: 12px;
@@ -42,7 +42,6 @@
 </head>
 <body>
 
-  <!-- Service Worker registration script -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -60,15 +59,12 @@
         <h1 style="font-size:18px;font-weight:800;color:white;">AlertBukavu</h1>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
-        <!-- Indicateur de rafraîchissement visuel -->
         <span id="refreshIndicator" style="color:rgba(255,255,255,.8);font-size:11px;font-weight:600;margin-right:4px;transition:all .4s ease;opacity:0;display:none;">Mise à jour...</span>
         
-        <!-- Bouton Recherche -->
         <button onclick="toggleHeaderSearch()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:50%;transition:background .2s;border:none;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'" title="Rechercher">
           <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">search</span>
         </button>
         
-        <!-- Bouton Notifications -->
         <button onclick="toggleNotifications(event)" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:50%;transition:background .2s;border:none;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'" title="Notifications">
           <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">notifications</span>
           <span id="notifBadge" style="position:absolute;top:-2px;right:-2px;background:#ba1a1a;color:white;font-size:10px;font-weight:800;border-radius:10px;padding:2px 6px;border:2px solid #840015;display:none;min-width:18px;box-sizing:border-box;text-align:center;line-height:1;">0</span>
@@ -78,7 +74,6 @@
       </div>
     </div>
 
-    <!-- Sleek Search Overlay -->
     <div id="headerSearchOverlay" style="display:none;position:absolute;inset:0;background:var(--header-gradient);padding:0 20px;align-items:center;z-index:51;border-radius:inherit;">
       <div style="width:100%;max-width:600px;margin:0 auto;position:relative;display:flex;align-items:center;gap:12px;">
         <span class="material-symbols-outlined" style="color:rgba(255,255,255,.6);font-size:22px;pointer-events:none;">search</span>
@@ -97,11 +92,9 @@
     </div>
   </section>
 
-  <!-- Filtres (Catégorie + Quartier en un seul bloc sticky) -->
   <div class="filter-bar-sticky" style="position:sticky;top:60px;z-index:30;background:rgba(255,255,255,.93);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #ddb8b6;box-shadow:0 2px 10px rgba(132,0,21,.05);padding:12px 16px;">
     <div style="display:flex;gap:10px;align-items:center;overflow-x:auto;" class="no-scrollbar">
       
-      <!-- Sélecteur de quartier moderne -->
       <div style="position:relative;flex-shrink:0;">
         <select id="filtreQuartier" onchange="filtrerParQuartier(this.value)" class="pill" style="padding-right:32px;appearance:none;-webkit-appearance:none;cursor:pointer;font-weight:700;border-color:#840015;color:#840015;background:#ffdad8;">
           <option value="tous">Tous les quartiers</option>
@@ -122,7 +115,17 @@
   </div>
 
   <main style="max-width:900px;margin:0 auto;padding:20px 16px;">
-    <!-- Skeletons chargés par défaut -->
+    <div class="section-card" style="margin-bottom: 24px; padding: 12px; display: block;" id="mapSection">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:14px; font-weight:800; color:#1a1a1a; display:flex; align-items:center; gap:6px; margin:0;">
+          <span class="material-symbols-outlined" style="color:#840015; font-size:20px;">map</span>
+          Carte de vigilance interactive
+        </h3>
+        <button onclick="toggleMapVisibility()" id="btnToggleMap" style="background:none; border:none; color:#840015; font-size:12px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;">Masquer la carte</button>
+      </div>
+      <div id="map" style="height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddb8b6; position: relative;"></div>
+    </div>
+
     <div id="alertesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
       <div class="skeleton-card">
         <div style="display:flex;gap:8px;"><div class="skeleton skeleton-line" style="width:60px;"></div><div class="skeleton skeleton-line" style="width:60px;"></div></div>
@@ -138,7 +141,6 @@
       </div>
     </div>
     
-    <!-- Zone de pagination -->
     <div id="paginationContainer" style="text-align:center;margin-top:24px;display:none;">
       <button onclick="voirPlus()" class="btn-outline" style="max-width:200px;margin:0 auto;height:44px;font-size:13px;border-radius:100px;">
         Voir plus d'alertes
@@ -155,17 +157,14 @@
     </div>
   </main>
 
-  <!-- Bouton d'action flottant -->
   <button class="fab" onclick="window.location.href='publier.html'" title="Publier une alerte">
     <span class="material-symbols-outlined" style="font-size:26px;color:white;">add_alert</span>
   </button>
 
-  <!-- Bouton Scroll To Top Smooth -->
   <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="position:fixed;bottom:88px;left:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid #ddb8b6;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:99;transition:all .3s;">
     <span class="material-symbols-outlined" style="color:#840015;font-size:22px;">arrow_upward</span>
   </button>
 
-  <!-- Tiroir de notifications latéral -->
   <div id="notifDrawer" style="display:none; position:fixed; top:0; right:0; bottom:0; width:100%; max-width:400px; background:rgba(255,255,255,0.96); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:-4px 0 24px rgba(132,0,21,0.15); z-index:1000; flex-direction:column; transform:translateX(100%);">
     <div style="padding:20px; border-bottom:1px solid #efecea; display:flex; align-items:center; justify-content:space-between; background:var(--header-gradient); color:white;">
       <div style="display:flex; align-items:center; gap:8px;">
@@ -177,7 +176,6 @@
       </button>
     </div>
     <div id="notifDrawerContent" style="flex:1; overflow-y:auto; padding:16px;" class="no-scrollbar">
-      <!-- Rempli dynamiquement -->
     </div>
   </div>
   <div id="drawerOverlay" onclick="toggleNotifications()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:999; backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); opacity:0;"></div>
@@ -195,21 +193,20 @@
     let toutesAlertes = [];
     let filtreCatActuel = 'tous';
     let filtreQuartierActuel = 'tous';
-    let limit = 20; // 20 alertes par page
+    let limit = 20;
     const user = AB.requireAuth();
+    let map = null;
+    let markerGroup = null;
     
-    // Timestamp de dernière lecture (depuis le serveur pour multi-navigateur)
     let serverLastReadTime = 0;
     async function chargerLastReadDepuisServeur() {
       try {
         const data = await AB.api('auth/notifications/read-at');
         if (data && data.readAt) {
           serverLastReadTime = new Date(data.readAt).getTime();
-          // Synchroniser localStorage avec la valeur serveur
           localStorage.setItem('ab_last_read_notifs', data.readAt);
         }
       } catch(e) {
-        // Fallback sur localStorage si le serveur est indisponible
         const local = localStorage.getItem('ab_last_read_notifs');
         if (local) serverLastReadTime = new Date(local).getTime();
       }
@@ -221,7 +218,6 @@
       av.onerror = () => { av.src = genererAvatar(user.nom || 'U', 36); };
     }
 
-    // Charger les quartiers dynamiquement dans le sélecteur
     const qSel = document.getElementById('filtreQuartier');
     QUARTIERS.forEach(q => {
       const o = document.createElement('option');
@@ -230,23 +226,81 @@
       qSel.appendChild(o);
     });
 
-    // Filtre quartier
+    function initMap() {
+      if (map) return;
+      const mapElement = document.getElementById('map');
+      if (!mapElement) return;
+      
+      map = L.map('map', { scrollWheelZoom: false }).setView([-2.502, 28.866], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+      
+      markerGroup = L.layerGroup().addTo(map);
+    }
+
+    function updateMapMarkers(alertesList) {
+      if (!map || !markerGroup) return;
+      markerGroup.clearLayers();
+      
+      alertesList.forEach(a => {
+        if (a.lat && a.lng && a.statut !== 'suspendue') {
+          const urg = URGENCES[a.urgence] || URGENCES.moyen;
+          const color = urg.color;
+          
+          const marker = L.circleMarker([parseFloat(a.lat), parseFloat(a.lng)], {
+            radius: 8,
+            fillColor: color,
+            color: '#ffffff',
+            weight: 1.5,
+            opacity: 1,
+            fillOpacity: 0.85
+          });
+          
+          marker.bindPopup(`
+            <div style="font-family:'Plus Jakarta Sans',sans-serif; text-align:left; min-width:140px;">
+              <strong style="color:${color}; text-transform:uppercase; font-size:9px;">[${a.urgence.toUpperCase()}]</strong>
+              <h4 style="margin:4px 0 2px 0; font-size:12px; font-weight:700; color:#1a1a1a;">${escHtml(a.titre)}</h4>
+              <p style="margin:0 0 6px 0; font-size:11px; color:#5b403e;">${escHtml(a.quartier)} • ${tempsRelatif(a.created_at)}</p>
+              <button onclick="voirDetailsAlerte('${a.id}')" style="background:#840015; color:white; border:none; padding:5px 8px; border-radius:4px; font-size:10px; font-weight:700; cursor:pointer; width:100%; font-family:'Plus Jakarta Sans',sans-serif;">Détails</button>
+            </div>
+          `);
+          
+          markerGroup.addLayer(marker);
+        }
+      });
+    }
+
+    function toggleMapVisibility() {
+      const btn = document.getElementById('btnToggleMap');
+      const mapContainer = document.getElementById('map');
+      
+      if (mapContainer.style.display === 'none') {
+        mapContainer.style.display = 'block';
+        btn.textContent = 'Masquer la carte';
+        if (map) {
+          setTimeout(() => map.invalidateSize(), 150);
+        }
+      } else {
+        mapContainer.style.display = 'none';
+        btn.textContent = 'Afficher la carte';
+      }
+    }
+
     function filtrerParQuartier(quartier) {
       filtreQuartierActuel = quartier;
-      limit = 20; // Réinitialise la pagination
+      limit = 20;
       afficherAlertes();
     }
 
-    // Filtre catégorie
     function filtrerParCat(btn, cat) {
       document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       filtreCatActuel = cat;
-      limit = 20; // Réinitialise la pagination
+      limit = 20;
       afficherAlertes();
     }
 
-    // Pagination
     function voirPlus() {
       limit += 20;
       afficherAlertes();
@@ -258,7 +312,6 @@
       const urgClass = `urgence-${a.urgence || 'moyen'}`;
       const photoAuteur = getPhotoUrl({ photoUrl: a.photo_auteur, nom: a.auteur_nom }, 36);
       
-      // Déterminer si l'alerte est nouvelle (moins de 10 min)
       const ageMs = Date.now() - new Date(a.created_at).getTime();
       const estNouvelle = ageMs < 10 * 60 * 1000;
       const badgeNouvelle = estNouvelle ? `<span class="badge" style="background:#ba1a1a;color:#fff;margin-right:6px;font-size:9px;">NOUVELLE</span>` : '';
@@ -313,21 +366,19 @@
       if (clearBtn) {
         clearBtn.style.display = rechercheActuelle ? 'flex' : 'none';
       }
-      limit = 20; // Réinitialise la pagination
+      limit = 20;
       afficherAlertes();
     }
 
     function calculerNotificationsNonLues(alertes) {
       if (!user) return;
-      // Utiliser le timestamp serveur en priorité (multi-navigateur)
       const lastRead = serverLastReadTime || 0;
-      
       const quartierUser = user.quartier || '';
+      
       const nonLues = alertes.filter(a => {
         const time = new Date(a.created_at).getTime();
         if (time <= lastRead) return false;
         
-        // Est-ce critique ou dans mon quartier ?
         const estCritique = a.urgence === 'critique';
         const estMonQuartier = quartierUser && a.quartier && a.quartier.toLowerCase() === quartierUser.toLowerCase();
         
@@ -346,7 +397,6 @@
     }
 
     function afficherAlertes() {
-      // Filtrer les alertes
       let liste = toutesAlertes;
       if (filtreCatActuel !== 'tous') {
         liste = liste.filter(a => a.categorie === filtreCatActuel);
@@ -367,6 +417,8 @@
       const empty = document.getElementById('emptyState');
       const pag = document.getElementById('paginationContainer');
       
+      updateMapMarkers(liste);
+
       if (!liste.length) {
         grid.innerHTML = '';
         empty.style.display = 'block';
@@ -376,11 +428,9 @@
 
       empty.style.display = 'none';
       
-      // Appliquer la pagination sur la liste filtrée
       const paginee = liste.slice(0, limit);
       grid.innerHTML = paginee.map((a, idx) => cardHTML(a, idx)).join('');
 
-      // Afficher/Masquer le bouton voir plus
       if (liste.length > limit) {
         pag.style.display = 'block';
       } else {
@@ -429,7 +479,6 @@
       } catch(e) { showToast(e.message, 'error'); }
     }
 
-    // Gestion du scroll pour le bouton scroll-to-top
     window.addEventListener('scroll', () => {
       const btn = document.getElementById('scrollToTopBtn');
       if (window.scrollY > 300) {
@@ -439,10 +488,18 @@
       }
     });
 
-    // Charger d'abord le timestamp serveur, puis les alertes
+    initMap();
     chargerLastReadDepuisServeur().then(() => chargerAlertes());
     
-    // Auto-refresh automatique toutes les 30s avec indicateur visuel silencieux
+    AB.connectSSE((nouvelleAlerte) => {
+      if (!toutesAlertes.some(a => a.id === nouvelleAlerte.id)) {
+        toutesAlertes.unshift(nouvelleAlerte);
+        calculerNotificationsNonLues(toutesAlertes);
+        afficherAlertes();
+        showToast(`Nouvelle alerte : ${nouvelleAlerte.titre}`, 'info');
+      }
+    });
+
     setInterval(() => chargerAlertes(true), 30000);
     
     afficherMenuAdmin();
@@ -470,7 +527,6 @@
       }
     }
 
-    // Modal de détails d'une alerte
     async function voirDetailsAlerte(id) {
       try {
         Swal.fire({ title: 'Chargement...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
@@ -519,6 +575,22 @@
                 <p style="margin-top:2px;">${a.nb_confirmations || 0} confirmation(s)</p>
               </div>
             </div>
+
+            <div style="border-top:1px solid #efecea; margin-top:16px; padding-top:12px;">
+              <h4 style="font-size:13px; font-weight:800; color:#1a1a1a; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                <span class="material-symbols-outlined" style="font-size:16px; color:#840015;">chat_bubble</span>
+                Espace d'échange et commentaires
+              </h4>
+              
+              <div id="commentsList" style="max-height:160px; overflow-y:auto; margin-bottom:12px; padding:6px; display:flex; flex-direction:column; gap:8px;" class="no-scrollbar">
+                <p style="font-size:11px; color:#906f6d; text-align:center; padding:10px 0;">Chargement des commentaires...</p>
+              </div>
+              
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input id="newCommentInput" type="text" placeholder="Ajouter un commentaire..." maxlength="500" style="flex:1; height:38px; padding:0 12px; border:1px solid #ddb8b6; border-radius:6px; font-size:12px; font-family:'Plus Jakarta Sans',sans-serif; outline:none;" />
+                <button id="btnSendComment" style="height:38px; padding:0 14px; background:#840015; color:white; border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;">Envoyer</button>
+              </div>
+            </div>
           </div>
         `;
 
@@ -531,6 +603,20 @@
           cancelButtonColor: '#efecea',
           customClass: {
             cancelButton: 'swal2-cancel-custom'
+          },
+          didOpen: () => {
+            chargerCommentairesDetails(a.id);
+            
+            const sendBtn = document.getElementById('btnSendComment');
+            const input = document.getElementById('newCommentInput');
+            if (sendBtn && input) {
+              sendBtn.onclick = () => soumettreCommentaire(a.id);
+              input.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                  soumettreCommentaire(a.id);
+                }
+              };
+            }
           }
         }).then((result) => {
           if (result.isConfirmed) {
@@ -544,7 +630,61 @@
       }
     }
 
-    // Gestion du tiroir de notifications
+    async function chargerCommentairesDetails(alertId) {
+      const container = document.getElementById('commentsList');
+      if (!container) return;
+      try {
+        const data = await AB.api(`alertes/${alertId}/commentaires`);
+        const list = data.commentaires || [];
+        if (list.length === 0) {
+          container.innerHTML = `<p style="font-size:11px; color:#906f6d; text-align:center; padding:10px 0;">Aucun commentaire. Soyez le premier à réagir !</p>`;
+          return;
+        }
+        
+        container.innerHTML = list.map(c => {
+          const photo = getPhotoUrl({ photoUrl: c.photo_auteur, nom: c.auteur_nom }, 24);
+          return `
+            <div style="display:flex; gap:8px; text-align:left; background:#faf8f7; padding:8px; border-radius:6px; border:1px solid #efecea;">
+              <img src="${photo}" style="width:24px; height:24px; border-radius:50%; object-fit:cover;" onerror="this.src='${genererAvatar(c.auteur_nom||'U',24)}'" />
+              <div style="flex:1; min-width:0;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:2px;">
+                  <span style="font-weight:700; color:#1a1a1a;">${escHtml(c.auteur_nom)}</span>
+                  <span style="color:#906f6d;">${tempsRelatif(c.created_at)}</span>
+                </div>
+                <p style="font-size:11.5px; color:#5b403e; line-height:1.4; margin:0; word-break:break-word;">${escHtml(c.contenu)}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+        
+        container.scrollTop = container.scrollHeight;
+      } catch (err) {
+        container.innerHTML = `<p style="font-size:11px; color:#FF3D71; text-align:center;">Erreur de chargement des commentaires</p>`;
+      }
+    }
+
+    async function soumettreCommentaire(alertId) {
+      const input = document.getElementById('newCommentInput');
+      const btn = document.getElementById('btnSendComment');
+      if (!input || !btn) return;
+      
+      const val = input.value.trim();
+      if (!val) return;
+      
+      btn.disabled = true;
+      btn.textContent = '...';
+      try {
+        await AB.api(`alertes/${alertId}/commentaires`, 'POST', { contenu: val });
+        input.value = '';
+        chargerCommentairesDetails(alertId);
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Envoyer';
+      }
+    }
+
     let notifsOpen = false;
     function toggleNotifications(event) {
       if (event) {
@@ -558,13 +698,11 @@
       if (!notifsOpen) {
         drawer.style.display = 'flex';
         overlay.style.display = 'block';
-        // force layout trigger for transition
         drawer.offsetHeight;
         drawer.classList.add('open');
         overlay.style.opacity = '1';
         notifsOpen = true;
         
-        // Effacer le compteur immédiatement (en prenant la date maximale pour pallier la dérive d'horloge)
         let maxTime = Date.now();
         if (toutesAlertes && toutesAlertes.length > 0) {
           const times = toutesAlertes.map(a => new Date(a.created_at).getTime());
@@ -575,10 +713,8 @@
         serverLastReadTime = maxTime;
         const badge = document.getElementById('notifBadge');
         if (badge) badge.style.display = 'none';
-        // Persister en base (multi-navigateur)
         AB.api('auth/notifications/mark-read', 'PUT').catch(() => {});
         
-        // Charger les notifications dans le tiroir
         chargerNotificationsDrawer();
       } else {
         drawer.classList.remove('open');
@@ -606,7 +742,6 @@
         const alertes = data.alertes || [];
         const quartierUser = user?.quartier || '';
         
-        // Filtrer les alertes critiques et du quartier de l'utilisateur
         const critiques = alertes.filter(a => a.urgence === 'critique');
         const quartierAlertes = alertes.filter(a => 
           quartierUser && 
@@ -647,8 +782,6 @@
       const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
       const urg = URGENCES[a.urgence] || URGENCES.moyen;
       const lastReadStr = localStorage.getItem('ab_last_read_notifs');
-      // Pour afficher le style non-lu de manière réaliste, on vérifie la date du clic d'avant
-      // (on soustrait 1.5s pour que la notif qui vient de déclencher l'ouverture apparaisse comme non-lue si elle l'était)
       const lastReadTime = lastReadStr ? new Date(lastReadStr).getTime() - 1500 : 0;
       const createdTime = new Date(a.created_at).getTime();
       const estNouveau = createdTime > lastReadTime;

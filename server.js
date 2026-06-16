@@ -13,11 +13,9 @@ const morgan = require('morgan');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ===== COMPRESSION & SECURE HEADERS & LOGGING =====
 app.use(compression());
 app.use(morgan('dev'));
 
-// Configurer Helmet de manière sécurisée tout en autorisant Google Maps, hCaptcha, Google reCAPTCHA et Google Fonts
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -36,7 +34,6 @@ app.use(helmet({
 app.use(cors());
 app.use(express.json());
 
-// ===== CONFIG =====
 const SUPABASE_URL = 'https://czviftkijvzzymimqspa.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN6dmlmdGtpanZ6enltaW1xc3BhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODQzMDY1MywiZXhwIjoyMDk0MDA2NjUzfQ.j8yyE4UlhknZSE5U3o6Cpb6YoKWvNm8KHQ9I7F8jbEc';
 const JWT_SECRET = 'alertbukavu_2026_secret_kivu_xyz789!';
@@ -73,7 +70,7 @@ async function detectDbSchema() {
       dbSchema.users.hasNbAlertes = keys.includes('nb_alertes');
     }
   } catch (e) {
-    console.warn('Schema detection warning (users):', e.message);
+    console.warn(e.message);
   }
 
   try {
@@ -87,15 +84,12 @@ async function detectDbSchema() {
       dbSchema.alertes.hasResolvedAt = keys.includes('resolved_at');
     }
   } catch (e) {
-    console.warn('Schema detection warning (alertes):', e.message);
+    console.warn(e.message);
   }
-  console.log('Database schema detection completed. Capabilities:', dbSchema);
 }
 
-// Détecter le schéma de la base de données de manière asynchrone
 detectDbSchema().catch(console.error);
 
-// Verification reCAPTCHA Google
 const RECAPTCHA_SECRET_KEY = process.env.RECAPTCHA_SECRET_KEY || '6LfCfv8sAAAAAOiwws2GtPJbmWiAiizh__LQg7Z6';
 
 async function verifyRecaptcha(token, ip) {
@@ -110,18 +104,16 @@ async function verifyRecaptcha(token, ip) {
     const data = await response.json();
     return !!data.success;
   } catch (err) {
-    console.error('reCAPTCHA validation error:', err);
+    console.error(err);
     return false;
   }
 }
 
-// Liste des quartiers autorisés pour la validation
 const ALLOWED_QUARTIERS = ['Kadutu', 'Ibanda', 'Bagira', 'Nyalukemba', 'Kasha', 'Panzi', 'Ciherano', 'Essence', 'Nyawera', 'Kasali', 'Autre'];
 const ALLOWED_CATEGORIES = ['incendie', 'route', 'inondation', 'accident', 'securite', 'sante', 'eau', 'meteo', 'autre'];
 
-// ===== MIDDLEWARE AUTH =====
 function verifyToken(req, res, next) {
-  const auth = req.headers.authorization;
+  const auth = req.headers.authorization || (req.query.token ? 'Bearer ' + req.query.token : null);
   if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'Non autorisé' });
   try {
     req.user = jwt.verify(auth.slice(7), JWT_SECRET);
@@ -136,8 +128,6 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-// ===== RATE LIMITERS =====
-// Limite sur l'authentification : max 10 requêtes par minute
 const authLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 10,
@@ -146,7 +136,6 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Limite sur la publication : max 5 alertes par heure par utilisateur
 const alertPublishLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 5,
@@ -157,27 +146,24 @@ const alertPublishLimiter = rateLimit({
   validate: { keyGeneratorIpFallback: false },
 });
 
-// ===== DATABASE WRAPPER WITH TIMEOUT =====
 async function dbQuery(promise) {
   return Promise.race([
     promise,
     new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 8000))
   ]).catch(err => {
     if (err.message === 'TIMEOUT') {
-      throw new Error('Le serveur de base de données Supabase ne répond pas. Veuillez réessayer.');
+      throw new Error('Le serveur de base de données ne répond pas. Veuillez réessayer.');
     }
     throw err;
   });
 }
 
-// Handler générique pour les erreurs
 const handleError = (res, err, defaultMsg = 'Une erreur est survenue') => {
-  console.error('Server Error:', err.message || err);
+  console.error(err.message || err);
   const status = err.message && err.message.includes('Supabase') ? 503 : 500;
   return res.status(status).json({ error: err.message || defaultMsg });
 };
 
-// ===== EMAIL =====
 function getTransporter() {
   return nodemailer.createTransport({
     service: 'gmail',
@@ -190,27 +176,12 @@ function escHtml(v = '') {
 }
 
 function buildEmailHTML(alert, auteur) {
-  const urgStyles = {
-    critique: {
-      accent: '#ef4444',
-      badgeBg: '#fef2f2',
-      badgeText: '#ef4444',
-      badgeBorder: '#fee2e2'
-    },
-    moyen: {
-      accent: '#f59e0b',
-      badgeBg: '#fffbeb',
-      badgeText: '#d97706',
-      badgeBorder: '#fef3c7'
-    },
-    faible: {
-      accent: '#10b981',
-      badgeBg: '#f0fdf4',
-      badgeText: '#059669',
-      badgeBorder: '#bbf7d0'
-    }
+  const colors = {
+    critique: '#ef4444',
+    moyen: '#f59e0b',
+    faible: '#10b981'
   };
-  const style = urgStyles[alert.urgence] || urgStyles.moyen;
+  const accentColor = colors[alert.urgence] || colors.moyen;
   const formattedDate = new Date().toLocaleDateString('fr-FR', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     hour: '2-digit', minute: '2-digit'
@@ -220,9 +191,9 @@ function buildEmailHTML(alert, auteur) {
   if (alert.photo_url) {
     imageHtml = `
       <div style="margin-bottom: 24px;">
-        <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Photo jointe</span>
+        <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Documentation photographique</span>
         <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc; text-align: center;">
-          <img src="${alert.photo_url}" alt="Illustration de l'alerte" style="width: 100%; max-height: 380px; object-fit: cover; display: block; margin: 0 auto;" />
+          <img src="${alert.photo_url}" alt="Incident" style="width: 100%; max-height: 380px; object-fit: cover; display: block; margin: 0 auto;" />
         </div>
       </div>
     `;
@@ -233,10 +204,10 @@ function buildEmailHTML(alert, auteur) {
     mapHtml = `
       <div style="margin-top: 28px; text-align: center;">
         <a href="https://www.google.com/maps/search/?api=1&query=${alert.lat},${alert.lng}" target="_blank" style="display: inline-block; background-color: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 2px 4px rgba(15,23,42,0.1); text-align: center;">
-          📍 Voir la localisation sur Google Maps
+          Consulter la localisation sur Google Maps
         </a>
         <div style="margin-top: 6px; font-size: 11px; color: #64748b;">
-          Coordonnées : ${alert.lat}, ${alert.lng}
+          Coordonnées geographiques : ${alert.lat}, ${alert.lng}
         </div>
       </div>
     `;
@@ -245,104 +216,70 @@ function buildEmailHTML(alert, auteur) {
   return `
     <div style="background-color: #f8fafc; padding: 40px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
       <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;">
-        
-        <!-- Top colored line based on urgency -->
-        <div style="height: 6px; background-color: ${style.accent};"></div>
-        
+        <div style="height: 6px; background-color: ${accentColor};"></div>
         <div style="padding: 36px;">
-          
-          <!-- Logo / Header -->
           <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
             <span style="font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">
-              ALERT<span style="color: #ef4444;">BUKAVU</span>
+              AlertBukavu
             </span>
-            <span style="background-color: ${style.badgeBg}; color: ${style.badgeText}; border: 1px solid ${style.badgeBorder}; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
-              🚨 ${escHtml((alert.urgence || 'moyen').toUpperCase())}
+            <span style="background-color: #f8fafc; color: #334155; border: 1px solid #e2e8f0; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              Niveau : ${escHtml((alert.urgence || 'moyen').toUpperCase())}
             </span>
           </div>
-
-          <!-- Title -->
           <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3; margin: 0 0 20px 0; letter-spacing: -0.01em;">
             ${escHtml(alert.titre)}
           </h2>
-
-          <!-- Metadata Grid -->
           <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
               <tr>
                 <td width="50%" style="padding-bottom: 12px; vertical-align: top;">
-                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Quartier</span>
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Secteur / Quartier</span>
                   <span style="font-size: 13px; font-weight: 700; color: #334155;">${escHtml(alert.quartier)}</span>
                 </td>
                 <td width="50%" style="padding-bottom: 12px; vertical-align: top;">
-                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Catégorie</span>
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Type d'incident</span>
                   <span style="font-size: 13px; font-weight: 700; color: #334155; text-transform: capitalize;">${escHtml(alert.categorie)}</span>
                 </td>
               </tr>
               <tr>
                 <td width="50%" style="vertical-align: top;">
-                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Publié Par</span>
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Signalé par</span>
                   <span style="font-size: 13px; font-weight: 700; color: #334155;">${escHtml(auteur)}</span>
                 </td>
                 <td width="50%" style="vertical-align: top;">
-                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Date de Signalement</span>
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Date et heure</span>
                   <span style="font-size: 13px; font-weight: 700; color: #334155;">${formattedDate}</span>
                 </td>
               </tr>
             </table>
           </div>
-
-          <!-- Description Section -->
           <div style="margin-bottom: 24px;">
-            <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Description de l'incident</span>
+            <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Description des faits</span>
             <div style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; white-space: pre-line;">${escHtml(alert.description)}</div>
           </div>
-
-          <!-- Optional Image -->
           ${imageHtml}
-
-          <!-- Optional Location/Map Button -->
           ${mapHtml}
-
         </div>
-
-        <!-- Footer -->
         <div style="background-color: #f8fafc; border-top: 1px solid #f1f5f9; padding: 24px 36px; text-align: center;">
           <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0 0 8px 0;">
-            Cet email a été envoyé automatiquement par la plateforme <strong>Alert Bukavu</strong> afin de notifier les autorités compétentes d'un incident en cours.
+            Ce message vous est adressé de manière automatique par la plateforme de sécurité civile AlertBukavu afin d'informer les entités compétentes.
           </p>
           <p style="font-size: 10px; color: #cbd5e1; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
-            Plateforme Citoyenne — Bukavu, RDC
+            Réseau de Vigilance Citoyenne — Bukavu, RDC
           </p>
         </div>
-
       </div>
     </div>
   `;
 }
 
 function buildNeighborhoodNotificationHTML(alert) {
-  const urgStyles = {
-    critique: {
-      accent: '#ef4444',
-      badgeBg: '#fef2f2',
-      badgeText: '#ef4444',
-      badgeBorder: '#fee2e2'
-    },
-    moyen: {
-      accent: '#f59e0b',
-      badgeBg: '#fffbeb',
-      badgeText: '#d97706',
-      badgeBorder: '#fef3c7'
-    },
-    faible: {
-      accent: '#10b981',
-      badgeBg: '#f0fdf4',
-      badgeText: '#059669',
-      badgeBorder: '#bbf7d0'
-    }
+  const colors = {
+    critique: '#ef4444',
+    moyen: '#f59e0b',
+    faible: '#10b981'
   };
-  const style = urgStyles[alert.urgence] || urgStyles.moyen;
+  const accentColor = colors[alert.urgence] || colors.moyen;
   const formattedDate = new Date().toLocaleDateString('fr-FR', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
     hour: '2-digit', minute: '2-digit'
@@ -352,9 +289,9 @@ function buildNeighborhoodNotificationHTML(alert) {
   if (alert.photo_url) {
     imageHtml = `
       <div style="margin-bottom: 24px;">
-        <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Photo jointe</span>
+        <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Aperçu visuel</span>
         <div style="border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; background-color: #f8fafc; text-align: center;">
-          <img src="${alert.photo_url}" alt="Illustration de l'alerte" style="width: 100%; max-height: 380px; object-fit: cover; display: block; margin: 0 auto;" />
+          <img src="${alert.photo_url}" alt="Visualisation" style="width: 100%; max-height: 380px; object-fit: cover; display: block; margin: 0 auto;" />
         </div>
       </div>
     `;
@@ -365,10 +302,10 @@ function buildNeighborhoodNotificationHTML(alert) {
     mapHtml = `
       <div style="margin-top: 28px; text-align: center;">
         <a href="https://www.google.com/maps/search/?api=1&query=${alert.lat},${alert.lng}" target="_blank" style="display: inline-block; background-color: #0f172a; color: #ffffff; padding: 12px 24px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; box-shadow: 0 2px 4px rgba(15,23,42,0.1); text-align: center;">
-          📍 Voir la localisation sur Google Maps
+          Consulter la localisation sur Google Maps
         </a>
         <div style="margin-top: 6px; font-size: 11px; color: #64748b;">
-          Coordonnées : ${alert.lat}, ${alert.lng}
+          Coordonnées geographiques : ${alert.lat}, ${alert.lng}
         </div>
       </div>
     `;
@@ -377,82 +314,61 @@ function buildNeighborhoodNotificationHTML(alert) {
   return `
     <div style="background-color: #f8fafc; padding: 40px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
       <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;">
-        
-        <!-- Top colored line based on urgency -->
-        <div style="height: 6px; background-color: ${style.accent};"></div>
-        
+        <div style="height: 6px; background-color: ${accentColor};"></div>
         <div style="padding: 36px;">
-          
-          <!-- Logo / Header -->
           <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
             <span style="font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">
-              ALERT<span style="color: #ef4444;">BUKAVU</span>
+              AlertBukavu
             </span>
-            <span style="background-color: ${style.badgeBg}; color: ${style.badgeText}; border: 1px solid ${style.badgeBorder}; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
-              🚨 NOTIFICATION QUARTIER
+            <span style="background-color: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              Avis de vigilance quartier
             </span>
           </div>
-
-          <!-- Alert Title -->
           <h2 style="font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.3; margin: 0 0 20px 0; letter-spacing: -0.01em;">
             ${escHtml(alert.titre)}
           </h2>
-
-          <!-- Crucial Alert Banner -->
           <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 16px; margin-bottom: 24px; color: #b45309; font-size: 13px; font-weight: 500; line-height: 1.5;">
-            ⚠️ <strong>Attention résidents de ${escHtml(alert.quartier)} :</strong> Une alerte d'urgence de niveau <strong>${escHtml((alert.urgence || 'moyen').toUpperCase())}</strong> est en cours dans votre quartier. Restez extrêmement vigilants et prenez vos précautions.
+            Message de sécurité : Un incident de niveau ${escHtml((alert.urgence || 'moyen').toUpperCase())} a été signalé dans votre secteur (${escHtml(alert.quartier)}). Nous vous invitons à faire preuve de vigilance et à prendre vos dispositions.
           </div>
-
-          <!-- Metadata Grid -->
           <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
               <tr>
                 <td width="50%" style="padding-bottom: 12px; vertical-align: top;">
-                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Quartier Concerné</span>
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Quartier concerné</span>
                   <span style="font-size: 13px; font-weight: 700; color: #334155;">${escHtml(alert.quartier)}</span>
                 </td>
                 <td width="50%" style="padding-bottom: 12px; vertical-align: top;">
-                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Type de Risque</span>
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Type de risque</span>
                   <span style="font-size: 13px; font-weight: 700; color: #334155; text-transform: capitalize;">${escHtml(alert.categorie)}</span>
                 </td>
               </tr>
               <tr>
                 <td width="50%" style="vertical-align: top;">
-                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Niveau d'Urgence</span>
-                  <span style="font-size: 13px; font-weight: 700; color: ${style.accent}; text-transform: capitalize;">${escHtml(alert.urgence)}</span>
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Urgence</span>
+                  <span style="font-size: 13px; font-weight: 700; color: ${accentColor}; text-transform: capitalize;">${escHtml(alert.urgence)}</span>
                 </td>
                 <td width="50%" style="vertical-align: top;">
-                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Date de Notification</span>
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px;">Date d'émission</span>
                   <span style="font-size: 13px; font-weight: 700; color: #334155;">${formattedDate}</span>
                 </td>
               </tr>
             </table>
           </div>
-
-          <!-- Description Section -->
           <div style="margin-bottom: 24px;">
             <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Détails de la situation</span>
             <div style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; white-space: pre-line;">${escHtml(alert.description)}</div>
           </div>
-
-          <!-- Optional Image -->
           ${imageHtml}
-
-          <!-- Optional Location/Map Button -->
           ${mapHtml}
-
         </div>
-
-        <!-- Footer -->
         <div style="background-color: #f8fafc; border-top: 1px solid #f1f5f9; padding: 24px 36px; text-align: center;">
           <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0 0 8px 0;">
-            Vous recevez cet email de sécurité car vous résidez dans le quartier <strong>${escHtml(alert.quartier)}</strong>.
+            Vous recevez cette notification de sécurité car vous êtes enregistré comme résident du quartier ${escHtml(alert.quartier)}.
           </p>
           <p style="font-size: 10px; color: #cbd5e1; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
-            Alert Bukavu — Plateforme Citoyenne — RDC
+            AlertBukavu — Coordination de la Protection Civile — RDC
           </p>
         </div>
-
       </div>
     </div>
   `;
@@ -462,78 +378,54 @@ function buildForgotPasswordHTML(user, tempPassword) {
   return `
     <div style="background-color: #f8fafc; padding: 40px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
       <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;">
-        
-        <!-- Top colored line -->
-        <div style="height: 6px; background-color: #ef4444;"></div>
-        
+        <div style="height: 6px; background-color: #840015;"></div>
         <div style="padding: 36px;">
-          
-          <!-- Logo / Header -->
           <div style="margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between;">
             <span style="font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">
-              ALERT<span style="color: #ef4444;">BUKAVU</span>
+              AlertBukavu
             </span>
-            <span style="background-color: #fee2e2; color: #ef4444; border: 1px solid #fecdd3; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
-              🔒 SÉCURITÉ
+            <span style="background-color: #fee2e2; color: #840015; border: 1px solid #fecdd3; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              Securité
             </span>
           </div>
-
-          <!-- Title -->
           <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.3; margin: 0 0 16px 0; letter-spacing: -0.01em;">
             Réinitialisation de votre mot de passe
           </h2>
-
           <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 16px 0;">
-            Bonjour <strong>${escHtml(user.nom)}</strong>,
+            Bonjour ${escHtml(user.nom)},
           </p>
-          
           <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 20px 0;">
-            Vous avez demandé la réinitialisation de votre mot de passe pour la plateforme Alert Bukavu. Un mot de passe de secours temporaire a été généré automatiquement pour votre compte :
+            Comme demandé, vous trouverez ci-dessous votre mot de passe temporaire pour vous connecter à la plateforme AlertBukavu.
           </p>
-
-          <!-- Password Display Card -->
           <div style="text-align: center; margin: 24px 0;">
             <div style="background-color: #f1f5f9; border: 1px dashed #cbd5e1; padding: 16px 24px; border-radius: 12px; font-family: 'Courier New', Courier, monospace; font-size: 22px; color: #0f172a; display: inline-block; letter-spacing: 2px; font-weight: 800; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
               ${tempPassword}
             </div>
           </div>
-
-          <!-- Alert / Advice Box -->
           <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 16px; margin: 24px 0; color: #b45309; font-size: 13px; font-weight: 500; line-height: 1.5;">
-            ⚠️ <strong>Conseil important :</strong> Utilisez ce mot de passe de secours pour vous connecter, puis rendez-vous immédiatement dans l'onglet <strong>Profil</strong> pour le remplacer par un nouveau mot de passe personnalisé et sécurisé.
+            Information importante : Veuillez utiliser ce code de secours pour votre prochaine authentification, puis modifiez immédiatement votre mot de passe dans l'onglet Profil afin de préserver l'accès à votre compte.
           </div>
-
           <p style="font-size: 13px; line-height: 1.6; color: #64748b; margin: 0;">
-            Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email en toute sécurité. Votre mot de passe actuel restera inchangé dès lors que vous ne vous connectez pas avec ce code temporaire.
+            Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer ce message de sécurité.
           </p>
-
         </div>
-
-        <!-- Footer -->
         <div style="background-color: #f8fafc; border-top: 1px solid #f1f5f9; padding: 24px 36px; text-align: center;">
           <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0 0 8px 0;">
-            Cet email de sécurité vous a été envoyé par <strong>Alert Bukavu</strong> suite à votre demande de réinitialisation.
+            Ce message de sécurité est envoyé automatiquement à la demande de l'utilisateur.
           </p>
           <p style="font-size: 10px; color: #cbd5e1; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
-            Alert Bukavu — Bukavu, RDC
+            AlertBukavu — Bukavu, RDC
           </p>
         </div>
-
       </div>
     </div>
   `;
 }
 
-// ===========================
-// ===== ROUTES AUTH =====
-// ===========================
-
-// Inscription (avec Rate Limiter et Validations Strictes)
 app.post('/api/auth/register', authLimiter, async (req, res) => {
   try {
     const { nom, username, email, telephone, quartier, password, recaptchaToken } = req.body;
     
-    // Validation Captcha
     const isLocalRequest = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
     if (!isLocalRequest) {
       const captchaValid = await verifyRecaptcha(recaptchaToken, req.ip);
@@ -542,7 +434,6 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
       }
     }
     
-    // Validations d'inputs
     if (!nom || !username || !email || !telephone || !quartier || !password) {
       return res.status(400).json({ error: 'Tous les champs sont obligatoires' });
     }
@@ -572,13 +463,11 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 
     const telFormatted = '+243' + digits;
 
-    // Vérifier email existant
     const { data: existingEmail } = await dbQuery(
       supabase.from('users').select('id').eq('email', email.toLowerCase()).maybeSingle()
     );
     if (existingEmail) return res.status(409).json({ error: 'Cet email est déjà utilisé' });
 
-    // Vérifier username existant
     const { data: existingUser } = await dbQuery(
       supabase.from('users').select('id').eq('username', username.toLowerCase()).maybeSingle()
     );
@@ -608,7 +497,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     );
 
     if (insertErr || !user) {
-      console.error('Insert User Error:', insertErr);
+      console.error(insertErr);
       return res.status(500).json({ error: insertErr?.message || 'Erreur lors de la création du compte' });
     }
 
@@ -624,12 +513,10 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
   }
 });
 
-// Connexion (avec Rate Limiter et Validations Strictes)
 app.post('/api/auth/login', authLimiter, async (req, res) => {
   try {
     const { email, password, recaptchaToken } = req.body;
     
-    // Validation Captcha
     const isLocalRequest = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
     if (!isLocalRequest) {
       const captchaValid = await verifyRecaptcha(recaptchaToken, req.ip);
@@ -650,7 +537,6 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
 
-    // Mettre à jour last_login
     if (dbSchema.users.hasLastLogin) {
       await dbQuery(supabase.from('users').update({ last_login: new Date().toISOString() }).eq('id', user.id));
     }
@@ -667,7 +553,6 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
   }
 });
 
-// Check username disponible
 app.get('/api/auth/check-username', async (req, res) => {
   const { username } = req.query;
   if (!username) return res.json({ available: false });
@@ -681,7 +566,6 @@ app.get('/api/auth/check-username', async (req, res) => {
   }
 });
 
-// Mettre à jour photo profil
 app.put('/api/auth/update-photo', verifyToken, async (req, res) => {
   const { photoUrl } = req.body;
   if (!photoUrl) return res.status(400).json({ error: 'URL photo manquante' });
@@ -696,7 +580,6 @@ app.put('/api/auth/update-photo', verifyToken, async (req, res) => {
   }
 });
 
-// Modifier son profil (Nom, Quartier, Téléphone)
 app.put('/api/auth/profile', verifyToken, async (req, res) => {
   try {
     const { nom, quartier, telephone } = req.body;
@@ -735,7 +618,6 @@ app.put('/api/auth/profile', verifyToken, async (req, res) => {
   }
 });
 
-// Données fraîches de l'utilisateur connecté
 app.get('/api/auth/me', verifyToken, async (req, res) => {
   try {
     const { data: user, error } = await dbQuery(
@@ -748,7 +630,6 @@ app.get('/api/auth/me', verifyToken, async (req, res) => {
   }
 });
 
-// Récupérer le timestamp de dernière lecture des notifications
 app.get('/api/auth/notifications/read-at', verifyToken, async (req, res) => {
   try {
     const { data: user, error } = await dbQuery(
@@ -757,13 +638,11 @@ app.get('/api/auth/notifications/read-at', verifyToken, async (req, res) => {
     if (error || !user) return res.json({ readAt: null });
     return res.json({ readAt: user.notifs_last_read || null });
   } catch (err) {
-    // Si la colonne n'existe pas encore, retourner null sans crasher
-    console.warn('notifs_last_read column may not exist yet:', err.message);
+    console.warn(err.message);
     return res.json({ readAt: null });
   }
 });
 
-// Marquer les notifications comme lues (persistant en base)
 app.put('/api/auth/notifications/mark-read', verifyToken, async (req, res) => {
   try {
     const now = new Date().toISOString();
@@ -771,18 +650,16 @@ app.put('/api/auth/notifications/mark-read', verifyToken, async (req, res) => {
       supabase.from('users').update({ notifs_last_read: now }).eq('id', req.user.id)
     );
     if (error) {
-      // Si la colonne n'existe pas encore dans Supabase, on log mais on ne bloque pas
-      console.warn('Could not update notifs_last_read (column may not exist):', error.message);
-      return res.json({ readAt: now, warning: 'Column notifs_last_read not found in DB, add it in Supabase.' });
+      console.warn(error.message);
+      return res.json({ readAt: now, warning: 'Champ indisponible' });
     }
     return res.json({ readAt: now });
   } catch (err) {
-    console.warn('mark-read error (non-blocking):', err.message);
+    console.warn(err.message);
     return res.json({ readAt: new Date().toISOString() });
   }
 });
 
-// Mot de passe oublié (Email réinitialisation sécurisé)
 app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email requis' });
@@ -792,12 +669,10 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       supabase.from('users').select('id, nom').eq('email', email.toLowerCase()).maybeSingle()
     );
     
-    // Pour des raisons de sécurité, nous renvoyons un succès même si l'email n'existe pas
     if (error || !user) {
       return res.json({ message: 'Si cet email est enregistré, vous recevrez un mot de passe temporaire sous peu.' });
     }
     
-    // Génération mot de passe temporaire robuste
     const tempPassword = Math.random().toString(36).slice(-8) + 'AB' + Math.floor(Math.random() * 100);
     const password_hash = await bcrypt.hash(tempPassword, 12);
     
@@ -805,11 +680,10 @@ app.post('/api/auth/forgot-password', async (req, res) => {
       supabase.from('users').update({ password_hash }).eq('id', user.id)
     );
     
-    // Envoi de l'email
     await getTransporter().sendMail({
-      from: `"Alert Bukavu" <${MAIL_USER}>`,
+      from: `"AlertBukavu" <${MAIL_USER}>`,
       to: email.toLowerCase(),
-      subject: `Mot de passe temporaire — Alert Bukavu`,
+      subject: `Mot de passe temporaire — AlertBukavu`,
       html: buildForgotPasswordHTML(user, tempPassword)
     });
     
@@ -819,11 +693,6 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   }
 });
 
-// ===========================
-// ===== ROUTES ALERTES =====
-// ===========================
-
-// Toutes les alertes
 app.get('/api/alertes', verifyToken, async (req, res) => {
   try {
     let baseQuery = supabase
@@ -852,7 +721,6 @@ app.get('/api/alertes', verifyToken, async (req, res) => {
   }
 });
 
-// Mes alertes
 app.get('/api/alertes/mes-alertes', verifyToken, async (req, res) => {
   try {
     const { data: alertes, error } = await dbQuery(
@@ -866,7 +734,6 @@ app.get('/api/alertes/mes-alertes', verifyToken, async (req, res) => {
   }
 });
 
-// Détail d'une alerte avec auteur
 app.get('/api/alertes/:id', verifyToken, async (req, res) => {
   try {
     const { data: alerte, error } = await dbQuery(
@@ -887,7 +754,6 @@ app.get('/api/alertes/:id', verifyToken, async (req, res) => {
   }
 });
 
-// Alertes filtrées par quartier
 app.get('/api/alertes/quartier/:quartier', verifyToken, async (req, res) => {
   try {
     const { quartier } = req.params;
@@ -915,17 +781,34 @@ app.get('/api/alertes/quartier/:quartier', verifyToken, async (req, res) => {
   }
 });
 
-// Publier une alerte (Rate limiter + Validation + Limite 5 alertes/24h)
+let clientsSSE = [];
+
+app.get('/api/alertes/flux', verifyToken, (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  
+  clientsSSE.push(res);
+  
+  req.on('close', () => {
+    clientsSSE = clientsSSE.filter(client => client !== res);
+  });
+});
+
+function diffuserNouvelleAlerte(alerte) {
+  clientsSSE.forEach(client => {
+    client.write(`data: ${JSON.stringify({ alerte })}\n\n`);
+  });
+}
+
 app.post('/api/alertes', verifyToken, alertPublishLimiter, async (req, res) => {
   try {
-    // 1. Vérifier si l'utilisateur est bloqué
     const { data: user, error: userErr } = await dbQuery(
       supabase.from('users').select('est_bloque').eq('id', req.user.id).single()
     );
     if (userErr || !user) return res.status(404).json({ error: 'Utilisateur introuvable' });
     if (user.est_bloque) return res.status(403).json({ error: 'Votre compte est bloqué pour fausses alertes.' });
 
-    // 2. Limite à 5 alertes par 24 heures par utilisateur
     const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: recentAlerts, error: countErr } = await dbQuery(
       supabase.from('alertes').select('id').eq('user_id', req.user.id).gte('created_at', oneDayAgo)
@@ -937,7 +820,6 @@ app.post('/api/alertes', verifyToken, alertPublishLimiter, async (req, res) => {
 
     const { titre, description, categorie, quartier, urgence, lat, lng, photo_url, recaptchaToken } = req.body;
     
-    // Validation Captcha
     const isLocalRequest = req.hostname === 'localhost' || req.hostname === '127.0.0.1';
     if (!isLocalRequest) {
       const captchaValid = await verifyRecaptcha(recaptchaToken, req.ip);
@@ -946,7 +828,6 @@ app.post('/api/alertes', verifyToken, alertPublishLimiter, async (req, res) => {
       }
     }
     
-    // 3. Valider et sanitiser tous les inputs
     if (!titre || !description || !categorie || !quartier) {
       return res.status(400).json({ error: 'Champs requis manquants' });
     }
@@ -960,7 +841,6 @@ app.post('/api/alertes', verifyToken, alertPublishLimiter, async (req, res) => {
       return res.status(400).json({ error: "Niveau d'urgence invalide." });
     }
 
-    // Récupérer les métadonnées de l'auteur pour dénormalisation
     const { data: auteurDetail } = await dbQuery(
       supabase.from('users').select('username, nom, quartier, photo_url').eq('id', req.user.id).single()
     );
@@ -988,35 +868,42 @@ app.post('/api/alertes', verifyToken, alertPublishLimiter, async (req, res) => {
     );
 
     if (insertErr || !alerte) {
-      console.error('Alerte insert error:', insertErr);
+      console.error(insertErr);
       return res.status(500).json({ error: 'Erreur lors de la publication' });
     }
 
-    // Incrémenter le compteur d'alertes de l'utilisateur
     if (dbSchema.users.hasNbAlertes) {
       const { data: auteurStats } = await dbQuery(supabase.from('users').select('nb_alertes').eq('id', req.user.id).single());
       await dbQuery(supabase.from('users').update({ nb_alertes: (auteurStats?.nb_alertes || 0) + 1 }).eq('id', req.user.id));
     }
 
-    // Email aux autorités
+    const outputAlerte = {
+      ...alerte,
+      auteur_nom: auteurDetail?.nom || 'Habitant',
+      auteur_username: auteurDetail?.username || null,
+      auteur_quartier: auteurDetail?.quartier || '',
+      photo_auteur: auteurDetail?.photo_url || null
+    };
+
+    diffuserNouvelleAlerte(outputAlerte);
+
     try {
       await getTransporter().sendMail({
-        from: `"Alert Bukavu" <${MAIL_USER}>`,
+        from: `"AlertBukavu" <${MAIL_USER}>`,
         to: AUTHORITY_EMAILS,
-        subject: `[${(urgence||'MOYEN').toUpperCase()}] ${categorie.toUpperCase()} — ${titre}`,
+        subject: `[VIGILANCE] ${categorie.toUpperCase()} — ${titre}`,
         html: buildEmailHTML(alerte, req.user.nom)
       });
     } catch(e) { 
-      console.error('Email error:', e.message); 
+      console.error(e.message); 
     }
 
-    return res.status(201).json({ alerte, message: 'Alerte publiée avec succès' });
+    return res.status(201).json({ alerte: outputAlerte, message: 'Alerte publiée avec succès' });
   } catch (err) {
     return handleError(res, err, 'Erreur lors de la publication de l\'alerte');
   }
 });
 
-// Modifier une alerte (auteur seulement, dans les 15 min après publication)
 app.put('/api/alertes/:id', verifyToken, async (req, res) => {
   try {
     const { titre, description, categorie, quartier, urgence } = req.body;
@@ -1039,7 +926,6 @@ app.put('/api/alertes/:id', verifyToken, async (req, res) => {
       return res.status(403).json({ error: 'Vous n\'êtes pas l\'auteur de cette alerte.' });
     }
     
-    // Vérification de la limite de temps (15 minutes)
     const ageMs = Date.now() - new Date(alerte.created_at).getTime();
     if (ageMs > 15 * 60 * 1000) {
       return res.status(400).json({ error: 'La limite de modification de 15 minutes est dépassée.' });
@@ -1059,7 +945,6 @@ app.put('/api/alertes/:id', verifyToken, async (req, res) => {
   }
 });
 
-// Supprimer une alerte (auteur ou admin)
 app.delete('/api/alertes/:id', verifyToken, async (req, res) => {
   try {
     const { data: alerte, error: fetchErr } = await dbQuery(
@@ -1076,7 +961,6 @@ app.delete('/api/alertes/:id', verifyToken, async (req, res) => {
     );
     if (delErr) throw delErr;
     
-    // Décrémenter le compteur
     if (dbSchema.users.hasNbAlertes) {
       const { data: auteurStats } = await dbQuery(supabase.from('users').select('nb_alertes').eq('id', alerte.user_id).single());
       if (auteurStats) {
@@ -1090,7 +974,6 @@ app.delete('/api/alertes/:id', verifyToken, async (req, res) => {
   }
 });
 
-// Confirmer une alerte (Empêcher sa propre alerte)
 app.post('/api/alertes/:id/confirmer', verifyToken, async (req, res) => {
   const alertId = req.params.id;
   try {
@@ -1099,7 +982,6 @@ app.post('/api/alertes/:id/confirmer', verifyToken, async (req, res) => {
     );
     if (fetchErr || !alerte) return res.status(404).json({ error: 'Alerte introuvable' });
     
-    // Empêcher de confirmer sa propre alerte
     if (alerte.user_id === req.user.id) {
       return res.status(400).json({ error: 'Vous ne pouvez pas confirmer votre propre alerte.' });
     }
@@ -1123,7 +1005,6 @@ app.post('/api/alertes/:id/confirmer', verifyToken, async (req, res) => {
   }
 });
 
-// Signaler une fausse alerte (Empêcher sa propre alerte)
 app.post('/api/alertes/:id/signaler', verifyToken, async (req, res) => {
   const alertId = req.params.id;
   try {
@@ -1132,7 +1013,6 @@ app.post('/api/alertes/:id/signaler', verifyToken, async (req, res) => {
     );
     if (fetchErr || !alerte) return res.status(404).json({ error: 'Alerte introuvable' });
     
-    // Empêcher de signaler sa propre alerte
     if (alerte.user_id === req.user.id) {
       return res.status(400).json({ error: 'Vous ne pouvez pas signaler votre propre alerte.' });
     }
@@ -1170,7 +1050,6 @@ app.post('/api/alertes/:id/signaler', verifyToken, async (req, res) => {
   }
 });
 
-// Changer statut (admin) - Enregistre resolved_at si résolue
 app.put('/api/alertes/:id/statut', verifyToken, requireAdmin, async (req, res) => {
   const { statut } = req.body;
   const allowed = ['active', 'resolue', 'suspendue'];
@@ -1196,7 +1075,58 @@ app.put('/api/alertes/:id/statut', verifyToken, requireAdmin, async (req, res) =
   }
 });
 
-// Statistiques globales précalculées
+app.get('/api/alertes/:id/commentaires', verifyToken, async (req, res) => {
+  try {
+    const { data: comments, error } = await dbQuery(
+      supabase.from('commentaires')
+        .select('*')
+        .eq('alerte_id', req.params.id)
+        .order('created_at', { ascending: true })
+    );
+    if (error) throw error;
+    return res.json({ commentaires: comments || [] });
+  } catch (err) {
+    return handleError(res, err, 'Impossible de charger les commentaires');
+  }
+});
+
+app.post('/api/alertes/:id/commentaires', verifyToken, async (req, res) => {
+  try {
+    const { contenu } = req.body;
+    if (!contenu || contenu.trim().length === 0) {
+      return res.status(400).json({ error: 'Le contenu du commentaire est obligatoire' });
+    }
+    if (contenu.length > 500) {
+      return res.status(400).json({ error: 'Le commentaire ne peut pas dépasser 500 caractères' });
+    }
+
+    const { data: user, error: userErr } = await dbQuery(
+      supabase.from('users').select('nom, username, photo_url').eq('id', req.user.id).single()
+    );
+    if (userErr || !user) return res.status(404).json({ error: 'Utilisateur introuvable' });
+
+    const insertObj = {
+      alerte_id: req.params.id,
+      user_id: req.user.id,
+      auteur_nom: user.nom,
+      auteur_username: user.username,
+      photo_auteur: user.photo_url || null,
+      contenu: contenu.trim()
+    };
+
+    const { data: comment, error: insertErr } = await dbQuery(
+      supabase.from('commentaires').insert([insertObj]).select().single()
+    );
+    if (insertErr || !comment) {
+      throw insertErr || new Error('Erreur d\'insertion');
+    }
+
+    return res.status(201).json({ commentaire: comment });
+  } catch (err) {
+    return handleError(res, err, 'Erreur lors de la publication du commentaire');
+  }
+});
+
 app.get('/api/stats', verifyToken, async (req, res) => {
   try {
     const { data: alertes, error } = await dbQuery(
@@ -1212,7 +1142,6 @@ app.get('/api/stats', verifyToken, async (req, res) => {
     const parQuartier = {};
     const parUrgence = { faible: 0, moyen: 0, critique: 0 };
     
-    // Timeline des 7 derniers jours
     const timeline = {};
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
@@ -1262,16 +1191,12 @@ app.get('/api/stats', verifyToken, async (req, res) => {
       parUrgence,
       timeline: Object.values(timeline),
       txResolution,
-      tempsMoyenResolution // retourné en heures
+      tempsMoyenResolution
     });
   } catch (err) {
     return handleError(res, err, 'Erreur de chargement des statistiques');
   }
 });
-
-// ===========================
-// ===== ROUTES ADMIN =====
-// ===========================
 
 app.get('/api/admin/users', verifyToken, requireAdmin, async (req, res) => {
   try {
@@ -1291,7 +1216,6 @@ app.get('/api/admin/users', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
-// Bloquer / Débloquer
 app.put('/api/admin/users/:id/bloquer', verifyToken, requireAdmin, async (req, res) => {
   if (req.params.id === req.user.id) {
     return res.status(400).json({ error: 'Vous ne pouvez pas vous bloquer vous-même' });
@@ -1308,7 +1232,6 @@ app.put('/api/admin/users/:id/bloquer', verifyToken, requireAdmin, async (req, r
   }
 });
 
-// Promouvoir Administrateur (role citizen -> admin)
 app.put('/api/admin/users/:id/promouvoir', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { error } = await dbQuery(
@@ -1321,20 +1244,16 @@ app.put('/api/admin/users/:id/promouvoir', verifyToken, requireAdmin, async (req
   }
 });
 
-// Supprimer un utilisateur (admin)
 app.delete('/api/admin/users/:id', verifyToken, requireAdmin, async (req, res) => {
   if (req.params.id === req.user.id) {
     return res.status(400).json({ error: 'Vous ne pouvez pas vous supprimer vous-même' });
   }
   const userId = req.params.id;
   try {
-    // 1. Supprimer les confirmations faites par cet utilisateur
     await dbQuery(supabase.from('confirmations').delete().eq('user_id', userId));
-    // 2. Supprimer les signalements faits par cet utilisateur
     await dbQuery(supabase.from('signalements').delete().eq('user_id', userId));
-    // 3. Supprimer les alertes de cet utilisateur (supprimera aussi en cascade les confirmations et signalements de ces alertes)
+    await dbQuery(supabase.from('commentaires').delete().eq('user_id', userId));
     await dbQuery(supabase.from('alertes').delete().eq('user_id', userId));
-    // 4. Supprimer l'utilisateur lui-même
     const { error } = await dbQuery(
       supabase.from('users').delete().eq('id', userId)
     );
@@ -1345,7 +1264,20 @@ app.delete('/api/admin/users/:id', verifyToken, requireAdmin, async (req, res) =
   }
 });
 
-// Envoyer notification par email à tous les utilisateurs du même quartier
+app.get('/api/admin/alertes/:id/preview-email', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const { data: alerte, error: fetchErr } = await dbQuery(
+      supabase.from('alertes').select('*').eq('id', req.params.id).maybeSingle()
+    );
+    if (fetchErr || !alerte) return res.status(404).json({ error: 'Alerte introuvable' });
+    
+    const html = buildNeighborhoodNotificationHTML(alerte);
+    return res.json({ html });
+  } catch (err) {
+    return handleError(res, err, 'Erreur de prévisualisation de la notification');
+  }
+});
+
 app.post('/api/admin/alertes/:id/notifier', verifyToken, requireAdmin, async (req, res) => {
   try {
     const { data: alerte, error: fetchErr } = await dbQuery(
@@ -1353,7 +1285,6 @@ app.post('/api/admin/alertes/:id/notifier', verifyToken, requireAdmin, async (re
     );
     if (fetchErr || !alerte) return res.status(404).json({ error: 'Alerte introuvable' });
     
-    // Trouver les utilisateurs du même quartier
     const { data: users, error: usersErr } = await dbQuery(
       supabase.from('users').select('email, nom').eq('quartier', alerte.quartier)
     );
@@ -1362,11 +1293,10 @@ app.post('/api/admin/alertes/:id/notifier', verifyToken, requireAdmin, async (re
     const emails = (users || []).map(u => u.email).filter(e => e && e !== req.user.email);
     if (!emails.length) return res.json({ message: 'Aucun résident à notifier dans ce quartier' });
     
-    // Envoyer la notification email groupée
     await getTransporter().sendMail({
-      from: `"Alert Bukavu" <${MAIL_USER}>`,
+      from: `"AlertBukavu" <${MAIL_USER}>`,
       to: emails,
-      subject: `🚨 [NOTIFICATION QUARTIER] ${alerte.quartier.toUpperCase()} — ${alerte.titre}`,
+      subject: `[VIGILANCE] Secteur ${alerte.quartier.toUpperCase()} — ${alerte.titre}`,
       html: buildNeighborhoodNotificationHTML(alerte)
     });
     
@@ -1376,9 +1306,6 @@ app.post('/api/admin/alertes/:id/notifier', verifyToken, requireAdmin, async (re
   }
 });
 
-// ===========================
-// ===== FICHIERS STATIQUES =====
-// ===========================
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));

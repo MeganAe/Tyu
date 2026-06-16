@@ -1,7 +1,3 @@
-// ================================
-// Alert Bukavu — Config Frontend
-// ================================
-
 const CLOUDINARY_CLOUD_NAME = 'duxhbgs3d';
 const CLOUDINARY_UPLOAD_PRESET = 'alertbukavu_unsigned';
 
@@ -16,7 +12,6 @@ async function uploadImage(file, folder = 'alertbukavu') {
   return data.secure_url;
 }
 
-// ---- Auth ----
 const AB = {
   saveToken: t => localStorage.setItem('ab_token', t),
   getToken: () => localStorage.getItem('ab_token'),
@@ -52,16 +47,131 @@ const AB = {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || data.message || 'Erreur serveur');
     return data;
+  },
+
+  getOfflineQueue: () => {
+    try {
+      return JSON.parse(localStorage.getItem('ab_offline_queue') || '[]');
+    } catch {
+      return [];
+    }
+  },
+
+  saveOfflineQueue: (q) => {
+    localStorage.setItem('ab_offline_queue', JSON.stringify(q));
+  },
+
+  addToOfflineQueue: (alertData) => {
+    const queue = AB.getOfflineQueue();
+    queue.push({
+      id: 'offline_' + Date.now(),
+      data: alertData,
+      timestamp: Date.now()
+    });
+    AB.saveOfflineQueue(queue);
+  },
+
+  syncOfflineQueue: async () => {
+    if (!navigator.onLine) return;
+    const queue = AB.getOfflineQueue();
+    if (queue.length === 0) return;
+
+    let successes = 0;
+    const remaining = [];
+
+    for (const item of queue) {
+      try {
+        let photo_url = item.data.photo_url;
+        if (item.data.photo_base64 && !photo_url) {
+          const b = await fetch(item.data.photo_base64).then(r => r.blob());
+          const file = new File([b], "photo_offline.jpg", { type: "image/jpeg" });
+          photo_url = await uploadImage(file, 'alertes');
+        }
+
+        const payload = { ...item.data, photo_url };
+        delete payload.photo_base64;
+
+        await AB.api('alertes', 'POST', payload);
+        successes++;
+      } catch (err) {
+        remaining.push(item);
+      }
+    }
+
+    AB.saveOfflineQueue(remaining);
+
+    if (successes > 0) {
+      showToast(`${successes} alerte(s) hors-ligne synchronisée(s) !`, 'success');
+      if (window.chargerAlertes) {
+        window.chargerAlertes();
+      }
+    }
+  },
+
+  connectSSE: (onNewAlert) => {
+    const token = localStorage.getItem('ab_token');
+    if (!token) return;
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    const source = new EventSource(`/api/alertes/flux?token=${token}`);
+
+    source.onmessage = (event) => {
+      try {
+        const parsed = JSON.parse(event.data);
+        if (parsed && parsed.alerte) {
+          if (onNewAlert) {
+            onNewAlert(parsed.alerte);
+          }
+          AB.triggerSystemNotification(parsed.alerte);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    source.onerror = () => {
+      source.close();
+      setTimeout(() => AB.connectSSE(onNewAlert), 5000);
+    };
+  },
+
+  triggerSystemNotification: (alert) => {
+    const user = AB.getUser();
+    if (!user) return;
+
+    const myQuartier = user.quartier || '';
+    const isCritical = alert.urgence === 'critique';
+    const isMyQuartier = myQuartier && alert.quartier && alert.quartier.toLowerCase() === myQuartier.toLowerCase();
+
+    if (!isCritical && !isMyQuartier) return;
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      const title = isCritical ? `[URGENT] ${alert.titre}` : `Vigilance Quartier: ${alert.titre}`;
+      const body = `Incident à ${alert.quartier} : ${alert.description}`;
+      const notification = new Notification(title, {
+        body: body,
+        icon: '/logo.png',
+        tag: alert.id
+      });
+
+      notification.onclick = () => {
+        window.focus();
+        if (window.voirDetailsAlerte) {
+          window.voirDetailsAlerte(alert.id);
+        }
+      };
+    }
   }
 };
 
-// ---- Données métier ----
 const QUARTIERS = [
   'Kadutu','Ibanda','Bagira','Nyalukemba',
   'Kasha','Panzi','Ciherano','Essence','Nyawera','Kasali','Autre'
 ];
 
-// Toutes les catégories originales restaurées
 const CATEGORIES = {
   incendie:   { label: 'Incendie',        icon: 'local_fire_department', color: '#FF3D71', bg: '#FFF0F5' },
   route:      { label: 'Route dégradée',  icon: 'construction',          color: '#FF9F43', bg: '#FFF5EC' },
@@ -80,7 +190,6 @@ const URGENCES = {
   critique: { label: 'CRITIQUE', color: '#FF3D71', bg: '#FFF0F5' }
 };
 
-// ---- Utilitaires ----
 function tempsRelatif(ts) {
   const diff = Date.now() - new Date(ts).getTime();
   const min = Math.floor(diff / 60000);
@@ -120,7 +229,6 @@ function normaliserTelephone(digits) {
   return '+243' + String(digits).replace(/\D/g, '');
 }
 
-// ---- Géolocalisation ----
 function obtenirPosition() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -142,14 +250,12 @@ function obtenirPosition() {
   });
 }
 
-// ---- Local Dev Detection ----
 function estLocal() {
   const hn = window.location.hostname;
   const pr = window.location.protocol;
   return pr === 'file:' || !hn || hn === 'localhost' || hn === '127.0.0.1' || hn === '[::1]' || hn.startsWith('192.168.') || hn.startsWith('10.') || hn.startsWith('172.');
 }
 
-// ---- SweetAlert2 & Fallback ----
 let isSwalFallback = false;
 if (typeof Swal === 'undefined') {
   isSwalFallback = true;
@@ -184,7 +290,6 @@ function showToast(msg, type = 'success') {
   if (!isSwalFallback) {
     Toast.fire({ icon: type, title: msg });
   } else {
-    // Inject fallback toast style if not present
     if (!document.getElementById('fallback-toast-style')) {
       const style = document.createElement('style');
       style.id = 'fallback-toast-style';
@@ -222,7 +327,6 @@ function showToast(msg, type = 'success') {
       document.head.appendChild(style);
     }
     
-    // Create container if not present
     let container = document.getElementById('fallback-toast-container');
     if (!container) {
       container = document.createElement('div');
@@ -262,7 +366,6 @@ function showAlert(title, text, icon = 'info') {
   }
 }
 
-// ---- Menu admin ----
 function afficherMenuAdmin() {
   if (!AB.isAdmin()) return;
   const nav = document.querySelector('.bottom-nav');
@@ -275,5 +378,6 @@ function afficherMenuAdmin() {
   nav.appendChild(link);
 }
 
-
-
+window.addEventListener('online', () => {
+  AB.syncOfflineQueue();
+});

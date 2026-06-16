@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AlertBukavu — Administration</title>
@@ -89,11 +91,17 @@
     </div>
     
     <div id="tabToutes" style="display:none;">
-      <div style="display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;">
-        <button class="filter-pill active" onclick="filtrerToutesAlertes(this, 'tous')">Toutes</button>
-        <button class="filter-pill" onclick="filtrerToutesAlertes(this, 'active')">Actives</button>
-        <button class="filter-pill" onclick="filtrerToutesAlertes(this, 'resolue')">Résolues</button>
-        <button class="filter-pill" onclick="filtrerToutesAlertes(this, 'suspendue')">Suspendues</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;">
+          <button class="filter-pill active" onclick="filtrerToutesAlertes(this, 'tous')">Toutes</button>
+          <button class="filter-pill" onclick="filtrerToutesAlertes(this, 'active')">Actives</button>
+          <button class="filter-pill" onclick="filtrerToutesAlertes(this, 'resolue')">Résolues</button>
+          <button class="filter-pill" onclick="filtrerToutesAlertes(this, 'suspendue')">Suspendues</button>
+        </div>
+        <button onclick="exporterCSV()" style="display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#00C48C;color:white;font-family:'Inter',sans-serif;transition:all .2s;white-space:nowrap;box-shadow:0 2px 4px rgba(0,196,140,0.2);">
+          <span class="material-symbols-outlined" style="font-size:16px;">download</span>
+          Exporter CSV
+        </button>
       </div>
       <div id="listToutes"><div class="skeleton" style="height:80px;border-radius:12px;"></div></div>
     </div>
@@ -109,7 +117,6 @@
           Répartition par Niveau d'Urgence
         </h2>
         <div id="urgencyStats" style="display:flex;flex-direction:column;gap:12px;">
-          <!-- Urgences custom horizontal progress bars -->
         </div>
       </div>
 
@@ -119,7 +126,6 @@
           Répartition par Catégorie d'Incident
         </h2>
         <div id="categoryStats" style="display:flex;flex-direction:column;gap:12px;">
-          <!-- Categories custom progress bars -->
         </div>
       </div>
 
@@ -129,7 +135,6 @@
           Répartition par Quartier de Bukavu
         </h2>
         <div id="quartierStats" style="display:flex;flex-direction:column;gap:12px;">
-          <!-- Quartier progress bars -->
         </div>
       </div>
     </div>
@@ -180,7 +185,6 @@ function renderAlerte(a, showSignal = false) {
   const statutColor = a.statut === 'suspendue' ? '#840015' : a.statut === 'resolue' ? '#00C48C' : '#FF9F43';
   const statutBg = a.statut === 'suspendue' ? '#ffdad8' : a.statut === 'resolue' ? '#E6FAF5' : '#FFF5EC';
   
-  // Bouton de notification seulement si alerte active
   const canNotify = a.statut === 'active';
   
   return `<div class="alerte-row">
@@ -263,6 +267,56 @@ function appliquerFiltreToutesAlertes() {
   document.getElementById('listToutes').innerHTML = aFiltrer.length
     ? aFiltrer.map(a => renderAlerte(a)).join('')
     : `<p style="color:#906f6d;font-size:14px;text-align:center;padding:28px 0;">Aucune alerte avec le statut "${filtreStatutActuel}"</p>`;
+}
+
+function exporterCSV() {
+  let aFiltrer = toutesLesAlertes;
+  if (filtreStatutActuel !== 'tous') {
+    aFiltrer = toutesLesAlertes.filter(a => a.statut === filtreStatutActuel);
+  }
+  if (aFiltrer.length === 0) {
+    showToast('Aucune alerte à exporter', 'info');
+    return;
+  }
+  const headers = ['ID', 'Titre', 'Description', 'Catégorie', 'Quartier', 'Urgence', 'Statut', 'Date de création', 'Confirmations', 'Signalements', 'Latitude', 'Longitude'];
+  const rows = aFiltrer.map(a => [
+    a.id,
+    a.titre,
+    a.description,
+    a.categorie,
+    a.quartier || 'Bukavu',
+    a.urgence,
+    a.statut,
+    new Date(a.created_at).toLocaleString('fr-FR'),
+    a.nb_confirmations || 0,
+    a.nb_signalements || 0,
+    a.lat || '',
+    a.lng || ''
+  ]);
+  const escapeField = val => {
+    if (val === null || val === undefined) return '';
+    let stringVal = String(val);
+    if (stringVal.includes('"') || stringVal.includes(',') || stringVal.includes('\n') || stringVal.includes('\r')) {
+      stringVal = stringVal.replace(/"/g, '""');
+      return `"${stringVal}"`;
+    }
+    return stringVal;
+  };
+  const csvContent = [
+    headers.map(escapeField).join(','),
+    ...rows.map(row => row.map(escapeField).join(','))
+  ].join('\r\n');
+  const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+  const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0,10);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `alertes_bukavu_${filtreStatutActuel}_${dateStr}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 }
 
 async function chargerUsers() {
@@ -391,21 +445,18 @@ async function chargerStatistiquesOnglet() {
     const urgMap = stats.parUrgence || { faible: 0, moyen: 0, critique: 0 };
     const getPct = val => total > 0 ? Math.round((val / total) * 100) : 0;
     
-    // 1. Répartition Urgences
     document.getElementById('urgencyStats').innerHTML = `
       ${renderProgressBar('Critique', urgMap.critique || 0, getPct(urgMap.critique || 0), '#FF3D71')}
       ${renderProgressBar('Moyen', urgMap.moyen || 0, getPct(urgMap.moyen || 0), '#FF9F43')}
       ${renderProgressBar('Faible', urgMap.faible || 0, getPct(urgMap.faible || 0), '#00C48C')}
     `;
     
-    // 2. Répartition Catégories
     const catHtml = Object.entries(CATEGORIES).map(([key, cat]) => {
       const count = stats.parCat[key] || 0;
       return renderProgressBar(cat.label, count, getPct(count), cat.color || '#840015');
     }).join('');
     document.getElementById('categoryStats').innerHTML = catHtml || '<p style="color:#906f6d;font-size:12px;text-align:center;">Aucune catégorie</p>';
     
-    // 3. Répartition Quartiers
     const qHtml = QUARTIERS.map(q => {
       const count = stats.parQuartier[q] || 0;
       return renderProgressBar(q, count, getPct(count), '#a95a56');

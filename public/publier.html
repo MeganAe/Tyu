@@ -1,20 +1,19 @@
 <!doctype html>
 <html lang="fr">
 <head>
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AlertBukavu — Publier une alerte</title>
-  <link rel="icon" type="image/png" href="logo.png"/>
   
-  <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="AlertBukavu — Publier une alerte"/>
   <meta property="og:description" content="Signalez un danger, une inondation, un incendie ou un autre incident à Bukavu en temps réel."/>
   
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
   <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="style.css"/>
   <style>
     .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
@@ -54,20 +53,17 @@
 
   <main style="max-width:640px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
 
-    <!-- Titre -->
     <div class="section-card">
       <label class="field-label">Titre de l'alerte *</label>
       <input id="titre" type="text" class="field-input no-icon" placeholder="Ex: Incendie au marché central..." maxlength="80" style="height:50px;font-size:14px;"/>
       <p class="char-count"><span id="titreCount">0</span> / 80</p>
     </div>
 
-    <!-- Catégorie -->
     <div class="section-card">
       <label class="field-label">Catégorie *</label>
       <div id="catGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;"></div>
     </div>
 
-    <!-- Quartier + Urgence -->
     <div class="section-card">
       <label class="field-label">Quartier concerné *</label>
       <div style="position:relative;margin-bottom:16px;">
@@ -84,14 +80,12 @@
       </div>
     </div>
 
-    <!-- Description -->
     <div class="section-card">
       <label class="field-label">Description détaillée *</label>
       <textarea id="description" class="field-input no-icon" placeholder="Décrivez la situation avec précision..." maxlength="500" style="height:110px;padding:14px 16px;resize:none;"></textarea>
       <p class="char-count"><span id="descCount">0</span> / 500</p>
     </div>
 
-    <!-- Photo avec compression Client-side -->
     <div class="section-card">
       <label class="field-label">Photo <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
       <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Ajoutez une photo. Elle sera automatiquement optimisée.</p>
@@ -106,7 +100,6 @@
       <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="previewPhoto(event)"/>
     </div>
 
-    <!-- GPS avec Google Maps preview & Saisie manuelle -->
     <div class="section-card">
       <label class="field-label">Localisation GPS <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
       <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Aide à localiser l'alerte sur la carte</p>
@@ -120,7 +113,6 @@
         </button>
       </div>
 
-      <!-- Saisie GPS manuelle -->
       <div id="manualGpsWrap" style="display:none;margin-top:12px;align-items:flex-end;gap:10px;">
         <div style="flex:1;">
           <label class="field-label" style="font-size:11px;margin-bottom:4px;">Latitude</label>
@@ -133,18 +125,15 @@
         <button onclick="validerManuelGps()" style="height:40px;padding:0 16px;background:#840015;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Valider</button>
       </div>
 
-      <!-- Google Maps Iframe preview -->
       <div id="mapPreviewWrap" style="display:none;margin-top:12px;border-radius:8px;overflow:hidden;border:1px solid #ddb8b6;">
         <iframe id="mapPreview" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
       </div>
     </div>
 
-    <!-- reCAPTCHA v2 Intégré -->
     <div class="captcha-wrap" style="display:flex;justify-content:center;margin-bottom:16px;">
       <div class="g-recaptcha" data-sitekey="6LfCfv8sAAAAAG-VWFp1wMrXch6hSxVS7JsRJh05" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
     </div>
 
-    <!-- Avertissement -->
     <div class="warning-box">
       <span class="material-symbols-outlined" style="color:#840015;font-size:20px;flex-shrink:0;">warning</span>
       <div>
@@ -153,7 +142,6 @@
       </div>
     </div>
 
-    <!-- Bouton Soumission -->
     <button id="btnPublier" class="btn-primary" onclick="publier()" style="height:52px;margin-bottom:20px;">
       <span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span>
       PUBLIER L'ALERTE
@@ -161,7 +149,6 @@
 
   </main>
 
-  <!-- Bouton Scroll to top -->
   <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="position:fixed;bottom:88px;left:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid #ddb8b6;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:99;transition:all .3s;">
     <span class="material-symbols-outlined" style="color:#840015;font-size:22px;">arrow_upward</span>
   </button>
@@ -178,7 +165,6 @@
   <script>
     const user = AB.requireAuth();
 
-    // Vérifier le statut de l'utilisateur sur le serveur au chargement
     async function verifierStatutCompte() {
       try {
         const u = AB.getUser();
@@ -194,21 +180,18 @@
     function onCaptchaSuccess(token) { captchaValidated = true; }
     function onCaptchaExpire() { captchaValidated = false; }
 
-    // Désactiver le captcha sur localhost pour faciliter le développement local
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       captchaValidated = true;
     }
     
     let catChoisie = '', urgChoisie = 'moyen', userLat = null, userLng = null, photoFile = null;
 
-    // Remplir quartiers
     QUARTIERS.forEach(q => {
       const o = document.createElement('option');
       o.value = q; o.textContent = q;
       document.getElementById('quartier').appendChild(o);
     });
 
-    // Remplir catégories
     const catGrid = document.getElementById('catGrid');
     Object.entries(CATEGORIES).forEach(([key, cat]) => {
       const btn = document.createElement('button');
@@ -234,7 +217,6 @@
       document.getElementById('descCount').textContent = this.value.length;
     });
 
-    // Image Compressor Client-side (canvas resize à max 1200px)
     function compressImage(file) {
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -264,7 +246,7 @@
             ctx.drawImage(img, 0, 0, width, height);
             canvas.toBlob((blob) => {
               resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-            }, 'image/jpeg', 0.85); // JPEG 85% pour haute qualité et légèreté
+            }, 'image/jpeg', 0.85);
           };
         };
       });
@@ -276,7 +258,6 @@
       if (!file.type.startsWith('image/')) { showToast('Choisissez une image', 'error'); return; }
       
       showToast('Optimisation de la photo...');
-      // Compression
       const compressed = await compressImage(file);
       photoFile = compressed;
       
@@ -293,7 +274,6 @@
       document.getElementById('photoInput').value = '';
     }
 
-    // Afficher/Masquer saisie GPS manuelle
     function toggleManualGps() {
       const el = document.getElementById('manualGpsWrap');
       el.style.display = el.style.display === 'none' ? 'flex' : 'none';
@@ -347,11 +327,19 @@
         showToast('Position obtenue avec succès');
       } catch(e) {
         lbl.textContent = 'Obtenir ma position';
-        // Afficher l'avertissement et la saisie manuelle si le GPS échoue
         showToast(e.message + ' Saisie manuelle activée.', 'warning');
         document.getElementById('manualGpsWrap').style.display = 'flex';
       }
       btn.disabled = false;
+    }
+
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
     }
 
     async function publier() {
@@ -366,7 +354,8 @@
       if (!quartier) { showToast('Choisissez le quartier concerné', 'error'); return; }
       if (!description) { showToast('La description est obligatoire', 'error'); return; }
       if (description.length > 500) { showToast('La description ne doit pas dépasser 500 caractères', 'error'); return; }
-      if (!captchaValidated) { showToast('Veuillez valider le captcha', 'error'); return; }
+      
+      if (navigator.onLine && !captchaValidated) { showToast('Veuillez valider le captcha', 'error'); return; }
 
       if (urgChoisie === 'critique') {
         const r = await showConfirm('Alerte CRITIQUE', 'Êtes-vous certain de la gravité de la situation ?', 'Oui, publier', 'warning');
@@ -375,6 +364,28 @@
 
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>&nbsp;Publication en cours...';
+
+      if (!navigator.onLine) {
+        try {
+          let photo_base64 = null;
+          if (photoFile) {
+            photo_base64 = await getBase64(photoFile);
+          }
+          
+          AB.addToOfflineQueue({
+            titre, description, categorie: catChoisie, quartier,
+            urgence: urgChoisie, lat: userLat, lng: userLng, photo_base64
+          });
+          
+          await showAlert('Mode hors-ligne', 'Vous êtes actuellement hors-ligne. Votre alerte a été enregistrée localement et sera publiée automatiquement dès le retour de votre connexion internet.', 'info');
+          window.location.href = 'index.html';
+        } catch (err) {
+          showToast('Erreur d\'enregistrement hors-ligne', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span> PUBLIER L\'ALERTE';
+        }
+        return;
+      }
 
       try {
         let photo_url = null;
@@ -403,7 +414,6 @@
       }
     }
 
-    // Gestion du scroll
     window.addEventListener('scroll', () => {
       const btn = document.getElementById('scrollToTopBtn');
       if (window.scrollY > 300) {
