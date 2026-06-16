@@ -1,24 +1,39 @@
 <!doctype html>
 <html lang="fr">
   <head>
-  <link rel="icon" type="image/png" href="favicon.png"/>
+    <link rel="icon" type="image/png" href="favicon.png" />
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AlertBukavu — Inscription</title>
-      <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <link rel="stylesheet" href="style.css" />
     <style>
-      html,body{min-height:100%;margin:0}
-      .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+      html,
+      body {
+        min-height: 100%;
+        margin: 0;
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
     </style>
   </head>
   <body class="auth-page">
-
     <div class="auth-bg">
       <div class="bukavu-scene" aria-hidden="true">
         <div class="sky-glow"></div>
@@ -33,77 +48,195 @@
     <div class="auth-scroll">
       <div class="auth-shell">
         <div class="glass-card register-card">
-
           <div class="floating-logo">
-            <img src="logo.png" alt="AlertBukavu Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-pulse\' style=\'width:100%;height:100%;border:3px solid #840015;border-radius:50%;display:flex;align-items:center;justify-content:center\'><span class=\'material-symbols-outlined\' style=\'color:#840015;font-size:46px;font-variation-settings:&quot;FILL&quot; 1,&quot;wght&quot; 700,&quot;GRAD&quot; 0,&quot;opsz&quot; 48\'>notification_important</span></div>'" />
+            <img
+              src="logo.png"
+              alt="AlertBukavu Logo"
+              onerror="
+                this.style.display = 'none';
+                this.parentElement.innerHTML =
+                  '<div class=\'logo-pulse\' style=\'width:100%;height:100%;border:3px solid #840015;border-radius:50%;display:flex;align-items:center;justify-content:center\'><span class=\'material-symbols-outlined\' style=\'color:#840015;font-size:46px;font-variation-settings:&quot;FILL&quot; 1,&quot;wght&quot; 700,&quot;GRAD&quot; 0,&quot;opsz&quot; 48\'>notification_important</span></div>';
+              "
+            />
           </div>
 
-          <div style="text-align:center;margin-bottom:20px">
-            <h1 style="font-size:22px;font-weight:800;color:#840015;margin-bottom:4px">Créer un compte</h1>
-            <p style="font-size:13px;color:#5b403e">Rejoignez la communauté AlertBukavu</p>
+          <div style="text-align: center; margin-bottom: 20px">
+            <h1
+              style="
+                font-size: 22px;
+                font-weight: 800;
+                color: #840015;
+                margin-bottom: 4px;
+              "
+            >
+              Créer un compte
+            </h1>
+            <p style="font-size: 13px; color: #5b403e">
+              Rejoignez la communauté AlertBukavu
+            </p>
           </div>
 
-          <form onsubmit="register(); return false;">
-
+          <form
+            onsubmit="
+              register();
+              return false;
+            "
+          >
             <div class="input-wrap">
-              <input id="nom" type="text" class="field-input" placeholder="Nom complet" />
+              <input
+                id="nom"
+                type="text"
+                class="field-input"
+                placeholder="Nom complet"
+              />
               <span class="auth-icon user" aria-hidden="true"></span>
             </div>
 
-            <div class="input-wrap" style="margin-bottom:4px">
-              <input id="username" type="text" class="field-input" placeholder="Nom d'utilisateur" maxlength="20" oninput="verifierUsername(this.value)" autocomplete="username" />
+            <div class="input-wrap" style="margin-bottom: 4px">
+              <input
+                id="username"
+                type="text"
+                class="field-input"
+                placeholder="Nom d'utilisateur"
+                maxlength="20"
+                oninput="verifierUsername(this.value)"
+                autocomplete="username"
+              />
               <span class="auth-icon at" aria-hidden="true"></span>
             </div>
-            <p id="usernameStatus" style="font-size:11px;margin-bottom:12px;padding-left:4px;min-height:16px"></p>
+            <p
+              id="usernameStatus"
+              style="
+                font-size: 11px;
+                margin-bottom: 12px;
+                padding-left: 4px;
+                min-height: 16px;
+              "
+            ></p>
 
             <div class="input-wrap">
-              <input id="email" type="email" class="field-input" placeholder="Adresse email" autocomplete="email" />
+              <input
+                id="email"
+                type="email"
+                class="field-input"
+                placeholder="Adresse email"
+                autocomplete="email"
+              />
               <span class="auth-icon mail" aria-hidden="true"></span>
             </div>
 
             <div class="tel-wrap">
               <div class="tel-prefix">+243</div>
-              <input id="telephone" type="tel" class="tel-input" placeholder="812 345 678" oninput="formatTelephone(this)" inputmode="numeric" />
+              <input
+                id="telephone"
+                type="tel"
+                class="tel-input"
+                placeholder="812 345 678"
+                oninput="formatTelephone(this)"
+                inputmode="numeric"
+              />
             </div>
-            <p id="telStatus" style="font-size:11px;margin-bottom:12px;padding-left:4px;min-height:16px"></p>
+            <p
+              id="telStatus"
+              style="
+                font-size: 11px;
+                margin-bottom: 12px;
+                padding-left: 4px;
+                min-height: 16px;
+              "
+            ></p>
 
-            <div class="input-wrap" style="margin-bottom:12px">
-              <select id="quartier" class="field-input" style="appearance:none;padding-right:36px;cursor:pointer">
+            <div class="input-wrap" style="margin-bottom: 12px">
+              <select
+                id="quartier"
+                class="field-input"
+                style="appearance: none; padding-right: 36px; cursor: pointer"
+              >
                 <option value="">Votre quartier...</option>
               </select>
               <span class="auth-icon pin" aria-hidden="true"></span>
               <span class="select-caret" aria-hidden="true"></span>
             </div>
 
-            <div class="input-wrap" style="margin-bottom:4px">
-              <input id="password" type="password" class="field-input" placeholder="Mot de passe (min. 8 car.)" style="padding-right:48px" oninput="updateStrength(this.value)" autocomplete="new-password" />
+            <div class="input-wrap" style="margin-bottom: 4px">
+              <input
+                id="password"
+                type="password"
+                class="field-input"
+                placeholder="Mot de passe (min. 8 car.)"
+                style="padding-right: 48px"
+                oninput="updateStrength(this.value)"
+                autocomplete="new-password"
+              />
               <span class="auth-icon key" aria-hidden="true"></span>
-              <button type="button" class="password-toggle" onclick="togglePwd()" aria-label="Afficher le mot de passe">
+              <button
+                type="button"
+                class="password-toggle"
+                onclick="togglePwd()"
+                aria-label="Afficher le mot de passe"
+              >
                 <span id="eyeIcon" aria-hidden="true"></span>
               </button>
             </div>
 
-            <div style="height:4px;border-radius:2px;background:#f0eded;margin-bottom:16px;overflow:hidden">
-              <div id="pwdFill" style="height:100%;width:0%;border-radius:2px;transition:all .3s"></div>
+            <div
+              style="
+                height: 4px;
+                border-radius: 2px;
+                background: #f0eded;
+                margin-bottom: 16px;
+                overflow: hidden;
+              "
+            >
+              <div
+                id="pwdFill"
+                style="
+                  height: 100%;
+                  width: 0%;
+                  border-radius: 2px;
+                  transition: all 0.3s;
+                "
+              ></div>
             </div>
 
-            
             <div class="captcha-wrap">
-              <div class="g-recaptcha" data-sitekey="6LfCfv8sAAAAAG-VWFp1wMrXch6hSxVS7JsRJh05" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
+              <div
+                class="g-recaptcha"
+                data-sitekey="6LfCfv8sAAAAAG-VWFp1wMrXch6hSxVS7JsRJh05"
+                data-callback="onCaptchaSuccess"
+                data-expired-callback="onCaptchaExpire"
+              ></div>
             </div>
 
-            <button type="submit" id="btnReg" class="btn-primary" style="margin-top:12px">
+            <button
+              type="submit"
+              id="btnReg"
+              class="btn-primary"
+              style="margin-top: 12px"
+            >
               CRÉER MON COMPTE
               <span class="btn-arrow" aria-hidden="true"></span>
             </button>
           </form>
 
-          <div style="margin-top:16px;text-align:center">
-            <a href="login.html" style="font-size:13px;font-weight:600;color:#840015;text-decoration:underline;text-underline-offset:3px">Déjà un compte ? Se connecter</a>
+          <div style="margin-top: 16px; text-align: center">
+            <a
+              href="login.html"
+              style="
+                font-size: 13px;
+                font-weight: 600;
+                color: #840015;
+                text-decoration: underline;
+                text-underline-offset: 3px;
+              "
+              >Déjà un compte ? Se connecter</a
+            >
           </div>
         </div>
 
-        <p class="auth-footer" style="margin-bottom:20px">AlertBukavu • Réseau communautaire • Bukavu, RDC</p>
+        <p class="auth-footer" style="margin-bottom: 20px">
+          AlertBukavu • Réseau communautaire • Bukavu, RDC
+        </p>
       </div>
     </div>
 
@@ -112,21 +245,30 @@
       AB.redirectIfAuth();
 
       let captchaValidated = false;
-      function onCaptchaSuccess(token) { captchaValidated = true; }
-      function onCaptchaExpire() { captchaValidated = false; }
+      function onCaptchaSuccess(token) {
+        captchaValidated = true;
+      }
+      function onCaptchaExpire() {
+        captchaValidated = false;
+      }
 
-      
       if (estLocal()) {
         captchaValidated = true;
       }
 
-      const sel = document.getElementById('quartier');
-      QUARTIERS.forEach(q => { const o = document.createElement('option'); o.value = q; o.textContent = q; sel.appendChild(o); });
+      const sel = document.getElementById("quartier");
+      QUARTIERS.forEach((q) => {
+        const o = document.createElement("option");
+        o.value = q;
+        o.textContent = q;
+        sel.appendChild(o);
+      });
 
       function togglePwd() {
-        const i = document.getElementById('password'), ic = document.getElementById('eyeIcon');
-        i.type = i.type === 'password' ? 'text' : 'password';
-        ic.className = i.type === 'password' ? '' : 'is-visible';
+        const i = document.getElementById("password"),
+          ic = document.getElementById("eyeIcon");
+        i.type = i.type === "password" ? "text" : "password";
+        ic.className = i.type === "password" ? "" : "is-visible";
       }
 
       function updateStrength(pwd) {
@@ -135,80 +277,143 @@
         if (/[A-Z]/.test(pwd)) s++;
         if (/[0-9]/.test(pwd)) s++;
         if (/[^A-Za-z0-9]/.test(pwd)) s++;
-        const cols = ['#FF3D71','#FF9F43','#FFD43B','#00C48C'];
-        const w = ['25%','50%','75%','100%'];
-        const f = document.getElementById('pwdFill');
-        f.style.width = s > 0 ? w[s-1] : '0%';
-        f.style.background = s > 0 ? cols[s-1] : '';
+        const cols = ["#FF3D71", "#FF9F43", "#FFD43B", "#00C48C"];
+        const w = ["25%", "50%", "75%", "100%"];
+        const f = document.getElementById("pwdFill");
+        f.style.width = s > 0 ? w[s - 1] : "0%";
+        f.style.background = s > 0 ? cols[s - 1] : "";
       }
 
       function formatTelephone(input) {
-        const digits = input.value.replace(/\D/g, '').slice(0, 9);
+        const digits = input.value.replace(/\D/g, "").slice(0, 9);
         input.value = digits;
-        const status = document.getElementById('telStatus');
-        if (!digits.length) { status.textContent = ''; return; }
+        const status = document.getElementById("telStatus");
+        if (!digits.length) {
+          status.textContent = "";
+          return;
+        }
         if (digits.length === 9) {
-          status.textContent = 'Numéro accepté';
-          status.style.color = '#00C48C';
+          status.textContent = "Numéro accepté";
+          status.style.color = "#00C48C";
         } else {
           status.textContent = `${digits.length}/9 chiffres`;
-          status.style.color = '#906f6d';
+          status.style.color = "#906f6d";
         }
       }
 
       let usernameTimer;
       async function verifierUsername(val) {
-        const status = document.getElementById('usernameStatus');
+        const status = document.getElementById("usernameStatus");
         clearTimeout(usernameTimer);
-        if (!val) { status.textContent = ''; return; }
-        if (!/^[a-zA-Z0-9_]{3,20}$/.test(val)) {
-          status.textContent = '3-20 caractères, lettres/chiffres/_';
-          status.style.color = '#FF3D71'; return;
+        if (!val) {
+          status.textContent = "";
+          return;
         }
-        status.textContent = 'Vérification...'; status.style.color = '#906f6d';
+        if (!/^[a-zA-Z0-9_]{3,20}$/.test(val)) {
+          status.textContent = "3-20 caractères, lettres/chiffres/_";
+          status.style.color = "#FF3D71";
+          return;
+        }
+        status.textContent = "Vérification...";
+        status.style.color = "#906f6d";
         usernameTimer = setTimeout(async () => {
           try {
             const data = await AB.api(`auth/check-username?username=${val}`);
-            status.textContent = data.available ? '@' + val + ' est disponible' : '@' + val + ' est déjà pris';
-            status.style.color = data.available ? '#00C48C' : '#FF3D71';
-          } catch { status.textContent = ''; }
+            status.textContent = data.available
+              ? "@" + val + " est disponible"
+              : "@" + val + " est déjà pris";
+            status.style.color = data.available ? "#00C48C" : "#FF3D71";
+          } catch {
+            status.textContent = "";
+          }
         }, 600);
       }
 
       async function register() {
-        const nom = document.getElementById('nom').value.trim();
-        const username = document.getElementById('username').value.trim().toLowerCase();
-        const email = document.getElementById('email').value.trim();
-        const telRaw = document.getElementById('telephone').value.trim();
-        const telephone = telRaw.replace(/\D/g, '');
-        const quartier = document.getElementById('quartier').value;
-        const password = document.getElementById('password').value;
-        const btn = document.getElementById('btnReg');
+        const nom = document.getElementById("nom").value.trim();
+        const username = document
+          .getElementById("username")
+          .value.trim()
+          .toLowerCase();
+        const email = document.getElementById("email").value.trim();
+        const telRaw = document.getElementById("telephone").value.trim();
+        const telephone = telRaw.replace(/\D/g, "");
+        const quartier = document.getElementById("quartier").value;
+        const password = document.getElementById("password").value;
+        const btn = document.getElementById("btnReg");
 
-        if (!nom) { showToast('Le nom est requis', 'error'); return; }
-        if (!username || !/^[a-zA-Z0-9_]{3,20}$/.test(username)) { showToast("Nom d'utilisateur invalide (3-20 car., lettres/chiffres/_)", 'error'); return; }
-        if (!email) { showToast("L'email est requis", 'error'); return; }
-        if (!telephone) { showToast('Le numéro de téléphone est requis', 'error'); return; }
-        if (telephone.length !== 9) { showToast('Le numéro de téléphone doit contenir exactement 9 chiffres', 'error'); return; }
-        if (!quartier) { showToast('Choisissez votre quartier', 'error'); return; }
-        if (password.length < 8) { showToast('Mot de passe trop court (min. 8 car.)', 'error'); return; }
-        if (!captchaValidated) { showToast('Veuillez valider le captcha', 'error'); return; }
+        if (!nom) {
+          showToast("Le nom est requis", "error");
+          return;
+        }
+        if (!username || !/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+          showToast(
+            "Nom d'utilisateur invalide (3-20 car., lettres/chiffres/_)",
+            "error",
+          );
+          return;
+        }
+        if (!email) {
+          showToast("L'email est requis", "error");
+          return;
+        }
+        if (!telephone) {
+          showToast("Le numéro de téléphone est requis", "error");
+          return;
+        }
+        if (telephone.length !== 9) {
+          showToast(
+            "Le numéro de téléphone doit contenir exactement 9 chiffres",
+            "error",
+          );
+          return;
+        }
+        if (!quartier) {
+          showToast("Choisissez votre quartier", "error");
+          return;
+        }
+        if (password.length < 8) {
+          showToast("Mot de passe trop court (min. 8 car.)", "error");
+          return;
+        }
+        if (!captchaValidated) {
+          showToast("Veuillez valider le captcha", "error");
+          return;
+        }
 
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner"></span>&nbsp;Création...';
 
         try {
-          const recaptchaToken = estLocal() ? '' : grecaptcha.getResponse();
-          const data = await AB.api('auth/register', 'POST', { nom, username, email, telephone, quartier, password, recaptchaToken });
+          const recaptchaToken = estLocal() ? "" : grecaptcha.getResponse();
+          const data = await AB.api("auth/register", "POST", {
+            nom,
+            username,
+            email,
+            telephone,
+            quartier,
+            password,
+            recaptchaToken,
+          });
           AB.saveToken(data.token);
           AB.saveUser(data.user);
-          await Swal.fire({ icon: 'success', title: 'Compte créé !', text: `Bienvenue sur AlertBukavu, @${username} !`, confirmButtonColor: '#840015', confirmButtonText: 'Commencer' });
-          window.location.href = 'index.html';
-        } catch(e) {
+          await Swal.fire({
+            icon: "success",
+            title: "Compte créé !",
+            text: `Bienvenue sur AlertBukavu, @${username} !`,
+            confirmButtonColor: "#840015",
+            confirmButtonText: "Commencer",
+          });
+          window.location.href = "index.html";
+        } catch (e) {
           btn.disabled = false;
-          btn.innerHTML = 'CRÉER MON COMPTE <span class="btn-arrow" aria-hidden="true"></span>';
-          if (typeof grecaptcha !== 'undefined') { grecaptcha.reset(); captchaValidated = false; }
-          showToast(e.message, 'error');
+          btn.innerHTML =
+            'CRÉER MON COMPTE <span class="btn-arrow" aria-hidden="true"></span>';
+          if (typeof grecaptcha !== "undefined") {
+            grecaptcha.reset();
+            captchaValidated = false;
+          }
+          showToast(e.message, "error");
         }
       }
     </script>

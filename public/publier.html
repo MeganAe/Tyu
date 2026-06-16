@@ -1,427 +1,930 @@
 <!doctype html>
 <html lang="fr">
-<head>
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <head>
+    <link rel="icon" type="image/png" href="favicon.png" />
 
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AlertBukavu — Publier une alerte</title>
-  
-  <meta property="og:title" content="AlertBukavu — Publier une alerte"/>
-  <meta property="og:description" content="Signalez un danger, une inondation, un incendie ou un autre incident à Bukavu en temps réel."/>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="style.css"/>
-  <style>
-    .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
-    body{padding-bottom:80px; scroll-behavior: smooth;}
-    html { scroll-behavior: smooth; }
-    
-    .cat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 8px;border-radius:10px;border:1.5px solid #ddb8b6;background:white;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:#5b403e;font-weight:600;font-size:12px;transition:all .2s;}
-    .cat-btn:hover{border-color:#840015;background:#ffdad8;}
-    .cat-btn.active{border-color:#840015;background:#ffdad8;color:#840015;}
-    
-    .urg-btn{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid #ddb8b6;background:white;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
-    .urg-btn.faible.active{background:#E6FAF5;color:#00C48C;border-color:#00C48C;}
-    .urg-btn.moyen.active{background:#FFF5EC;color:#FF9F43;border-color:#FF9F43;}
-    .urg-btn.critique.active{background:#FFF0F5;color:#FF3D71;border-color:#FF3D71;}
-    
-    .photo-upload-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s;}
-    .photo-upload-btn:hover{background:#ffb3af;}
-    
-    .warning-box{background:#ffdad8;border-left:4px solid #840015;border-radius:8px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;}
-    .char-count{font-size:11px;color:#906f6d;text-align:right;margin-top:4px;margin-bottom:0;}
-  </style>
-</head>
-<body>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlertBukavu — Publier une alerte</title>
 
-  <header class="top-bar">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <button onclick="history.back()" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;">
-        <span class="material-symbols-outlined" style="font-size:22px;color:white;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">arrow_back</span>
+    <meta property="og:title" content="AlertBukavu — Publier une alerte" />
+    <meta
+      property="og:description"
+      content="Signalez un danger, une inondation, un incendie ou un autre incident à Bukavu en temps réel."
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 1,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 48;
+      }
+      body {
+        padding-bottom: 80px;
+        scroll-behavior: smooth;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      .cat-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 14px 8px;
+        border-radius: 10px;
+        border: 1.5px solid #ddb8b6;
+        background: white;
+        cursor: pointer;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        color: #5b403e;
+        font-weight: 600;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+      .cat-btn:hover {
+        border-color: #840015;
+        background: #ffdad8;
+      }
+      .cat-btn.active {
+        border-color: #840015;
+        background: #ffdad8;
+        color: #840015;
+      }
+
+      .urg-btn {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: 1.5px solid #ddb8b6;
+        background: white;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        transition: all 0.2s;
+      }
+      .urg-btn.faible.active {
+        background: #e6faf5;
+        color: #00c48c;
+        border-color: #00c48c;
+      }
+      .urg-btn.moyen.active {
+        background: #fff5ec;
+        color: #ff9f43;
+        border-color: #ff9f43;
+      }
+      .urg-btn.critique.active {
+        background: #fff0f5;
+        color: #ff3d71;
+        border-color: #ff3d71;
+      }
+
+      .photo-upload-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        background: #ffdad8;
+        color: #840015;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        transition: background 0.2s;
+      }
+      .photo-upload-btn:hover {
+        background: #ffb3af;
+      }
+
+      .warning-box {
+        background: #ffdad8;
+        border-left: 4px solid #840015;
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .char-count {
+        font-size: 11px;
+        color: #906f6d;
+        text-align: right;
+        margin-top: 4px;
+        margin-bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-bar">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <button
+          onclick="history.back()"
+          style="
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+          "
+        >
+          <span
+            class="material-symbols-outlined"
+            style="
+              font-size: 22px;
+              color: white;
+              font-variation-settings:
+                &quot;FILL&quot; 0,
+                &quot;wght&quot; 400,
+                &quot;GRAD&quot; 0,
+                &quot;opsz&quot; 24;
+            "
+            >arrow_back</span
+          >
+        </button>
+        <h1 style="font-size: 17px; font-weight: 800; color: white">
+          Publier une alerte
+        </h1>
+      </div>
+    </header>
+
+    <section class="hero-section" style="padding: 16px 20px 36px">
+      <p style="font-size: 13px; color: rgba(255, 255, 255, 0.85)">
+        Signalez un incident à la communauté de Bukavu
+      </p>
+    </section>
+
+    <main
+      style="
+        max-width: 640px;
+        margin: -20px auto 0;
+        padding: 0 16px 20px;
+        position: relative;
+        z-index: 1;
+      "
+    >
+      <div class="section-card">
+        <label class="field-label">Titre de l'alerte *</label>
+        <input
+          id="titre"
+          type="text"
+          class="field-input no-icon"
+          placeholder="Ex: Incendie au marché central..."
+          maxlength="80"
+          style="height: 50px; font-size: 14px"
+        />
+        <p class="char-count"><span id="titreCount">0</span> / 80</p>
+      </div>
+
+      <div class="section-card">
+        <label class="field-label">Catégorie *</label>
+        <div
+          id="catGrid"
+          style="
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+          "
+        ></div>
+      </div>
+
+      <div class="section-card">
+        <label class="field-label">Quartier concerné *</label>
+        <div style="position: relative; margin-bottom: 16px">
+          <select
+            id="quartier"
+            class="field-input no-icon"
+            style="
+              height: 50px;
+              font-size: 14px;
+              appearance: none;
+              padding-right: 36px;
+            "
+          >
+            <option value="">Choisir un quartier...</option>
+          </select>
+          <span
+            class="material-symbols-outlined"
+            style="
+              position: absolute;
+              right: 12px;
+              top: 50%;
+              transform: translateY(-50%);
+              font-size: 18px;
+              color: #906f6d;
+              pointer-events: none;
+              font-variation-settings:
+                &quot;FILL&quot; 0,
+                &quot;wght&quot; 400,
+                &quot;GRAD&quot; 0,
+                &quot;opsz&quot; 24;
+            "
+            >expand_more</span
+          >
+        </div>
+        <label class="field-label">Niveau d'urgence *</label>
+        <div style="display: flex; gap: 10px">
+          <button class="urg-btn faible" onclick="selUrg(this, 'faible')">
+            Faible
+          </button>
+          <button class="urg-btn moyen active" onclick="selUrg(this, 'moyen')">
+            Moyen
+          </button>
+          <button class="urg-btn critique" onclick="selUrg(this, 'critique')">
+            Critique
+          </button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <label class="field-label">Description détaillée *</label>
+        <textarea
+          id="description"
+          class="field-input no-icon"
+          placeholder="Décrivez la situation avec précision..."
+          maxlength="500"
+          style="height: 110px; padding: 14px 16px; resize: none"
+        ></textarea>
+        <p class="char-count"><span id="descCount">0</span> / 500</p>
+      </div>
+
+      <div class="section-card">
+        <label class="field-label"
+          >Photo
+          <span style="color: #906f6d; font-weight: 400"
+            >(optionnel)</span
+          ></label
+        >
+        <p style="font-size: 12px; color: #906f6d; margin-bottom: 12px">
+          Ajoutez une photo. Elle sera automatiquement optimisée.
+        </p>
+        <div id="photoPreviewWrap" style="display: none; margin-bottom: 12px">
+          <img
+            id="photoPreview"
+            src=""
+            alt="Preview"
+            style="
+              width: 100%;
+              max-height: 180px;
+              object-fit: cover;
+              border-radius: 8px;
+              border: 1px solid #ddb8b6;
+            "
+          />
+          <button
+            onclick="supprimerPhoto()"
+            style="
+              margin-top: 8px;
+              padding: 6px 14px;
+              background: #ffdad8;
+              color: #840015;
+              border: none;
+              border-radius: 6px;
+              font-size: 12px;
+              font-weight: 700;
+              cursor: pointer;
+              font-family: &quot;Plus Jakarta Sans&quot;, sans-serif;
+            "
+          >
+            Supprimer la photo
+          </button>
+        </div>
+        <label for="photoInput" class="photo-upload-btn">
+          <span class="material-symbols-outlined" style="font-size: 18px"
+            >add_photo_alternate</span
+          >
+          <span id="photoLabel">Ajouter une photo</span>
+        </label>
+        <input
+          id="photoInput"
+          type="file"
+          accept="image/*"
+          style="display: none"
+          onchange="previewPhoto(event)"
+        />
+      </div>
+
+      <div class="section-card">
+        <label class="field-label"
+          >Localisation GPS
+          <span style="color: #906f6d; font-weight: 400"
+            >(optionnel)</span
+          ></label
+        >
+        <p style="font-size: 12px; color: #906f6d; margin-bottom: 12px">
+          Aide à localiser l'alerte sur la carte
+        </p>
+        <div style="display: flex; gap: 10px">
+          <button
+            onclick="getLocation()"
+            id="btnGps"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 10px 18px;
+              background: #ffdad8;
+              color: #840015;
+              border: none;
+              border-radius: 8px;
+              font-size: 13px;
+              font-weight: 700;
+              cursor: pointer;
+              font-family: &quot;Plus Jakarta Sans&quot;, sans-serif;
+              transition: all 0.2s;
+            "
+          >
+            <span class="material-symbols-outlined" style="font-size: 18px"
+              >my_location</span
+            >
+            <span id="gpsLabel">Obtenir ma position</span>
+          </button>
+          <button
+            onclick="toggleManualGps()"
+            id="btnManualGps"
+            style="
+              padding: 10px 14px;
+              background: white;
+              color: #906f6d;
+              border: 1px solid #ddb8b6;
+              border-radius: 8px;
+              font-size: 13px;
+              font-weight: 600;
+              cursor: pointer;
+              font-family: &quot;Plus Jakarta Sans&quot;, sans-serif;
+            "
+          >
+            Saisie manuelle
+          </button>
+        </div>
+
+        <div
+          id="manualGpsWrap"
+          style="
+            display: none;
+            margin-top: 12px;
+            align-items: flex-end;
+            gap: 10px;
+          "
+        >
+          <div style="flex: 1">
+            <label
+              class="field-label"
+              style="font-size: 11px; margin-bottom: 4px"
+              >Latitude</label
+            >
+            <input
+              id="manualLat"
+              type="number"
+              step="any"
+              class="field-input no-icon"
+              style="height: 40px; font-size: 13px"
+              placeholder="Ex: -2.5012"
+            />
+          </div>
+          <div style="flex: 1">
+            <label
+              class="field-label"
+              style="font-size: 11px; margin-bottom: 4px"
+              >Longitude</label
+            >
+            <input
+              id="manualLng"
+              type="number"
+              step="any"
+              class="field-input no-icon"
+              style="height: 40px; font-size: 13px"
+              placeholder="Ex: 28.8623"
+            />
+          </div>
+          <button
+            onclick="validerManuelGps()"
+            style="
+              height: 40px;
+              padding: 0 16px;
+              background: #840015;
+              color: white;
+              border: none;
+              border-radius: 8px;
+              font-size: 12px;
+              font-weight: 700;
+              cursor: pointer;
+              font-family: &quot;Plus Jakarta Sans&quot;, sans-serif;
+            "
+          >
+            Valider
+          </button>
+        </div>
+
+        <div
+          id="mapPreviewWrap"
+          style="
+            display: none;
+            margin-top: 12px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #ddb8b6;
+          "
+        >
+          <iframe
+            id="mapPreview"
+            width="100%"
+            height="180"
+            style="border: 0"
+            allowfullscreen=""
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+
+      <div
+        class="captcha-wrap"
+        style="display: flex; justify-content: center; margin-bottom: 16px"
+      >
+        <div
+          class="g-recaptcha"
+          data-sitekey="6LfCfv8sAAAAAG-VWFp1wMrXch6hSxVS7JsRJh05"
+          data-callback="onCaptchaSuccess"
+          data-expired-callback="onCaptchaExpire"
+        ></div>
+      </div>
+
+      <div class="warning-box">
+        <span
+          class="material-symbols-outlined"
+          style="color: #840015; font-size: 20px; flex-shrink: 0"
+          >warning</span
+        >
+        <div>
+          <p
+            style="
+              font-size: 13px;
+              color: #410006;
+              font-weight: 700;
+              margin-bottom: 4px;
+            "
+          >
+            Responsabilité
+          </p>
+          <p style="font-size: 12px; color: #410006; line-height: 1.5">
+            Toute fausse alerte entraîne la suspension de votre compte. Après 3
+            fausses alertes, le compte est définitivement bloqué.
+          </p>
+        </div>
+      </div>
+
+      <button
+        id="btnPublier"
+        class="btn-primary"
+        onclick="publier()"
+        style="height: 52px; margin-bottom: 20px"
+      >
+        <span
+          class="material-symbols-outlined"
+          style="font-size: 20px; color: white"
+          >add_alert</span
+        >
+        PUBLIER L'ALERTE
       </button>
-      <h1 style="font-size:17px;font-weight:800;color:white;">Publier une alerte</h1>
-    </div>
-  </header>
+    </main>
 
-  <section class="hero-section" style="padding:16px 20px 36px;">
-    <p style="font-size:13px;color:rgba(255,255,255,.85);">Signalez un incident à la communauté de Bukavu</p>
-  </section>
-
-  <main style="max-width:640px;margin:-20px auto 0;padding:0 16px 20px;position:relative;z-index:1;">
-
-    <div class="section-card">
-      <label class="field-label">Titre de l'alerte *</label>
-      <input id="titre" type="text" class="field-input no-icon" placeholder="Ex: Incendie au marché central..." maxlength="80" style="height:50px;font-size:14px;"/>
-      <p class="char-count"><span id="titreCount">0</span> / 80</p>
-    </div>
-
-    <div class="section-card">
-      <label class="field-label">Catégorie *</label>
-      <div id="catGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;"></div>
-    </div>
-
-    <div class="section-card">
-      <label class="field-label">Quartier concerné *</label>
-      <div style="position:relative;margin-bottom:16px;">
-        <select id="quartier" class="field-input no-icon" style="height:50px;font-size:14px;appearance:none;padding-right:36px;">
-          <option value="">Choisir un quartier...</option>
-        </select>
-        <span class="material-symbols-outlined" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">expand_more</span>
-      </div>
-      <label class="field-label">Niveau d'urgence *</label>
-      <div style="display:flex;gap:10px;">
-        <button class="urg-btn faible" onclick="selUrg(this,'faible')">Faible</button>
-        <button class="urg-btn moyen active" onclick="selUrg(this,'moyen')">Moyen</button>
-        <button class="urg-btn critique" onclick="selUrg(this,'critique')">Critique</button>
-      </div>
-    </div>
-
-    <div class="section-card">
-      <label class="field-label">Description détaillée *</label>
-      <textarea id="description" class="field-input no-icon" placeholder="Décrivez la situation avec précision..." maxlength="500" style="height:110px;padding:14px 16px;resize:none;"></textarea>
-      <p class="char-count"><span id="descCount">0</span> / 500</p>
-    </div>
-
-    <div class="section-card">
-      <label class="field-label">Photo <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
-      <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Ajoutez une photo. Elle sera automatiquement optimisée.</p>
-      <div id="photoPreviewWrap" style="display:none;margin-bottom:12px;">
-        <img id="photoPreview" src="" alt="Preview" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;border:1px solid #ddb8b6;"/>
-        <button onclick="supprimerPhoto()" style="margin-top:8px;padding:6px 14px;background:#ffdad8;color:#840015;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Supprimer la photo</button>
-      </div>
-      <label for="photoInput" class="photo-upload-btn">
-        <span class="material-symbols-outlined" style="font-size:18px;">add_photo_alternate</span>
-        <span id="photoLabel">Ajouter une photo</span>
-      </label>
-      <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="previewPhoto(event)"/>
-    </div>
-
-    <div class="section-card">
-      <label class="field-label">Localisation GPS <span style="color:#906f6d;font-weight:400;">(optionnel)</span></label>
-      <p style="font-size:12px;color:#906f6d;margin-bottom:12px;">Aide à localiser l'alerte sur la carte</p>
-      <div style="display:flex;gap:10px;">
-        <button onclick="getLocation()" id="btnGps" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#ffdad8;color:#840015;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;">
-          <span class="material-symbols-outlined" style="font-size:18px;">my_location</span>
-          <span id="gpsLabel">Obtenir ma position</span>
-        </button>
-        <button onclick="toggleManualGps()" id="btnManualGps" style="padding:10px 14px;background:white;color:#906f6d;border:1px solid #ddb8b6;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">
-          Saisie manuelle
-        </button>
-      </div>
-
-      <div id="manualGpsWrap" style="display:none;margin-top:12px;align-items:flex-end;gap:10px;">
-        <div style="flex:1;">
-          <label class="field-label" style="font-size:11px;margin-bottom:4px;">Latitude</label>
-          <input id="manualLat" type="number" step="any" class="field-input no-icon" style="height:40px;font-size:13px;" placeholder="Ex: -2.5012"/>
-        </div>
-        <div style="flex:1;">
-          <label class="field-label" style="font-size:11px;margin-bottom:4px;">Longitude</label>
-          <input id="manualLng" type="number" step="any" class="field-input no-icon" style="height:40px;font-size:13px;" placeholder="Ex: 28.8623"/>
-        </div>
-        <button onclick="validerManuelGps()" style="height:40px;padding:0 16px;background:#840015;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;">Valider</button>
-      </div>
-
-      <div id="mapPreviewWrap" style="display:none;margin-top:12px;border-radius:8px;overflow:hidden;border:1px solid #ddb8b6;">
-        <iframe id="mapPreview" width="100%" height="180" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-      </div>
-    </div>
-
-    <div class="captcha-wrap" style="display:flex;justify-content:center;margin-bottom:16px;">
-      <div class="g-recaptcha" data-sitekey="6LfCfv8sAAAAAG-VWFp1wMrXch6hSxVS7JsRJh05" data-callback="onCaptchaSuccess" data-expired-callback="onCaptchaExpire"></div>
-    </div>
-
-    <div class="warning-box">
-      <span class="material-symbols-outlined" style="color:#840015;font-size:20px;flex-shrink:0;">warning</span>
-      <div>
-        <p style="font-size:13px;color:#410006;font-weight:700;margin-bottom:4px;">Responsabilité</p>
-        <p style="font-size:12px;color:#410006;line-height:1.5;">Toute fausse alerte entraîne la suspension de votre compte. Après 3 fausses alertes, le compte est définitivement bloqué.</p>
-      </div>
-    </div>
-
-    <button id="btnPublier" class="btn-primary" onclick="publier()" style="height:52px;margin-bottom:20px;">
-      <span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span>
-      PUBLIER L'ALERTE
+    <button
+      id="scrollToTopBtn"
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+      style="
+        position: fixed;
+        bottom: 88px;
+        left: 20px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #ddb8b6;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 99;
+        transition: all 0.3s;
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="color: #840015; font-size: 22px"
+        >arrow_upward</span
+      >
     </button>
 
-  </main>
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item"
+        ><span class="material-symbols-outlined" style="font-size: 22px"
+          >rss_feed</span
+        ><span>Alertes</span></a
+      >
+      <a href="publier.html" class="nav-item active"
+        ><span class="material-symbols-outlined" style="font-size: 22px"
+          >add_alert</span
+        ><span>Publier</span></a
+      >
+      <a href="stats.html" class="nav-item"
+        ><span class="material-symbols-outlined" style="font-size: 22px"
+          >analytics</span
+        ><span>Stats</span></a
+      >
+      <a href="profil.html" class="nav-item"
+        ><span class="material-symbols-outlined" style="font-size: 22px"
+          >person</span
+        ><span>Profil</span></a
+      >
+    </nav>
 
-  <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="position:fixed;bottom:88px;left:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid #ddb8b6;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:99;transition:all .3s;">
-    <span class="material-symbols-outlined" style="color:#840015;font-size:22px;">arrow_upward</span>
-  </button>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="config.js"></script>
+    <script>
+      const user = AB.requireAuth();
 
-  <nav class="bottom-nav">
-    <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;">rss_feed</span><span>Alertes</span></a>
-    <a href="publier.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">add_alert</span><span>Publier</span></a>
-    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;">analytics</span><span>Stats</span></a>
-    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;">person</span><span>Profil</span></a>
-  </nav>
-
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="config.js"></script>
-  <script>
-    const user = AB.requireAuth();
-
-    async function verifierStatutCompte() {
-      try {
-        const u = AB.getUser();
-        if (u && u.est_bloque) {
-          await showAlert('Compte suspendu', 'Votre compte est suspendu pour fausses alertes. Redirection...', 'error');
-          window.location.href = 'index.html';
-        }
-      } catch (e) {}
-    }
-    verifierStatutCompte();
-
-    let captchaValidated = false;
-    function onCaptchaSuccess(token) { captchaValidated = true; }
-    function onCaptchaExpire() { captchaValidated = false; }
-
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      captchaValidated = true;
-    }
-    
-    let catChoisie = '', urgChoisie = 'moyen', userLat = null, userLng = null, photoFile = null;
-
-    QUARTIERS.forEach(q => {
-      const o = document.createElement('option');
-      o.value = q; o.textContent = q;
-      document.getElementById('quartier').appendChild(o);
-    });
-
-    const catGrid = document.getElementById('catGrid');
-    Object.entries(CATEGORIES).forEach(([key, cat]) => {
-      const btn = document.createElement('button');
-      btn.className = 'cat-btn';
-      btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:24px;color:${cat.color};">${cat.icon}</span>${cat.label}`;
-      btn.onclick = () => {
-        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        catChoisie = key;
-      };
-      catGrid.appendChild(btn);
-    });
-
-    function selUrg(btn, val) {
-      document.querySelectorAll('.urg-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active'); urgChoisie = val;
-    }
-
-    document.getElementById('titre').addEventListener('input', function() {
-      document.getElementById('titreCount').textContent = this.value.length;
-    });
-    document.getElementById('description').addEventListener('input', function() {
-      document.getElementById('descCount').textContent = this.value.length;
-    });
-
-    function compressImage(file) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (event) => {
-          const img = new Image();
-          img.src = event.target.result;
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const max_size = 1200;
-            let width = img.width;
-            let height = img.height;
-            if (width > height) {
-              if (width > max_size) {
-                height *= max_size / width;
-                width = max_size;
-              }
-            } else {
-              if (height > max_size) {
-                width *= max_size / height;
-                height = max_size;
-              }
-            }
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            canvas.toBlob((blob) => {
-              resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-            }, 'image/jpeg', 0.85);
-          };
-        };
-      });
-    }
-
-    async function previewPhoto(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      if (!file.type.startsWith('image/')) { showToast('Choisissez une image', 'error'); return; }
-      
-      showToast('Optimisation de la photo...');
-      const compressed = await compressImage(file);
-      photoFile = compressed;
-      
-      const url = URL.createObjectURL(compressed);
-      document.getElementById('photoPreview').src = url;
-      document.getElementById('photoPreviewWrap').style.display = 'block';
-      document.getElementById('photoLabel').textContent = `${compressed.name} (optimisée)`;
-    }
-
-    function supprimerPhoto() {
-      photoFile = null;
-      document.getElementById('photoPreviewWrap').style.display = 'none';
-      document.getElementById('photoLabel').textContent = 'Ajouter une photo';
-      document.getElementById('photoInput').value = '';
-    }
-
-    function toggleManualGps() {
-      const el = document.getElementById('manualGpsWrap');
-      el.style.display = el.style.display === 'none' ? 'flex' : 'none';
-    }
-
-    function validerManuelGps() {
-      const latVal = parseFloat(document.getElementById('manualLat').value);
-      const lngVal = parseFloat(document.getElementById('manualLng').value);
-      
-      if (isNaN(latVal) || isNaN(lngVal)) {
-        showToast('Veuillez entrer des coordonnées numériques valides.', 'error');
-        return;
-      }
-      if (latVal < -90 || latVal > 90 || lngVal < -180 || lngVal > 180) {
-        showToast('Coordonnées géographiques hors limites.', 'error');
-        return;
-      }
-      
-      userLat = latVal.toFixed(5);
-      userLng = lngVal.toFixed(5);
-      
-      document.getElementById('gpsLabel').textContent = `${userLat}, ${userLng}`;
-      const btn = document.getElementById('btnGps');
-      btn.style.background = '#E6FAF5';
-      btn.style.color = '#00C48C';
-      
-      updateMapPreview(userLat, userLng);
-      showToast('Position manuelle enregistrée');
-    }
-
-    function updateMapPreview(lat, lng) {
-      const iframe = document.getElementById('mapPreview');
-      iframe.src = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
-      document.getElementById('mapPreviewWrap').style.display = 'block';
-    }
-
-    async function getLocation() {
-      const lbl = document.getElementById('gpsLabel');
-      const btn = document.getElementById('btnGps');
-      lbl.textContent = 'Localisation en cours...';
-      btn.disabled = true;
-      try {
-        const pos = await obtenirPosition();
-        userLat = pos.lat;
-        userLng = pos.lng;
-        lbl.textContent = `${userLat}, ${userLng}`;
-        btn.style.background = '#E6FAF5';
-        btn.style.color = '#00C48C';
-        
-        updateMapPreview(userLat, userLng);
-        showToast('Position obtenue avec succès');
-      } catch(e) {
-        lbl.textContent = 'Obtenir ma position';
-        showToast(e.message + ' Saisie manuelle activée.', 'warning');
-        document.getElementById('manualGpsWrap').style.display = 'flex';
-      }
-      btn.disabled = false;
-    }
-
-    function getBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-      });
-    }
-
-    async function publier() {
-      const titre = document.getElementById('titre').value.trim();
-      const description = document.getElementById('description').value.trim();
-      const quartier = document.getElementById('quartier').value;
-      const btn = document.getElementById('btnPublier');
-
-      if (!titre) { showToast('Le titre est obligatoire', 'error'); return; }
-      if (titre.length > 80) { showToast('Le titre ne doit pas dépasser 80 caractères', 'error'); return; }
-      if (!catChoisie) { showToast('Choisissez une catégorie', 'error'); return; }
-      if (!quartier) { showToast('Choisissez le quartier concerné', 'error'); return; }
-      if (!description) { showToast('La description est obligatoire', 'error'); return; }
-      if (description.length > 500) { showToast('La description ne doit pas dépasser 500 caractères', 'error'); return; }
-      
-      if (navigator.onLine && !captchaValidated) { showToast('Veuillez valider le captcha', 'error'); return; }
-
-      if (urgChoisie === 'critique') {
-        const r = await showConfirm('Alerte CRITIQUE', 'Êtes-vous certain de la gravité de la situation ?', 'Oui, publier', 'warning');
-        if (!r.isConfirmed) return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span>&nbsp;Publication en cours...';
-
-      if (!navigator.onLine) {
+      async function verifierStatutCompte() {
         try {
-          let photo_base64 = null;
-          if (photoFile) {
-            photo_base64 = await getBase64(photoFile);
+          const u = AB.getUser();
+          if (u && u.est_bloque) {
+            await showAlert(
+              "Compte suspendu",
+              "Votre compte est suspendu pour fausses alertes. Redirection...",
+              "error",
+            );
+            window.location.href = "index.html";
           }
-          
-          AB.addToOfflineQueue({
-            titre, description, categorie: catChoisie, quartier,
-            urgence: urgChoisie, lat: userLat, lng: userLng, photo_base64
-          });
-          
-          await showAlert('Mode hors-ligne', 'Vous êtes actuellement hors-ligne. Votre alerte a été enregistrée localement et sera publiée automatiquement dès le retour de votre connexion internet.', 'info');
-          window.location.href = 'index.html';
-        } catch (err) {
-          showToast('Erreur d\'enregistrement hors-ligne', 'error');
-          btn.disabled = false;
-          btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span> PUBLIER L\'ALERTE';
-        }
-        return;
+        } catch (e) {}
+      }
+      verifierStatutCompte();
+
+      let captchaValidated = false;
+      function onCaptchaSuccess(token) {
+        captchaValidated = true;
+      }
+      function onCaptchaExpire() {
+        captchaValidated = false;
       }
 
-      try {
-        let photo_url = null;
-        if (photoFile) {
-          Swal.fire({ title: 'Upload de la photo...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
-          photo_url = await uploadImage(photoFile, 'alertes');
-          Swal.close();
-        }
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        captchaValidated = true;
+      }
 
-        const recaptchaToken = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : grecaptcha.getResponse();
-        await AB.api('alertes', 'POST', {
-          titre, categorie: catChoisie, quartier,
-          urgence: urgChoisie, description,
-          lat: userLat, lng: userLng, photo_url,
-          recaptchaToken
+      let catChoisie = "",
+        urgChoisie = "moyen",
+        userLat = null,
+        userLng = null,
+        photoFile = null;
+
+      QUARTIERS.forEach((q) => {
+        const o = document.createElement("option");
+        o.value = q;
+        o.textContent = q;
+        document.getElementById("quartier").appendChild(o);
+      });
+
+      const catGrid = document.getElementById("catGrid");
+      Object.entries(CATEGORIES).forEach(([key, cat]) => {
+        const btn = document.createElement("button");
+        btn.className = "cat-btn";
+        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size:24px;color:${cat.color};">${cat.icon}</span>${cat.label}`;
+        btn.onclick = () => {
+          document
+            .querySelectorAll(".cat-btn")
+            .forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          catChoisie = key;
+        };
+        catGrid.appendChild(btn);
+      });
+
+      function selUrg(btn, val) {
+        document
+          .querySelectorAll(".urg-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        urgChoisie = val;
+      }
+
+      document.getElementById("titre").addEventListener("input", function () {
+        document.getElementById("titreCount").textContent = this.value.length;
+      });
+      document
+        .getElementById("description")
+        .addEventListener("input", function () {
+          document.getElementById("descCount").textContent = this.value.length;
         });
 
-        await showAlert('Alerte publiée !', 'Votre alerte a été envoyée à la communauté et aux autorités.', 'success');
-        window.location.href = 'index.html';
-      } catch(e) {
-        Swal.close();
-        showToast(e.message, 'error');
-        if (typeof grecaptcha !== 'undefined') { grecaptcha.reset(); captchaValidated = false; }
-        btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span> PUBLIER L\'ALERTE';
+      function compressImage(file) {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+              const canvas = document.createElement("canvas");
+              const max_size = 1200;
+              let width = img.width;
+              let height = img.height;
+              if (width > height) {
+                if (width > max_size) {
+                  height *= max_size / width;
+                  width = max_size;
+                }
+              } else {
+                if (height > max_size) {
+                  width *= max_size / height;
+                  height = max_size;
+                }
+              }
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0, width, height);
+              canvas.toBlob(
+                (blob) => {
+                  resolve(
+                    new File([blob], file.name, {
+                      type: "image/jpeg",
+                      lastModified: Date.now(),
+                    }),
+                  );
+                },
+                "image/jpeg",
+                0.85,
+              );
+            };
+          };
+        });
       }
-    }
 
-    window.addEventListener('scroll', () => {
-      const btn = document.getElementById('scrollToTopBtn');
-      if (window.scrollY > 300) {
-        btn.style.display = 'flex';
-      } else {
-        btn.style.display = 'none';
+      async function previewPhoto(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+          showToast("Choisissez une image", "error");
+          return;
+        }
+
+        showToast("Optimisation de la photo...");
+        const compressed = await compressImage(file);
+        photoFile = compressed;
+
+        const url = URL.createObjectURL(compressed);
+        document.getElementById("photoPreview").src = url;
+        document.getElementById("photoPreviewWrap").style.display = "block";
+        document.getElementById("photoLabel").textContent =
+          `${compressed.name} (optimisée)`;
       }
-    });
-  </script>
-</body>
+
+      function supprimerPhoto() {
+        photoFile = null;
+        document.getElementById("photoPreviewWrap").style.display = "none";
+        document.getElementById("photoLabel").textContent = "Ajouter une photo";
+        document.getElementById("photoInput").value = "";
+      }
+
+      function toggleManualGps() {
+        const el = document.getElementById("manualGpsWrap");
+        el.style.display = el.style.display === "none" ? "flex" : "none";
+      }
+
+      function validerManuelGps() {
+        const latVal = parseFloat(document.getElementById("manualLat").value);
+        const lngVal = parseFloat(document.getElementById("manualLng").value);
+
+        if (isNaN(latVal) || isNaN(lngVal)) {
+          showToast(
+            "Veuillez entrer des coordonnées numériques valides.",
+            "error",
+          );
+          return;
+        }
+        if (latVal < -90 || latVal > 90 || lngVal < -180 || lngVal > 180) {
+          showToast("Coordonnées géographiques hors limites.", "error");
+          return;
+        }
+
+        userLat = latVal.toFixed(5);
+        userLng = lngVal.toFixed(5);
+
+        document.getElementById("gpsLabel").textContent =
+          `${userLat}, ${userLng}`;
+        const btn = document.getElementById("btnGps");
+        btn.style.background = "#E6FAF5";
+        btn.style.color = "#00C48C";
+
+        updateMapPreview(userLat, userLng);
+        showToast("Position manuelle enregistrée");
+      }
+
+      function updateMapPreview(lat, lng) {
+        const iframe = document.getElementById("mapPreview");
+        iframe.src = `https://maps.google.com/maps?q=${lat},${lng}&z=15&output=embed`;
+        document.getElementById("mapPreviewWrap").style.display = "block";
+      }
+
+      async function getLocation() {
+        const lbl = document.getElementById("gpsLabel");
+        const btn = document.getElementById("btnGps");
+        lbl.textContent = "Localisation en cours...";
+        btn.disabled = true;
+        try {
+          const pos = await obtenirPosition();
+          userLat = pos.lat;
+          userLng = pos.lng;
+          lbl.textContent = `${userLat}, ${userLng}`;
+          btn.style.background = "#E6FAF5";
+          btn.style.color = "#00C48C";
+
+          updateMapPreview(userLat, userLng);
+          showToast("Position obtenue avec succès");
+        } catch (e) {
+          lbl.textContent = "Obtenir ma position";
+          showToast(e.message + " Saisie manuelle activée.", "warning");
+          document.getElementById("manualGpsWrap").style.display = "flex";
+        }
+        btn.disabled = false;
+      }
+
+      function getBase64(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(file);
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (error) => reject(error);
+        });
+      }
+
+      async function publier() {
+        const titre = document.getElementById("titre").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const quartier = document.getElementById("quartier").value;
+        const btn = document.getElementById("btnPublier");
+
+        if (!titre) {
+          showToast("Le titre est obligatoire", "error");
+          return;
+        }
+        if (titre.length > 80) {
+          showToast("Le titre ne doit pas dépasser 80 caractères", "error");
+          return;
+        }
+        if (!catChoisie) {
+          showToast("Choisissez une catégorie", "error");
+          return;
+        }
+        if (!quartier) {
+          showToast("Choisissez le quartier concerné", "error");
+          return;
+        }
+        if (!description) {
+          showToast("La description est obligatoire", "error");
+          return;
+        }
+        if (description.length > 500) {
+          showToast(
+            "La description ne doit pas dépasser 500 caractères",
+            "error",
+          );
+          return;
+        }
+
+        if (navigator.onLine && !captchaValidated) {
+          showToast("Veuillez valider le captcha", "error");
+          return;
+        }
+
+        if (urgChoisie === "critique") {
+          const r = await showConfirm(
+            "Alerte CRITIQUE",
+            "Êtes-vous certain de la gravité de la situation ?",
+            "Oui, publier",
+            "warning",
+          );
+          if (!r.isConfirmed) return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML =
+          '<span class="spinner"></span>&nbsp;Publication en cours...';
+
+        if (!navigator.onLine) {
+          try {
+            let photo_base64 = null;
+            if (photoFile) {
+              photo_base64 = await getBase64(photoFile);
+            }
+
+            AB.addToOfflineQueue({
+              titre,
+              description,
+              categorie: catChoisie,
+              quartier,
+              urgence: urgChoisie,
+              lat: userLat,
+              lng: userLng,
+              photo_base64,
+            });
+
+            await showAlert(
+              "Mode hors-ligne",
+              "Vous êtes actuellement hors-ligne. Votre alerte a été enregistrée localement et sera publiée automatiquement dès le retour de votre connexion internet.",
+              "info",
+            );
+            window.location.href = "index.html";
+          } catch (err) {
+            showToast("Erreur d'enregistrement hors-ligne", "error");
+            btn.disabled = false;
+            btn.innerHTML =
+              '<span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span> PUBLIER L\'ALERTE';
+          }
+          return;
+        }
+
+        try {
+          let photo_url = null;
+          if (photoFile) {
+            Swal.fire({
+              title: "Upload de la photo...",
+              allowOutsideClick: false,
+              showConfirmButton: false,
+              didOpen: () => Swal.showLoading(),
+            });
+            photo_url = await uploadImage(photoFile, "alertes");
+            Swal.close();
+          }
+
+          const recaptchaToken =
+            window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1"
+              ? ""
+              : grecaptcha.getResponse();
+          await AB.api("alertes", "POST", {
+            titre,
+            categorie: catChoisie,
+            quartier,
+            urgence: urgChoisie,
+            description,
+            lat: userLat,
+            lng: userLng,
+            photo_url,
+            recaptchaToken,
+          });
+
+          await showAlert(
+            "Alerte publiée !",
+            "Votre alerte a été envoyée à la communauté et aux autorités.",
+            "success",
+          );
+          window.location.href = "index.html";
+        } catch (e) {
+          Swal.close();
+          showToast(e.message, "error");
+          if (typeof grecaptcha !== "undefined") {
+            grecaptcha.reset();
+            captchaValidated = false;
+          }
+          btn.disabled = false;
+          btn.innerHTML =
+            '<span class="material-symbols-outlined" style="font-size:20px;color:white;">add_alert</span> PUBLIER L\'ALERTE';
+        }
+      }
+
+      window.addEventListener("scroll", () => {
+        const btn = document.getElementById("scrollToTopBtn");
+        if (window.scrollY > 300) {
+          btn.style.display = "flex";
+        } else {
+          btn.style.display = "none";
+        }
+      });
+    </script>
+  </body>
 </html>

@@ -1,10 +1,8 @@
-const fs = require('fs');
+const fs = require("fs");
 
-const filePath = 'index.html';
+const filePath = "index.html";
 
-
-let content = fs.readFileSync(filePath, 'utf-8');
-
+let content = fs.readFileSync(filePath, "utf-8");
 
 const headerSearchBtn = `      <button onclick="toggleHeaderSearch()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:50%;transition:background .2s;border:none;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'" title="Rechercher">
         <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">search</span>
@@ -12,12 +10,10 @@ const headerSearchBtn = `      <button onclick="toggleHeaderSearch()" style="pos
       
       `;
 
-
 content = content.replace(
   /<button onclick="toggleNotifications/,
-  headerSearchBtn + '<button onclick="toggleNotifications'
+  headerSearchBtn + '<button onclick="toggleNotifications',
 );
-
 
 const headerSearch = `
   <div id="headerSearchBar" style="display:none;position:fixed;top:60px;left:0;right:0;background:var(--header-gradient);padding:16px 20px;z-index:49;box-shadow:0 2px 12px rgba(132,0,21,0.3);">
@@ -31,11 +27,7 @@ const headerSearch = `
   </div>
 `;
 
-content = content.replace(
-  /  <\/header>/,
-  '  </header>' + headerSearch
-);
-
+content = content.replace(/  <\/header>/, "  </header>" + headerSearch);
 
 const searchFunctions = `
     function toggleHeaderSearch() {
@@ -60,9 +52,8 @@ const searchFunctions = `
 
 content = content.replace(
   /    afficherMenuAdmin\(\);/,
-  '    afficherMenuAdmin();' + searchFunctions
+  "    afficherMenuAdmin();" + searchFunctions,
 );
 
-
-fs.writeFileSync(filePath, content, 'utf-8');
-console.log('✓ Le fichier index.html a été mis à jour avec succès!');
+fs.writeFileSync(filePath, content, "utf-8");
+console.log("✓ Le fichier index.html a été mis à jour avec succès!");

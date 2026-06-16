@@ -1,365 +1,843 @@
 <!doctype html>
 <html lang="fr">
-<head>
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <head>
+    <link rel="icon" type="image/png" href="favicon.png" />
 
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AlertBukavu — Mon Profil</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
-     crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="style.css"/>
-  <style>
-    .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
-    body{padding-bottom:80px;}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlertBukavu — Mon Profil</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+      rel="stylesheet"
+    />
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 1,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 48;
+      }
+      body {
+        padding-bottom: 80px;
+      }
 
-    
-    .profile-photo-wrap{position:relative;display:inline-block;margin-bottom:14px;z-index:2;}
-    .profile-photo{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 4px 20px rgba(0,0,0,.25);display:block;}
-    .photo-edit-btn{position:absolute;bottom:2px;right:2px;width:30px;height:30px;background:#840015;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .2s;}
-    .photo-edit-btn:hover{transform:scale(1.1);}
-    .photo-edit-btn .material-symbols-outlined{font-size:15px;color:white;}
+      .profile-photo-wrap {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 14px;
+        z-index: 2;
+      }
+      .profile-photo {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        display: block;
+      }
+      .photo-edit-btn {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 30px;
+        height: 30px;
+        background: #840015;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border: 2px solid white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        transition: transform 0.2s;
+      }
+      .photo-edit-btn:hover {
+        transform: scale(1.1);
+      }
+      .photo-edit-btn .material-symbols-outlined {
+        font-size: 15px;
+        color: white;
+      }
 
-    .stat-mini{flex:1;background:white;border-radius:12px;border:1px solid #ddb8b6;padding:16px;text-align:center;box-shadow:0 1px 4px rgba(132,0,21,.05);}
-    .alerte-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #efecea;}
-    .alerte-row:last-child{border-bottom:none;padding-bottom:0;}
-    .section-card{background:white;border-radius:14px;border:1px solid #ddb8b6;padding:20px;margin-bottom:14px;box-shadow:0 2px 8px rgba(132,0,21,.04);}
-    .btn-outline{width:100%;height:50px;background:white;border:1.5px solid #ddb8b6;border-radius:10px;color:#5b403e;font-size:14px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-bottom:20px;}
-    .btn-outline:hover{border-color:#840015;color:#840015;background:#ffdad8;}
-  </style>
-</head>
-<body>
-
-  <header class="top-bar">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <h1 style="font-size:17px;font-weight:800;color:white;">Mon Profil</h1>
-    </div>
-  </header>
-
-  
-  <section class="hero-section" style="padding:24px 20px 56px;text-align:center;">
-    <label for="photoInput" class="profile-photo-wrap" style="cursor:pointer; display:inline-block; position:relative; z-index:2;">
-      <img id="photoUser" class="profile-photo" src="" alt="Photo de profil"/>
-      <div class="photo-edit-btn" title="Changer la photo">
-        <span class="material-symbols-outlined">photo_camera</span>
+      .stat-mini {
+        flex: 1;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #ddb8b6;
+        padding: 16px;
+        text-align: center;
+        box-shadow: 0 1px 4px rgba(132, 0, 21, 0.05);
+      }
+      .alerte-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #efecea;
+      }
+      .alerte-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .section-card {
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #ddb8b6;
+        padding: 20px;
+        margin-bottom: 14px;
+        box-shadow: 0 2px 8px rgba(132, 0, 21, 0.04);
+      }
+      .btn-outline {
+        width: 100%;
+        height: 50px;
+        background: white;
+        border: 1.5px solid #ddb8b6;
+        border-radius: 10px;
+        color: #5b403e;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s;
+        margin-bottom: 20px;
+      }
+      .btn-outline:hover {
+        border-color: #840015;
+        color: #840015;
+        background: #ffdad8;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-bar">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <h1 style="font-size: 17px; font-weight: 800; color: white">
+          Mon Profil
+        </h1>
       </div>
-    </label>
-    <input id="photoInput" type="file" accept="image/*" style="display:none;" onchange="changerPhoto(event)"/>
-    <h2 id="nomUser" style="font-size:20px;font-weight:800;color:white;margin-bottom:2px;"></h2>
-    <p id="usernameUser" style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:6px;"></p>
-    <p id="emailUser" style="font-size:12px;color:rgba(255,255,255,.55);margin-bottom:10px;"></p>
-    <span id="quartierBadge" style="background:rgba(255,255,255,.15);color:white;padding:4px 16px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3);"></span>
-  </section>
+    </header>
 
-  <main style="max-width:640px;margin:-32px auto 0;padding:0 16px;position:relative;z-index:1;">
+    <section
+      class="hero-section"
+      style="padding: 24px 20px 56px; text-align: center"
+    >
+      <label
+        for="photoInput"
+        class="profile-photo-wrap"
+        style="
+          cursor: pointer;
+          display: inline-block;
+          position: relative;
+          z-index: 2;
+        "
+      >
+        <img
+          id="photoUser"
+          class="profile-photo"
+          src=""
+          alt="Photo de profil"
+        />
+        <div class="photo-edit-btn" title="Changer la photo">
+          <span class="material-symbols-outlined">photo_camera</span>
+        </div>
+      </label>
+      <input
+        id="photoInput"
+        type="file"
+        accept="image/*"
+        style="display: none"
+        onchange="changerPhoto(event)"
+      />
+      <h2
+        id="nomUser"
+        style="
+          font-size: 20px;
+          font-weight: 800;
+          color: white;
+          margin-bottom: 2px;
+        "
+      ></h2>
+      <p
+        id="usernameUser"
+        style="
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.7);
+          margin-bottom: 6px;
+        "
+      ></p>
+      <p
+        id="emailUser"
+        style="
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.55);
+          margin-bottom: 10px;
+        "
+      ></p>
+      <span
+        id="quartierBadge"
+        style="
+          background: rgba(255, 255, 255, 0.15);
+          color: white;
+          padding: 4px 16px;
+          border-radius: 100px;
+          font-size: 12px;
+          font-weight: 600;
+          border: 1px solid rgba(255, 255, 255, 0.3);
+        "
+      ></span>
+    </section>
 
-    
-    <div id="warningCompte" style="display:none;background:#ffdad8;border-left:4px solid #840015;border-radius:8px;padding:14px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start;">
-      <span class="material-symbols-outlined" style="color:#840015;font-size:20px;flex-shrink:0;">warning</span>
-      <div>
-        <p style="font-size:13px;color:#410006;font-weight:700;margin-bottom:4px;">Compte en sursis (Averti)</p>
-        <p id="warningCompteMsg" style="font-size:12px;color:#410006;line-height:1.5;">Attention, vous avez déjà cumulé des fausses alertes. À la 3ème fausse alerte, votre compte sera définitivement suspendu !</p>
-      </div>
-    </div>
-
-    
-    <div style="display:flex;gap:12px;margin-bottom:14px;">
-      <div class="stat-mini">
-        <p id="nbAlertes" style="font-size:28px;font-weight:800;color:#840015;line-height:1;margin-bottom:4px;">0</p>
-        <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Alertes</p>
-      </div>
-      <div class="stat-mini">
-        <p id="nbConfirmations" style="font-size:28px;font-weight:800;color:#00c48c;line-height:1;margin-bottom:4px;">0</p>
-        <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Confirmées</p>
-      </div>
-      <div class="stat-mini">
-        <p id="nbFausses" style="font-size:28px;font-weight:800;color:#ff3d71;line-height:1;margin-bottom:4px;">0</p>
-        <p style="font-size:11px;font-weight:700;color:#906f6d;text-transform:uppercase;letter-spacing:.05em;">Fausses</p>
-      </div>
-    </div>
-
-    
-    <div class="section-card">
-      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">manage_accounts</span>
-        Modifier mes informations
-      </h2>
-      <p style="font-size:12px;color:#906f6d;margin-bottom:14px;">Mettez à jour vos informations publiques</p>
-      
-      <div style="margin-bottom:12px;">
-        <label class="field-label" style="font-size:12px;font-weight:700;color:#5b403e;display:block;margin-bottom:6px;">Nom complet *</label>
-        <input id="editNom" type="text" class="field-input no-icon" style="height:44px;font-size:14px;" placeholder="Ex: Jean Mukengere" />
-      </div>
-
-      <div style="margin-bottom:12px;">
-        <label class="field-label" style="font-size:12px;font-weight:700;color:#5b403e;display:block;margin-bottom:6px;">Quartier de résidence *</label>
-        <div style="position:relative;">
-          <select id="editQuartier" class="field-input no-icon" style="height:44px;font-size:14px;appearance:none;padding-right:36px;">
-            <option value="">Sélectionner votre quartier...</option>
-          </select>
-          <span class="material-symbols-outlined" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:18px;color:#906f6d;pointer-events:none;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">expand_more</span>
+    <main
+      style="
+        max-width: 640px;
+        margin: -32px auto 0;
+        padding: 0 16px;
+        position: relative;
+        z-index: 1;
+      "
+    >
+      <div
+        id="warningCompte"
+        style="
+          display: none;
+          background: #ffdad8;
+          border-left: 4px solid #840015;
+          border-radius: 8px;
+          padding: 14px 16px;
+          margin-bottom: 14px;
+          display: flex;
+          gap: 10px;
+          align-items: flex-start;
+        "
+      >
+        <span
+          class="material-symbols-outlined"
+          style="color: #840015; font-size: 20px; flex-shrink: 0"
+          >warning</span
+        >
+        <div>
+          <p
+            style="
+              font-size: 13px;
+              color: #410006;
+              font-weight: 700;
+              margin-bottom: 4px;
+            "
+          >
+            Compte en sursis (Averti)
+          </p>
+          <p
+            id="warningCompteMsg"
+            style="font-size: 12px; color: #410006; line-height: 1.5"
+          >
+            Attention, vous avez déjà cumulé des fausses alertes. À la 3ème
+            fausse alerte, votre compte sera définitivement suspendu !
+          </p>
         </div>
       </div>
 
-      <div style="margin-bottom:16px;">
-        <label class="field-label" style="font-size:12px;font-weight:700;color:#5b403e;display:block;margin-bottom:6px;">Numéro de téléphone * (9 chiffres)</label>
-        <div style="display:flex;align-items:center;position:relative;">
-          <span style="position:absolute;left:14px;font-size:14px;color:#906f6d;font-weight:600;">+243</span>
-          <input id="editTelephone" type="text" class="field-input no-icon" style="height:44px;font-size:14px;padding-left:55px;" placeholder="991234567" maxlength="9" />
+      <div style="display: flex; gap: 12px; margin-bottom: 14px">
+        <div class="stat-mini">
+          <p
+            id="nbAlertes"
+            style="
+              font-size: 28px;
+              font-weight: 800;
+              color: #840015;
+              line-height: 1;
+              margin-bottom: 4px;
+            "
+          >
+            0
+          </p>
+          <p
+            style="
+              font-size: 11px;
+              font-weight: 700;
+              color: #906f6d;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+            "
+          >
+            Alertes
+          </p>
+        </div>
+        <div class="stat-mini">
+          <p
+            id="nbConfirmations"
+            style="
+              font-size: 28px;
+              font-weight: 800;
+              color: #00c48c;
+              line-height: 1;
+              margin-bottom: 4px;
+            "
+          >
+            0
+          </p>
+          <p
+            style="
+              font-size: 11px;
+              font-weight: 700;
+              color: #906f6d;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+            "
+          >
+            Confirmées
+          </p>
+        </div>
+        <div class="stat-mini">
+          <p
+            id="nbFausses"
+            style="
+              font-size: 28px;
+              font-weight: 800;
+              color: #ff3d71;
+              line-height: 1;
+              margin-bottom: 4px;
+            "
+          >
+            0
+          </p>
+          <p
+            style="
+              font-size: 11px;
+              font-weight: 700;
+              color: #906f6d;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+            "
+          >
+            Fausses
+          </p>
         </div>
       </div>
 
-      <button onclick="mettreAJourProfil()" id="btnSaveProfil" class="btn-primary" style="height:44px;font-size:13px;width:100%;margin:0;display:flex;align-items:center;justify-content:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;">save</span>
-        Enregistrer les modifications
+      <div class="section-card">
+        <h2
+          style="
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          "
+        >
+          <span
+            class="material-symbols-outlined"
+            style="font-size: 18px; color: #840015"
+            >manage_accounts</span
+          >
+          Modifier mes informations
+        </h2>
+        <p style="font-size: 12px; color: #906f6d; margin-bottom: 14px">
+          Mettez à jour vos informations publiques
+        </p>
+
+        <div style="margin-bottom: 12px">
+          <label
+            class="field-label"
+            style="
+              font-size: 12px;
+              font-weight: 700;
+              color: #5b403e;
+              display: block;
+              margin-bottom: 6px;
+            "
+            >Nom complet *</label
+          >
+          <input
+            id="editNom"
+            type="text"
+            class="field-input no-icon"
+            style="height: 44px; font-size: 14px"
+            placeholder="Ex: Jean Mukengere"
+          />
+        </div>
+
+        <div style="margin-bottom: 12px">
+          <label
+            class="field-label"
+            style="
+              font-size: 12px;
+              font-weight: 700;
+              color: #5b403e;
+              display: block;
+              margin-bottom: 6px;
+            "
+            >Quartier de résidence *</label
+          >
+          <div style="position: relative">
+            <select
+              id="editQuartier"
+              class="field-input no-icon"
+              style="
+                height: 44px;
+                font-size: 14px;
+                appearance: none;
+                padding-right: 36px;
+              "
+            >
+              <option value="">Sélectionner votre quartier...</option>
+            </select>
+            <span
+              class="material-symbols-outlined"
+              style="
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 18px;
+                color: #906f6d;
+                pointer-events: none;
+                font-variation-settings:
+                  &quot;FILL&quot; 0,
+                  &quot;wght&quot; 400,
+                  &quot;GRAD&quot; 0,
+                  &quot;opsz&quot; 24;
+              "
+              >expand_more</span
+            >
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px">
+          <label
+            class="field-label"
+            style="
+              font-size: 12px;
+              font-weight: 700;
+              color: #5b403e;
+              display: block;
+              margin-bottom: 6px;
+            "
+            >Numéro de téléphone * (9 chiffres)</label
+          >
+          <div style="display: flex; align-items: center; position: relative">
+            <span
+              style="
+                position: absolute;
+                left: 14px;
+                font-size: 14px;
+                color: #906f6d;
+                font-weight: 600;
+              "
+              >+243</span
+            >
+            <input
+              id="editTelephone"
+              type="text"
+              class="field-input no-icon"
+              style="height: 44px; font-size: 14px; padding-left: 55px"
+              placeholder="991234567"
+              maxlength="9"
+            />
+          </div>
+        </div>
+
+        <button
+          onclick="mettreAJourProfil()"
+          id="btnSaveProfil"
+          class="btn-primary"
+          style="
+            height: 44px;
+            font-size: 13px;
+            width: 100%;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+          "
+        >
+          <span class="material-symbols-outlined" style="font-size: 18px"
+            >save</span
+          >
+          Enregistrer les modifications
+        </button>
+      </div>
+
+      <div class="section-card">
+        <h2
+          style="
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          "
+        >
+          <span
+            class="material-symbols-outlined"
+            style="font-size: 18px; color: #840015"
+            >history</span
+          >
+          Mes alertes récentes
+        </h2>
+        <p style="font-size: 12px; color: #906f6d; margin-bottom: 14px">
+          Vos 10 dernières publications (avec option de suppression)
+        </p>
+        <div id="mesAlertesList">
+          <div
+            class="skeleton"
+            style="height: 56px; margin-bottom: 10px; border-radius: 8px"
+          ></div>
+          <div
+            class="skeleton"
+            style="height: 56px; margin-bottom: 10px; border-radius: 8px"
+          ></div>
+          <div class="skeleton" style="height: 56px; border-radius: 8px"></div>
+        </div>
+      </div>
+
+      <button onclick="AB.logout()" class="btn-outline">
+        <span class="material-symbols-outlined" style="font-size: 18px"
+          >logout</span
+        >
+        Se déconnecter
       </button>
-    </div>
+    </main>
 
-    
-    <div class="section-card">
-      <h2 style="font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
-        <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">history</span>
-        Mes alertes récentes
-      </h2>
-      <p style="font-size:12px;color:#906f6d;margin-bottom:14px;">Vos 10 dernières publications (avec option de suppression)</p>
-      <div id="mesAlertesList">
-        <div class="skeleton" style="height:56px;margin-bottom:10px;border-radius:8px;"></div>
-        <div class="skeleton" style="height:56px;margin-bottom:10px;border-radius:8px;"></div>
-        <div class="skeleton" style="height:56px;border-radius:8px;"></div>
-      </div>
-    </div>
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item"
+        ><span
+          class="material-symbols-outlined"
+          style="
+            font-size: 22px;
+            font-variation-settings:
+              &quot;FILL&quot; 0,
+              &quot;wght&quot; 400,
+              &quot;GRAD&quot; 0,
+              &quot;opsz&quot; 24;
+          "
+          >rss_feed</span
+        ><span>Alertes</span></a
+      >
+      <a href="publier.html" class="nav-item"
+        ><span
+          class="material-symbols-outlined"
+          style="
+            font-size: 22px;
+            font-variation-settings:
+              &quot;FILL&quot; 0,
+              &quot;wght&quot; 400,
+              &quot;GRAD&quot; 0,
+              &quot;opsz&quot; 24;
+          "
+          >add_alert</span
+        ><span>Publier</span></a
+      >
+      <a href="stats.html" class="nav-item"
+        ><span
+          class="material-symbols-outlined"
+          style="
+            font-size: 22px;
+            font-variation-settings:
+              &quot;FILL&quot; 0,
+              &quot;wght&quot; 400,
+              &quot;GRAD&quot; 0,
+              &quot;opsz&quot; 24;
+          "
+          >analytics</span
+        ><span>Stats</span></a
+      >
+      <a href="profil.html" class="nav-item active"
+        ><span class="material-symbols-outlined" style="font-size: 22px"
+          >person</span
+        ><span>Profil</span></a
+      >
+    </nav>
 
-    <button onclick="AB.logout()" class="btn-outline">
-      <span class="material-symbols-outlined" style="font-size:18px;">logout</span>
-      Se déconnecter
-    </button>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="config.js"></script>
+    <script>
+      const user = AB.requireAuth();
 
-  </main>
+      QUARTIERS.forEach((q) => {
+        const o = document.createElement("option");
+        o.value = q;
+        o.textContent = q;
+        document.getElementById("editQuartier").appendChild(o);
+      });
 
-  <nav class="bottom-nav">
-    <a href="index.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">rss_feed</span><span>Alertes</span></a>
-    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">add_alert</span><span>Publier</span></a>
-    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;">analytics</span><span>Stats</span></a>
-    <a href="profil.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">person</span><span>Profil</span></a>
-  </nav>
+      if (user) {
+        document.getElementById("nomUser").textContent =
+          user.nom || "Utilisateur";
+        document.getElementById("usernameUser").textContent = user.username
+          ? "@" + user.username
+          : "";
+        document.getElementById("emailUser").textContent = user.email || "";
+        document.getElementById("quartierBadge").textContent =
+          user.quartier || "Bukavu";
+        const photo = document.getElementById("photoUser");
+        photo.src = getPhotoUrl(user, 96);
+        photo.onerror = () => {
+          photo.src = genererAvatar(user.nom || "U", 96);
+        };
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="config.js"></script>
-  <script>
-    const user = AB.requireAuth();
+        document.getElementById("editNom").value = user.nom || "";
+        document.getElementById("editQuartier").value = user.quartier || "";
+        if (user.telephone) {
+          const cleaned = user.telephone.replace(/\D/g, "");
 
-    
-    QUARTIERS.forEach(q => {
-      const o = document.createElement('option');
-      o.value = q; o.textContent = q;
-      document.getElementById('editQuartier').appendChild(o);
-    });
-
-    if (user) {
-      document.getElementById('nomUser').textContent = user.nom || 'Utilisateur';
-      document.getElementById('usernameUser').textContent = user.username ? '@' + user.username : '';
-      document.getElementById('emailUser').textContent = user.email || '';
-      document.getElementById('quartierBadge').textContent = user.quartier || 'Bukavu';
-      const photo = document.getElementById('photoUser');
-      photo.src = getPhotoUrl(user, 96);
-      photo.onerror = () => { photo.src = genererAvatar(user.nom || 'U', 96); };
-
-      
-      document.getElementById('editNom').value = user.nom || '';
-      document.getElementById('editQuartier').value = user.quartier || '';
-      if (user.telephone) {
-        const cleaned = user.telephone.replace(/\D/g, '');
-        
-        document.getElementById('editTelephone').value = cleaned.slice(-9);
-      }
-
-      
-      const nbFausses = user.nb_fausses_alertes || 0;
-      const warningCompte = document.getElementById('warningCompte');
-      if (nbFausses >= 2) {
-        warningCompte.style.display = 'flex';
-        document.getElementById('warningCompteMsg').textContent = `Attention, vous avez déjà cumulé ${nbFausses} fausses alertes. À la 3ème fausse alerte, votre compte sera définitivement suspendu !`;
-      } else {
-        warningCompte.style.display = 'none';
-      }
-    }
-
-    
-    async function rafraichirProfilDepuisServeur() {
-      try {
-        const data = await AB.api('auth/me');
-        if (!data || !data.user) return;
-        const freshUser = data.user;
-        AB.saveUser({ ...user, ...freshUser });
-
-        
-        document.getElementById('nomUser').textContent = freshUser.nom || 'Utilisateur';
-        document.getElementById('usernameUser').textContent = freshUser.username ? '@' + freshUser.username : '';
-        document.getElementById('quartierBadge').textContent = freshUser.quartier || 'Bukavu';
-        document.getElementById('editNom').value = freshUser.nom || '';
-        document.getElementById('editQuartier').value = freshUser.quartier || '';
-
-        
-        const photo = document.getElementById('photoUser');
-        if (freshUser.photo_url) {
-          photo.src = freshUser.photo_url;
-          photo.onerror = () => { photo.src = genererAvatar(freshUser.nom || 'U', 96); };
+          document.getElementById("editTelephone").value = cleaned.slice(-9);
         }
 
-        
-        const nbFausses = freshUser.nb_fausses_alertes || 0;
-        const warningCompte = document.getElementById('warningCompte');
+        const nbFausses = user.nb_fausses_alertes || 0;
+        const warningCompte = document.getElementById("warningCompte");
         if (nbFausses >= 2) {
-          warningCompte.style.display = 'flex';
-          document.getElementById('warningCompteMsg').textContent = `Attention, vous avez déjà cumulé ${nbFausses} fausses alertes. À la 3ème fausse alerte, votre compte sera définitivement suspendu !`;
+          warningCompte.style.display = "flex";
+          document.getElementById("warningCompteMsg").textContent =
+            `Attention, vous avez déjà cumulé ${nbFausses} fausses alertes. À la 3ème fausse alerte, votre compte sera définitivement suspendu !`;
         } else {
-          warningCompte.style.display = 'none';
+          warningCompte.style.display = "none";
         }
-      } catch(e) {
-        
-        console.warn('Impossible de rafraîchir le profil depuis le serveur:', e.message);
-      }
-    }
-    rafraichirProfilDepuisServeur();
-
-    
-    async function mettreAJourProfil() {
-      const nom = document.getElementById('editNom').value.trim();
-      const quartier = document.getElementById('editQuartier').value;
-      const telephone = document.getElementById('editTelephone').value.trim();
-      const btn = document.getElementById('btnSaveProfil');
-
-      if (!nom) { showToast('Le nom complet est obligatoire.', 'error'); return; }
-      if (nom.length < 2 || nom.length > 100) { showToast('Le nom doit faire entre 2 et 100 caractères.', 'error'); return; }
-      if (!quartier) { showToast('Sélectionnez votre quartier.', 'error'); return; }
-      if (!telephone) { showToast('Le numéro de téléphone est obligatoire.', 'error'); return; }
-
-      const digits = telephone.replace(/\D/g, '');
-      if (digits.length !== 9) {
-        showToast('Le numéro de téléphone doit contenir exactement 9 chiffres (ex: 991234567).', 'error');
-        return;
       }
 
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> &nbsp;Enregistrement...';
+      async function rafraichirProfilDepuisServeur() {
+        try {
+          const data = await AB.api("auth/me");
+          if (!data || !data.user) return;
+          const freshUser = data.user;
+          AB.saveUser({ ...user, ...freshUser });
 
-      try {
-        const res = await AB.api('auth/profile', 'PUT', { nom, quartier, telephone: digits });
-        
-        
-        AB.saveUser(res.user);
-        if (res.token) {
-          localStorage.setItem('ab_token', res.token);
+          document.getElementById("nomUser").textContent =
+            freshUser.nom || "Utilisateur";
+          document.getElementById("usernameUser").textContent =
+            freshUser.username ? "@" + freshUser.username : "";
+          document.getElementById("quartierBadge").textContent =
+            freshUser.quartier || "Bukavu";
+          document.getElementById("editNom").value = freshUser.nom || "";
+          document.getElementById("editQuartier").value =
+            freshUser.quartier || "";
+
+          const photo = document.getElementById("photoUser");
+          if (freshUser.photo_url) {
+            photo.src = freshUser.photo_url;
+            photo.onerror = () => {
+              photo.src = genererAvatar(freshUser.nom || "U", 96);
+            };
+          }
+
+          const nbFausses = freshUser.nb_fausses_alertes || 0;
+          const warningCompte = document.getElementById("warningCompte");
+          if (nbFausses >= 2) {
+            warningCompte.style.display = "flex";
+            document.getElementById("warningCompteMsg").textContent =
+              `Attention, vous avez déjà cumulé ${nbFausses} fausses alertes. À la 3ème fausse alerte, votre compte sera définitivement suspendu !`;
+          } else {
+            warningCompte.style.display = "none";
+          }
+        } catch (e) {
+          console.warn(
+            "Impossible de rafraîchir le profil depuis le serveur:",
+            e.message,
+          );
         }
-
-        btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">save</span> Enregistrer les modifications';
-        
-        await showAlert('Profil mis à jour !', 'Vos informations ont été modifiées avec succès.', 'success');
-        location.reload();
-      } catch (e) {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">save</span> Enregistrer les modifications';
-        showToast(e.message, 'error');
       }
-    }
+      rafraichirProfilDepuisServeur();
 
-    
-    async function changerPhoto(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      if (!file.type.startsWith('image/')) { showToast('Choisissez une image', 'error'); return; }
-      if (file.size > 8 * 1024 * 1024) { showToast('Image trop lourde (max 8 Mo)', 'error'); return; }
+      async function mettreAJourProfil() {
+        const nom = document.getElementById("editNom").value.trim();
+        const quartier = document.getElementById("editQuartier").value;
+        const telephone = document.getElementById("editTelephone").value.trim();
+        const btn = document.getElementById("btnSaveProfil");
 
-      
-      const previewUrl = URL.createObjectURL(file);
-      document.getElementById('photoUser').src = previewUrl;
-
-      Swal.fire({ title: 'Upload en cours...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
-
-      try {
-        const photoUrl = await uploadImage(file, 'profils');
-        await AB.api('auth/update-photo', 'PUT', { photoUrl });
-        const updatedUser = { ...AB.getUser(), photo_url: photoUrl };
-        AB.saveUser(updatedUser);
-        URL.revokeObjectURL(previewUrl);
-        document.getElementById('photoUser').src = photoUrl;
-        Swal.close();
-        showToast('Photo de profil mise à jour !');
-      } catch(e) {
-        Swal.close();
-        document.getElementById('photoUser').src = getPhotoUrl(user, 96);
-        URL.revokeObjectURL(previewUrl);
-        showToast('Erreur : ' + e.message, 'error');
-      }
-      event.target.value = '';
-    }
-
-    
-    async function supprimerAlerte(id) {
-      const confirm = await showConfirm(
-        'Supprimer l\'alerte ?',
-        'Cette action est irréversible. L\'alerte sera définitivement retirée.',
-        'Oui, supprimer',
-        'warning'
-      );
-      if (!confirm.isConfirmed) return;
-      
-      try {
-        Swal.fire({ title: 'Suppression de l\'alerte...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
-        await AB.api(`alertes/${id}`, 'DELETE');
-        Swal.close();
-        showToast('Alerte supprimée avec succès');
-        chargerMesAlertes();
-      } catch (e) {
-        Swal.close();
-        showToast('Erreur : ' + e.message, 'error');
-      }
-    }
-
-    
-    async function chargerMesAlertes() {
-      try {
-        const data = await AB.api('alertes/mes-alertes');
-        const alertes = data.alertes || [];
-        document.getElementById('nbAlertes').textContent = alertes.length;
-
-        
-        const totalConf = alertes.reduce((sum, a) => sum + (a.nb_confirmations || 0), 0);
-        document.getElementById('nbConfirmations').textContent = totalConf;
-
-        
-        document.getElementById('nbFausses').textContent = user?.nb_fausses_alertes || 0;
-
-        const list = document.getElementById('mesAlertesList');
-        if (!alertes.length) {
-          list.innerHTML = `<div style="text-align:center;padding:28px 0;">
-            <span class="material-symbols-outlined" style="font-size:36px;color:#ddb8b6;">inbox</span>
-            <p style="color:#906f6d;font-size:13px;margin-top:8px;">Aucune alerte publiée</p>
-          </div>`;
+        if (!nom) {
+          showToast("Le nom complet est obligatoire.", "error");
+          return;
+        }
+        if (nom.length < 2 || nom.length > 100) {
+          showToast("Le nom doit faire entre 2 et 100 caractères.", "error");
+          return;
+        }
+        if (!quartier) {
+          showToast("Sélectionnez votre quartier.", "error");
+          return;
+        }
+        if (!telephone) {
+          showToast("Le numéro de téléphone est obligatoire.", "error");
           return;
         }
 
-        const statutStyle = s => ({
-          active:    { label: 'Active',    bg: '#FFF5EC', color: '#FF9F43' },
-          resolue:   { label: 'Résolue',   bg: '#efecea', color: '#906f6d' },
-          suspendue: { label: 'Suspendue', bg: '#ffdad8', color: '#840015' }
-        }[s] || { label: 'Active', bg: '#FFF5EC', color: '#FF9F43' });
+        const digits = telephone.replace(/\D/g, "");
+        if (digits.length !== 9) {
+          showToast(
+            "Le numéro de téléphone doit contenir exactement 9 chiffres (ex: 991234567).",
+            "error",
+          );
+          return;
+        }
 
-        list.innerHTML = alertes.slice(0, 10).map(a => {
-          const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
-          const urg = URGENCES[a.urgence] || URGENCES.moyen;
-          const st = statutStyle(a.statut);
-          return `<div class="alerte-row" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> &nbsp;Enregistrement...';
+
+        try {
+          const res = await AB.api("auth/profile", "PUT", {
+            nom,
+            quartier,
+            telephone: digits,
+          });
+
+          AB.saveUser(res.user);
+          if (res.token) {
+            localStorage.setItem("ab_token", res.token);
+          }
+
+          btn.disabled = false;
+          btn.innerHTML =
+            '<span class="material-symbols-outlined" style="font-size:18px;">save</span> Enregistrer les modifications';
+
+          await showAlert(
+            "Profil mis à jour !",
+            "Vos informations ont été modifiées avec succès.",
+            "success",
+          );
+          location.reload();
+        } catch (e) {
+          btn.disabled = false;
+          btn.innerHTML =
+            '<span class="material-symbols-outlined" style="font-size:18px;">save</span> Enregistrer les modifications';
+          showToast(e.message, "error");
+        }
+      }
+
+      async function changerPhoto(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+          showToast("Choisissez une image", "error");
+          return;
+        }
+        if (file.size > 8 * 1024 * 1024) {
+          showToast("Image trop lourde (max 8 Mo)", "error");
+          return;
+        }
+
+        const previewUrl = URL.createObjectURL(file);
+        document.getElementById("photoUser").src = previewUrl;
+
+        Swal.fire({
+          title: "Upload en cours...",
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          didOpen: () => Swal.showLoading(),
+        });
+
+        try {
+          const photoUrl = await uploadImage(file, "profils");
+          await AB.api("auth/update-photo", "PUT", { photoUrl });
+          const updatedUser = { ...AB.getUser(), photo_url: photoUrl };
+          AB.saveUser(updatedUser);
+          URL.revokeObjectURL(previewUrl);
+          document.getElementById("photoUser").src = photoUrl;
+          Swal.close();
+          showToast("Photo de profil mise à jour !");
+        } catch (e) {
+          Swal.close();
+          document.getElementById("photoUser").src = getPhotoUrl(user, 96);
+          URL.revokeObjectURL(previewUrl);
+          showToast("Erreur : " + e.message, "error");
+        }
+        event.target.value = "";
+      }
+
+      async function supprimerAlerte(id) {
+        const confirm = await showConfirm(
+          "Supprimer l'alerte ?",
+          "Cette action est irréversible. L'alerte sera définitivement retirée.",
+          "Oui, supprimer",
+          "warning",
+        );
+        if (!confirm.isConfirmed) return;
+
+        try {
+          Swal.fire({
+            title: "Suppression de l'alerte...",
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => Swal.showLoading(),
+          });
+          await AB.api(`alertes/${id}`, "DELETE");
+          Swal.close();
+          showToast("Alerte supprimée avec succès");
+          chargerMesAlertes();
+        } catch (e) {
+          Swal.close();
+          showToast("Erreur : " + e.message, "error");
+        }
+      }
+
+      async function chargerMesAlertes() {
+        try {
+          const data = await AB.api("alertes/mes-alertes");
+          const alertes = data.alertes || [];
+          document.getElementById("nbAlertes").textContent = alertes.length;
+
+          const totalConf = alertes.reduce(
+            (sum, a) => sum + (a.nb_confirmations || 0),
+            0,
+          );
+          document.getElementById("nbConfirmations").textContent = totalConf;
+
+          document.getElementById("nbFausses").textContent =
+            user?.nb_fausses_alertes || 0;
+
+          const list = document.getElementById("mesAlertesList");
+          if (!alertes.length) {
+            list.innerHTML = `<div style="text-align:center;padding:28px 0;">
+            <span class="material-symbols-outlined" style="font-size:36px;color:#ddb8b6;">inbox</span>
+            <p style="color:#906f6d;font-size:13px;margin-top:8px;">Aucune alerte publiée</p>
+          </div>`;
+            return;
+          }
+
+          const statutStyle = (s) =>
+            ({
+              active: { label: "Active", bg: "#FFF5EC", color: "#FF9F43" },
+              resolue: { label: "Résolue", bg: "#efecea", color: "#906f6d" },
+              suspendue: {
+                label: "Suspendue",
+                bg: "#ffdad8",
+                color: "#840015",
+              },
+            })[s] || { label: "Active", bg: "#FFF5EC", color: "#FF9F43" };
+
+          list.innerHTML = alertes
+            .slice(0, 10)
+            .map((a) => {
+              const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
+              const urg = URGENCES[a.urgence] || URGENCES.moyen;
+              const st = statutStyle(a.statut);
+              return `<div class="alerte-row" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
             <div style="width:10px;height:10px;border-radius:50%;background:${urg.color};margin-top:2px;flex-shrink:0;margin-right:12px;"></div>
             <div style="flex:1;min-width:0;text-align:left;">
               <p style="font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(a.titre)}</p>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <span style="font-size:10px;font-weight:700;background:${cat.bg};color:${cat.color};padding:2px 8px;border-radius:4px;">${cat.label}</span>
                 <span style="font-size:11px;color:#906f6d;">${tempsRelatif(a.created_at)}</span>
-                <span style="font-size:11px;color:#906f6d;">${a.nb_confirmations || 0} confirmation${(a.nb_confirmations || 0) > 1 ? 's' : ''}</span>
+                <span style="font-size:11px;color:#906f6d;">${a.nb_confirmations || 0} confirmation${(a.nb_confirmations || 0) > 1 ? "s" : ""}</span>
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:12px;">
@@ -369,14 +847,16 @@
               </button>
             </div>
           </div>`;
-        }).join('');
-      } catch(e) {
-        document.getElementById('mesAlertesList').innerHTML = '<p style="color:#906f6d;font-size:13px;text-align:center;padding:20px 0;">Impossible de charger les alertes</p>';
+            })
+            .join("");
+        } catch (e) {
+          document.getElementById("mesAlertesList").innerHTML =
+            '<p style="color:#906f6d;font-size:13px;text-align:center;padding:20px 0;">Impossible de charger les alertes</p>';
+        }
       }
-    }
 
-    chargerMesAlertes();
-    afficherMenuAdmin();
-  </script>
-</body>
+      chargerMesAlertes();
+      afficherMenuAdmin();
+    </script>
+  </body>
 </html>
