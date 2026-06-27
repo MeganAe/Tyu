@@ -1,270 +1,738 @@
 <!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  
-  <title>AlertBukavu — Alertes en cours</title>
-  <link rel="icon" type="image/png" href="logo.png"/>
-  
-  <!-- Open Graph Meta Tags pour partage sur réseaux sociaux -->
-  <meta property="og:title" content="AlertBukavu — Plateforme d'alertes citoyennes"/>
-  <meta property="og:description" content="Signalez et suivez les incidents en temps réel à Bukavu (RDC) pour protéger votre communauté."/>
-  <meta property="og:image" content="/logo.png"/>
-  <meta property="og:type" content="website"/>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="style.css"/>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
-     crossorigin="anonymous"></script>
-  <style>
-    .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 48}
-    body{padding-bottom:90px; scroll-behavior: smooth;}
-    html { scroll-behavior: smooth; }
-    
-    /* Skeleton loader modern */
-    .skeleton-card {
-      background: white;
-      border-radius: 12px;
-      border: 1px solid #ddb8b6;
-      padding: 16px;
-      height: 220px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .skeleton-line {
-      height: 14px;
-      border-radius: 4px;
-    }
-  </style>
-</head>
-<body>
+  <head>
+    <link rel="icon" type="image/png" href="favicon.png" />
 
-  <!-- Service Worker registration script -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('Service Worker enregistré !', reg.scope))
-          .catch(err => console.error('Échec enregistrement Service Worker:', err));
-      });
-    }
-  </script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <header class="top-bar">
-    <div id="headerDefaultContent" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <img src="logo.png" alt="Logo" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'"/>
-        <h1 style="font-size:18px;font-weight:800;color:white;">AlertBukavu</h1>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <!-- Indicateur de rafraîchissement visuel -->
-        <span id="refreshIndicator" style="color:rgba(255,255,255,.8);font-size:11px;font-weight:600;margin-right:4px;transition:all .4s ease;opacity:0;display:none;">Mise à jour...</span>
-        
-        <!-- Bouton Recherche -->
-        <button onclick="toggleHeaderSearch()" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:50%;transition:background .2s;border:none;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'" title="Rechercher">
-          <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">search</span>
-        </button>
-        
-        <!-- Bouton Notifications -->
-        <button onclick="toggleNotifications(event)" style="position:relative;display:flex;align-items:center;justify-content:center;color:white;width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:50%;transition:background .2s;border:none;cursor:pointer;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'" title="Notifications">
-          <span class="material-symbols-outlined" style="font-size:22px;font-variation-settings:'FILL' 0;">notifications</span>
-          <span id="notifBadge" style="position:absolute;top:-2px;right:-2px;background:#ba1a1a;color:white;font-size:10px;font-weight:800;border-radius:10px;padding:2px 6px;border:2px solid #840015;display:none;min-width:18px;box-sizing:border-box;text-align:center;line-height:1;">0</span>
-        </button>
-        
-        <img id="headerAvatar" src="" alt="" style="width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,.4);cursor:pointer;object-fit:cover;" onclick="window.location.href='profil.html'"/>
-      </div>
-    </div>
+    <title>AlertBukavu — Alertes en cours</title>
 
-    <!-- Sleek Search Overlay -->
-    <div id="headerSearchOverlay" style="display:none;position:absolute;inset:0;background:var(--header-gradient);padding:0 20px;align-items:center;z-index:51;border-radius:inherit;">
-      <div style="width:100%;max-width:600px;margin:0 auto;position:relative;display:flex;align-items:center;gap:12px;">
-        <span class="material-symbols-outlined" style="color:rgba(255,255,255,.6);font-size:22px;pointer-events:none;">search</span>
-        <input id="headerSearchInput" type="text" placeholder="Rechercher des alertes..." oninput="filtrerAlertesRecherche(this.value)" style="flex:1;height:40px;padding:0 40px 0 10px;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.25);border-radius:8px;font-size:14px;color:white;outline:none;transition:all .3s ease;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:inset 0 1px 2px rgba(0,0,0,.15);"/>
-        <button onclick="closeHeaderSearch()" style="background:none;border:none;color:white;opacity:0.7;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:4px;border-radius:50%;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
-          <span class="material-symbols-outlined" style="font-size:22px;">close</span>
-        </button>
-      </div>
-    </div>
-  </header>
+    <meta
+      property="og:title"
+      content="AlertBukavu — Plateforme d'alertes citoyennes"
+    />
+    <meta
+      property="og:description"
+      content="Signalez et suivez les incidents en temps réel à Bukavu (RDC) pour protéger votre communauté."
+    />
+    <meta property="og:image" content="/logo.png" />
+    <meta property="og:type" content="website" />
 
-  <section class="hero-section" style="padding: 24px 20px;">
-    <div style="max-width:600px;margin:0 auto;position:relative;z-index:2;text-align:center;">
-      <h2 style="font-size:24px;font-weight:800;color:white;margin-bottom:6px;">Alertes citoyennes en temps réel</h2>
-      <p style="font-size:13px;color:rgba(255,255,255,.85);">Suivez et signalez les incidents pour protéger votre communauté à Bukavu.</p>
-    </div>
-  </section>
-
-  <!-- Filtres (Catégorie + Quartier en un seul bloc sticky) -->
-  <div class="filter-bar-sticky" style="position:sticky;top:60px;z-index:30;background:rgba(255,255,255,.93);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid #ddb8b6;box-shadow:0 2px 10px rgba(132,0,21,.05);padding:12px 16px;">
-    <div style="display:flex;gap:10px;align-items:center;overflow-x:auto;" class="no-scrollbar">
-      
-      <!-- Sélecteur de quartier moderne -->
-      <div style="position:relative;flex-shrink:0;">
-        <select id="filtreQuartier" onchange="filtrerParQuartier(this.value)" class="pill" style="padding-right:32px;appearance:none;-webkit-appearance:none;cursor:pointer;font-weight:700;border-color:#840015;color:#840015;background:#ffdad8;">
-          <option value="tous">Tous les quartiers</option>
-        </select>
-        <span class="material-symbols-outlined" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:16px;color:#840015;pointer-events:none;">expand_more</span>
-      </div>
-      
-      <div style="width:1px;height:24px;background:#ddb8b6;flex-shrink:0;"></div>
-
-      <button class="pill active" onclick="filtrerParCat(this,'tous')">Toutes</button>
-      <button class="pill" onclick="filtrerParCat(this,'securite')">Sécurité</button>
-      <button class="pill" onclick="filtrerParCat(this,'eau')">Eau</button>
-      <button class="pill" onclick="filtrerParCat(this,'route')">Routes</button>
-      <button class="pill" onclick="filtrerParCat(this,'sante')">Santé</button>
-      <button class="pill" onclick="filtrerParCat(this,'meteo')">Météo</button>
-      <button class="pill" onclick="filtrerParCat(this,'autre')">Autre</button>
-    </div>
-  </div>
-
-  <main style="max-width:900px;margin:0 auto;padding:20px 16px;">
-    <!-- Skeletons chargés par défaut -->
-    <div id="alertesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;">
-      <div class="skeleton-card">
-        <div style="display:flex;gap:8px;"><div class="skeleton skeleton-line" style="width:60px;"></div><div class="skeleton skeleton-line" style="width:60px;"></div></div>
-        <div class="skeleton skeleton-line" style="width:80%;height:18px;margin-top:6px;"></div>
-        <div class="skeleton skeleton-line" style="width:100%;height:40px;"></div>
-        <div class="skeleton skeleton-line" style="width:40%;margin-top:auto;"></div>
-      </div>
-      <div class="skeleton-card">
-        <div style="display:flex;gap:8px;"><div class="skeleton skeleton-line" style="width:60px;"></div><div class="skeleton skeleton-line" style="width:60px;"></div></div>
-        <div class="skeleton skeleton-line" style="width:75%;height:18px;margin-top:6px;"></div>
-        <div class="skeleton skeleton-line" style="width:100%;height:40px;"></div>
-        <div class="skeleton skeleton-line" style="width:40%;margin-top:auto;"></div>
-      </div>
-    </div>
-    
-    <!-- Zone de pagination -->
-    <div id="paginationContainer" style="text-align:center;margin-top:24px;display:none;">
-      <button onclick="voirPlus()" class="btn-outline" style="max-width:200px;margin:0 auto;height:44px;font-size:13px;border-radius:100px;">
-        Voir plus d'alertes
-        <span class="material-symbols-outlined" style="font-size:18px;">expand_more</span>
-      </button>
-    </div>
-
-    <div id="emptyState" style="display:none;text-align:center;padding:64px 20px;">
-      <div style="width:72px;height:72px;background:#ffdad8;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-        <span class="material-symbols-outlined" style="font-size:32px;color:#840015;">notifications_none</span>
-      </div>
-      <p style="font-weight:700;font-size:16px;color:#1a1a1a;margin-bottom:6px;">Aucune alerte</p>
-      <p style="color:#5b403e;font-size:14px;">Aucun incident signalé dans ce quartier ou cette catégorie.</p>
-    </div>
-  </main>
-
-  <!-- Bouton d'action flottant -->
-  <button class="fab" onclick="window.location.href='publier.html'" title="Publier une alerte">
-    <span class="material-symbols-outlined" style="font-size:26px;color:white;">add_alert</span>
-  </button>
-
-  <!-- Bouton Scroll To Top Smooth -->
-  <button id="scrollToTopBtn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="position:fixed;bottom:88px;left:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid #ddb8b6;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:99;transition:all .3s;">
-    <span class="material-symbols-outlined" style="color:#840015;font-size:22px;">arrow_upward</span>
-  </button>
-
-  <!-- Tiroir de notifications latéral -->
-  <div id="notifDrawer" style="display:none; position:fixed; top:0; right:0; bottom:0; width:100%; max-width:400px; background:rgba(255,255,255,0.96); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:-4px 0 24px rgba(132,0,21,0.15); z-index:1000; flex-direction:column; transform:translateX(100%);">
-    <div style="padding:20px; border-bottom:1px solid #efecea; display:flex; align-items:center; justify-content:space-between; background:var(--header-gradient); color:white;">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1">notifications</span>
-        <h2 style="font-size:16px; font-weight:800; margin:0;">Notifications</h2>
-      </div>
-      <button onclick="toggleNotifications()" style="background:none; border:none; color:white; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:6px; border-radius:50%; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='none'">
-        <span class="material-symbols-outlined" style="font-size:22px;">close</span>
-      </button>
-    </div>
-    <div id="notifDrawerContent" style="flex:1; overflow-y:auto; padding:16px;" class="no-scrollbar">
-      <!-- Rempli dynamiquement -->
-    </div>
-  </div>
-  <div id="drawerOverlay" onclick="toggleNotifications()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:999; backdrop-filter:blur(2px); -webkit-backdrop-filter:blur(2px); opacity:0;"></div>
-
-  <nav class="bottom-nav">
-    <a href="index.html" class="nav-item active"><span class="material-symbols-outlined" style="font-size:22px;">rss_feed</span><span>Alertes</span></a>
-    <a href="publier.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;">add_alert</span><span>Publier</span></a>
-    <a href="stats.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;">analytics</span><span>Stats</span></a>
-    <a href="profil.html" class="nav-item"><span class="material-symbols-outlined ms-o" style="font-size:22px;">person</span><span>Profil</span></a>
-  </nav>
-
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="config.js"></script>
-  <script>
-    let toutesAlertes = [];
-    let filtreCatActuel = 'tous';
-    let filtreQuartierActuel = 'tous';
-    let limit = 20; // 20 alertes par page
-    const user = AB.requireAuth();
-    
-    // Timestamp de dernière lecture (depuis le serveur pour multi-navigateur)
-    let serverLastReadTime = 0;
-    async function chargerLastReadDepuisServeur() {
-      try {
-        const data = await AB.api('auth/notifications/read-at');
-        if (data && data.readAt) {
-          serverLastReadTime = new Date(data.readAt).getTime();
-          // Synchroniser localStorage avec la valeur serveur
-          localStorage.setItem('ab_last_read_notifs', data.readAt);
-        }
-      } catch(e) {
-        // Fallback sur localStorage si le serveur est indisponible
-        const local = localStorage.getItem('ab_last_read_notifs');
-        if (local) serverLastReadTime = new Date(local).getTime();
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9084505054390559"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 1,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 48;
       }
-    }
-    
-    if (user) {
-      const av = document.getElementById('headerAvatar');
-      av.src = getPhotoUrl(user, 36);
-      av.onerror = () => { av.src = genererAvatar(user.nom || 'U', 36); };
-    }
+      body {
+        padding-bottom: 90px;
+        scroll-behavior: smooth;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
 
-    // Charger les quartiers dynamiquement dans le sélecteur
-    const qSel = document.getElementById('filtreQuartier');
-    QUARTIERS.forEach(q => {
-      const o = document.createElement('option');
-      o.value = q;
-      o.textContent = q;
-      qSel.appendChild(o);
-    });
+      .skeleton-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #ddb8b6;
+        padding: 16px;
+        height: 220px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .skeleton-line {
+        height: 14px;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) =>
+              console.log("Service Worker enregistré !", reg.scope),
+            )
+            .catch((err) =>
+              console.error("Échec enregistrement Service Worker:", err),
+            );
+        });
+      }
+    </script>
 
-    // Filtre quartier
-    function filtrerParQuartier(quartier) {
-      filtreQuartierActuel = quartier;
-      limit = 20; // Réinitialise la pagination
-      afficherAlertes();
-    }
+    <header class="top-bar">
+      <div
+        id="headerDefaultContent"
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 100%;
+        "
+      >
+        <div style="display: flex; align-items: center; gap: 10px">
+          <img
+            src="logo.png"
+            alt="Logo"
+            style="
+              width: 28px;
+              height: 28px;
+              border-radius: 50%;
+              object-fit: cover;
+            "
+            onerror="this.style.display = 'none'"
+          />
+          <h1 style="font-size: 18px; font-weight: 800; color: white">
+            AlertBukavu
+          </h1>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span
+            id="refreshIndicator"
+            style="
+              color: rgba(255, 255, 255, 0.8);
+              font-size: 11px;
+              font-weight: 600;
+              margin-right: 4px;
+              transition: all 0.4s ease;
+              opacity: 0;
+              display: none;
+            "
+            >Mise à jour...</span
+          >
 
-    // Filtre catégorie
-    function filtrerParCat(btn, cat) {
-      document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      filtreCatActuel = cat;
-      limit = 20; // Réinitialise la pagination
-      afficherAlertes();
-    }
+          <button
+            onclick="toggleHeaderSearch()"
+            style="
+              position: relative;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              width: 36px;
+              height: 36px;
+              background: rgba(255, 255, 255, 0.15);
+              border-radius: 50%;
+              transition: background 0.2s;
+              border: none;
+              cursor: pointer;
+            "
+            onmouseover="this.style.background = 'rgba(255,255,255,.25)'"
+            onmouseout="this.style.background = 'rgba(255,255,255,.15)'"
+            title="Rechercher"
+          >
+            <span
+              class="material-symbols-outlined"
+              style="
+                font-size: 22px;
+                font-variation-settings: &quot;FILL&quot; 0;
+              "
+              >search</span
+            >
+          </button>
 
-    // Pagination
-    function voirPlus() {
-      limit += 20;
-      afficherAlertes();
-    }
+          <button
+            onclick="toggleNotifications(event)"
+            style="
+              position: relative;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              width: 36px;
+              height: 36px;
+              background: rgba(255, 255, 255, 0.15);
+              border-radius: 50%;
+              transition: background 0.2s;
+              border: none;
+              cursor: pointer;
+            "
+            onmouseover="this.style.background = 'rgba(255,255,255,.25)'"
+            onmouseout="this.style.background = 'rgba(255,255,255,.15)'"
+            title="Notifications"
+          >
+            <span
+              class="material-symbols-outlined"
+              style="
+                font-size: 22px;
+                font-variation-settings: &quot;FILL&quot; 0;
+              "
+              >notifications</span
+            >
+            <span
+              id="notifBadge"
+              style="
+                position: absolute;
+                top: -2px;
+                right: -2px;
+                background: #ba1a1a;
+                color: white;
+                font-size: 10px;
+                font-weight: 800;
+                border-radius: 10px;
+                padding: 2px 6px;
+                border: 2px solid #840015;
+                display: none;
+                min-width: 18px;
+                box-sizing: border-box;
+                text-align: center;
+                line-height: 1;
+              "
+              >0</span
+            >
+          </button>
 
-    function cardHTML(a, i) {
-      const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
-      const urg = URGENCES[a.urgence] || URGENCES.moyen;
-      const urgClass = `urgence-${a.urgence || 'moyen'}`;
-      const photoAuteur = getPhotoUrl({ photoUrl: a.photo_auteur, nom: a.auteur_nom }, 36);
-      
-      // Déterminer si l'alerte est nouvelle (moins de 10 min)
-      const ageMs = Date.now() - new Date(a.created_at).getTime();
-      const estNouvelle = ageMs < 10 * 60 * 1000;
-      const badgeNouvelle = estNouvelle ? `<span class="badge" style="background:#ba1a1a;color:#fff;margin-right:6px;font-size:9px;">NOUVELLE</span>` : '';
+          <img
+            id="headerAvatar"
+            src=""
+            alt=""
+            style="
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              border: 2px solid rgba(255, 255, 255, 0.4);
+              cursor: pointer;
+              object-fit: cover;
+            "
+            onclick="window.location.href = 'profil.html'"
+          />
+        </div>
+      </div>
 
-      return `
-      <div class="card card-anim ${urgClass}" style="animation-delay:${(i%20)*40}ms;">
+      <div
+        id="headerSearchOverlay"
+        style="
+          display: none;
+          position: absolute;
+          inset: 0;
+          background: var(--header-gradient);
+          padding: 0 20px;
+          align-items: center;
+          z-index: 51;
+          border-radius: inherit;
+        "
+      >
+        <div
+          style="
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          "
+        >
+          <span
+            class="material-symbols-outlined"
+            style="
+              color: rgba(255, 255, 255, 0.6);
+              font-size: 22px;
+              pointer-events: none;
+            "
+            >search</span
+          >
+          <input
+            id="headerSearchInput"
+            type="text"
+            placeholder="Rechercher des alertes..."
+            oninput="filtrerAlertesRecherche(this.value)"
+            style="
+              flex: 1;
+              height: 40px;
+              padding: 0 40px 0 10px;
+              background: rgba(255, 255, 255, 0.18);
+              border: 1.5px solid rgba(255, 255, 255, 0.25);
+              border-radius: 8px;
+              font-size: 14px;
+              color: white;
+              outline: none;
+              transition: all 0.3s ease;
+              font-family: &quot;Plus Jakarta Sans&quot;, sans-serif;
+              box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+            "
+          />
+          <button
+            onclick="closeHeaderSearch()"
+            style="
+              background: none;
+              border: none;
+              color: white;
+              opacity: 0.7;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding: 4px;
+              border-radius: 50%;
+              transition: opacity 0.2s;
+            "
+            onmouseover="this.style.opacity = '1'"
+            onmouseout="this.style.opacity = '0.7'"
+          >
+            <span class="material-symbols-outlined" style="font-size: 22px"
+              >close</span
+            >
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero-section" style="padding: 24px 20px">
+      <div
+        style="
+          max-width: 600px;
+          margin: 0 auto;
+          position: relative;
+          z-index: 2;
+          text-align: center;
+        "
+      >
+        <h2
+          style="
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 6px;
+          "
+        >
+          Alertes citoyennes en temps réel
+        </h2>
+        <p style="font-size: 13px; color: rgba(255, 255, 255, 0.85)">
+          Suivez et signalez les incidents pour protéger votre communauté à
+          Bukavu.
+        </p>
+      </div>
+    </section>
+
+    <div
+      class="filter-bar-sticky"
+      style="
+        position: sticky;
+        top: 60px;
+        z-index: 30;
+        background: rgba(255, 255, 255, 0.93);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid #ddb8b6;
+        box-shadow: 0 2px 10px rgba(132, 0, 21, 0.05);
+        padding: 12px 16px;
+      "
+    >
+      <div
+        style="display: flex; gap: 10px; align-items: center; overflow-x: auto"
+        class="no-scrollbar"
+      >
+        <div style="position: relative; flex-shrink: 0">
+          <select
+            id="filtreQuartier"
+            onchange="filtrerParQuartier(this.value)"
+            class="pill"
+            style="
+              padding-right: 32px;
+              appearance: none;
+              -webkit-appearance: none;
+              cursor: pointer;
+              font-weight: 700;
+              border-color: #840015;
+              color: #840015;
+              background: #ffdad8;
+            "
+          >
+            <option value="tous">Tous les quartiers</option>
+          </select>
+          <span
+            class="material-symbols-outlined"
+            style="
+              position: absolute;
+              right: 10px;
+              top: 50%;
+              transform: translateY(-50%);
+              font-size: 16px;
+              color: #840015;
+              pointer-events: none;
+            "
+            >expand_more</span
+          >
+        </div>
+
+        <div
+          style="width: 1px; height: 24px; background: #ddb8b6; flex-shrink: 0"
+        ></div>
+
+        <button class="pill active" onclick="filtrerParCat(this, 'tous')">
+          Toutes
+        </button>
+        <button class="pill" onclick="filtrerParCat(this, 'securite')">
+          Sécurité
+        </button>
+        <button class="pill" onclick="filtrerParCat(this, 'eau')">Eau</button>
+        <button class="pill" onclick="filtrerParCat(this, 'route')">
+          Routes
+        </button>
+        <button class="pill" onclick="filtrerParCat(this, 'sante')">
+          Santé
+        </button>
+        <button class="pill" onclick="filtrerParCat(this, 'meteo')">
+          Météo
+        </button>
+        <button class="pill" onclick="filtrerParCat(this, 'autre')">
+          Autre
+        </button>
+      </div>
+    </div>
+
+    <main style="max-width: 900px; margin: 0 auto; padding: 20px 16px">
+      <div
+        id="alertesGrid"
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 16px;
+        "
+      >
+        <div class="skeleton-card">
+          <div style="display: flex; gap: 8px">
+            <div class="skeleton skeleton-line" style="width: 60px"></div>
+            <div class="skeleton skeleton-line" style="width: 60px"></div>
+          </div>
+          <div
+            class="skeleton skeleton-line"
+            style="width: 80%; height: 18px; margin-top: 6px"
+          ></div>
+          <div
+            class="skeleton skeleton-line"
+            style="width: 100%; height: 40px"
+          ></div>
+          <div
+            class="skeleton skeleton-line"
+            style="width: 40%; margin-top: auto"
+          ></div>
+        </div>
+        <div class="skeleton-card">
+          <div style="display: flex; gap: 8px">
+            <div class="skeleton skeleton-line" style="width: 60px"></div>
+            <div class="skeleton skeleton-line" style="width: 60px"></div>
+          </div>
+          <div
+            class="skeleton skeleton-line"
+            style="width: 75%; height: 18px; margin-top: 6px"
+          ></div>
+          <div
+            class="skeleton skeleton-line"
+            style="width: 100%; height: 40px"
+          ></div>
+          <div
+            class="skeleton skeleton-line"
+            style="width: 40%; margin-top: auto"
+          ></div>
+        </div>
+      </div>
+
+      <div
+        id="paginationContainer"
+        style="text-align: center; margin-top: 24px; display: none"
+      >
+        <button
+          onclick="voirPlus()"
+          class="btn-outline"
+          style="
+            max-width: 200px;
+            margin: 0 auto;
+            height: 44px;
+            font-size: 13px;
+            border-radius: 100px;
+          "
+        >
+          Voir plus d'alertes
+          <span class="material-symbols-outlined" style="font-size: 18px"
+            >expand_more</span
+          >
+        </button>
+      </div>
+
+      <div
+        id="emptyState"
+        style="display: none; text-align: center; padding: 64px 20px"
+      >
+        <div
+          style="
+            width: 72px;
+            height: 72px;
+            background: #ffdad8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+          "
+        >
+          <span
+            class="material-symbols-outlined"
+            style="font-size: 32px; color: #840015"
+            >notifications_none</span
+          >
+        </div>
+        <p
+          style="
+            font-weight: 700;
+            font-size: 16px;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+          "
+        >
+          Aucune alerte
+        </p>
+        <p style="color: #5b403e; font-size: 14px">
+          Aucun incident signalé dans ce quartier ou cette catégorie.
+        </p>
+      </div>
+    </main>
+
+    <button
+      class="fab"
+      onclick="window.location.href = 'publier.html'"
+      title="Publier une alerte"
+    >
+      <span
+        class="material-symbols-outlined"
+        style="font-size: 26px; color: white"
+        >add_alert</span
+      >
+    </button>
+
+    <button
+      id="scrollToTopBtn"
+      onclick="window.scrollTo({ top: 0, behavior: 'smooth' })"
+      style="
+        position: fixed;
+        bottom: 88px;
+        left: 20px;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid #ddb8b6;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 99;
+        transition: all 0.3s;
+      "
+    >
+      <span
+        class="material-symbols-outlined"
+        style="color: #840015; font-size: 22px"
+        >arrow_upward</span
+      >
+    </button>
+
+    <div
+      id="notifDrawer"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        max-width: 400px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: -4px 0 24px rgba(132, 0, 21, 0.15);
+        z-index: 1000;
+        flex-direction: column;
+        transform: translateX(100%);
+      "
+    >
+      <div
+        style="
+          padding: 20px;
+          border-bottom: 1px solid #efecea;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: var(--header-gradient);
+          color: white;
+        "
+      >
+        <div style="display: flex; align-items: center; gap: 8px">
+          <span
+            class="material-symbols-outlined"
+            style="font-variation-settings: &quot;FILL&quot; 1"
+            >notifications</span
+          >
+          <h2 style="font-size: 16px; font-weight: 800; margin: 0">
+            Notifications
+          </h2>
+        </div>
+        <button
+          onclick="toggleNotifications()"
+          style="
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            border-radius: 50%;
+            transition: background 0.2s;
+          "
+          onmouseover="this.style.background = 'rgba(255,255,255,0.15)'"
+          onmouseout="this.style.background = 'none'"
+        >
+          <span class="material-symbols-outlined" style="font-size: 22px"
+            >close</span
+          >
+        </button>
+      </div>
+      <div
+        id="notifDrawerContent"
+        style="flex: 1; overflow-y: auto; padding: 16px"
+        class="no-scrollbar"
+      ></div>
+    </div>
+    <div
+      id="drawerOverlay"
+      onclick="toggleNotifications()"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        opacity: 0;
+      "
+    ></div>
+
+    <nav class="bottom-nav">
+      <a href="index.html" class="nav-item active"
+        ><span class="material-symbols-outlined" style="font-size: 22px"
+          >rss_feed</span
+        ><span>Alertes</span></a
+      >
+      <a href="publier.html" class="nav-item"
+        ><span class="material-symbols-outlined ms-o" style="font-size: 22px"
+          >add_alert</span
+        ><span>Publier</span></a
+      >
+      <a href="stats.html" class="nav-item"
+        ><span class="material-symbols-outlined ms-o" style="font-size: 22px"
+          >analytics</span
+        ><span>Stats</span></a
+      >
+      <a href="profil.html" class="nav-item"
+        ><span class="material-symbols-outlined ms-o" style="font-size: 22px"
+          >person</span
+        ><span>Profil</span></a
+      >
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="config.js"></script>
+    <script>
+      let toutesAlertes = [];
+      let filtreCatActuel = "tous";
+      let filtreQuartierActuel = "tous";
+      let limit = 20;
+      const user = AB.requireAuth();
+
+      let serverLastReadTime = 0;
+      async function chargerLastReadDepuisServeur() {
+        try {
+          const data = await AB.api("auth/notifications/read-at");
+          if (data && data.readAt) {
+            serverLastReadTime = new Date(data.readAt).getTime();
+            localStorage.setItem("ab_last_read_notifs", data.readAt);
+          }
+        } catch (e) {
+          const local = localStorage.getItem("ab_last_read_notifs");
+          if (local) serverLastReadTime = new Date(local).getTime();
+        }
+      }
+
+      if (user) {
+        const av = document.getElementById("headerAvatar");
+        av.src = getPhotoUrl(user, 36);
+        av.onerror = () => {
+          av.src = genererAvatar(user.nom || "U", 36);
+        };
+      }
+
+      const qSel = document.getElementById("filtreQuartier");
+      QUARTIERS.forEach((q) => {
+        const o = document.createElement("option");
+        o.value = q;
+        o.textContent = q;
+        qSel.appendChild(o);
+      });
+
+      function filtrerParQuartier(quartier) {
+        filtreQuartierActuel = quartier;
+        limit = 20;
+        afficherAlertes();
+      }
+
+      function filtrerParCat(btn, cat) {
+        document
+          .querySelectorAll(".pill")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        filtreCatActuel = cat;
+        limit = 20;
+        afficherAlertes();
+      }
+
+      function voirPlus() {
+        limit += 20;
+        afficherAlertes();
+      }
+
+      function cardHTML(a, i) {
+        const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
+        const urg = URGENCES[a.urgence] || URGENCES.moyen;
+        const urgClass = `urgence-${a.urgence || "moyen"}`;
+        const photoAuteur = getPhotoUrl(
+          { photoUrl: a.photo_auteur, nom: a.auteur_nom },
+          36,
+        );
+
+        const ageMs = Date.now() - new Date(a.created_at).getTime();
+        const estNouvelle = ageMs < 10 * 60 * 1000;
+        const badgeNouvelle = estNouvelle
+          ? `<span class="badge" style="background:#ba1a1a;color:#fff;margin-right:6px;font-size:9px;">NOUVELLE</span>`
+          : "";
+
+        return `
+      <div class="card card-anim ${urgClass}" style="animation-delay:${(i % 20) * 40}ms;">
         <div style="padding:16px 16px 12px;cursor:pointer;" onclick="voirDetailsAlerte('${a.id}')">
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
             ${badgeNouvelle}
@@ -277,7 +745,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#906f6d;">
             <span style="display:flex;align-items:center;gap:4px;">
               <span class="material-symbols-outlined" style="font-size:14px;color:#840015;">location_on</span>
-              ${escHtml(a.quartier || 'Bukavu')}
+              ${escHtml(a.quartier || "Bukavu")}
             </span>
             <span style="display:flex;align-items:center;gap:8px;">
               <span>${a.nb_confirmations || 0} conf.</span>
@@ -285,14 +753,14 @@
             </span>
           </div>
         </div>
-        ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" class="alerte-img" alt="Photo alerte" loading="lazy" onerror="this.style.display='none'"/>` : ''}
+        ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" class="alerte-img" alt="Photo alerte" loading="lazy" onerror="this.style.display='none'"/>` : ""}
         <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#faf8f7;border-top:1px solid #efecea;">
-          <img src="${photoAuteur}" class="author-img" onerror="this.src='${genererAvatar(a.auteur_nom||'U',36)}'"/>
+          <img src="${photoAuteur}" class="author-img" onerror="this.src='${genererAvatar(a.auteur_nom || "U", 36)}'"/>
           <div style="flex:1;">
-            <p style="font-size:13px;font-weight:700;color:#1a1a1a;line-height:1.2;">${escHtml(a.auteur_nom || 'Habitant')}</p>
-            <p style="font-size:11px;color:#906f6d;">${a.auteur_username ? '@'+escHtml(a.auteur_username) : escHtml(a.auteur_quartier||'Bukavu')}</p>
+            <p style="font-size:13px;font-weight:700;color:#1a1a1a;line-height:1.2;">${escHtml(a.auteur_nom || "Habitant")}</p>
+            <p style="font-size:11px;color:#906f6d;">${a.auteur_username ? "@" + escHtml(a.auteur_username) : escHtml(a.auteur_quartier || "Bukavu")}</p>
           </div>
-          ${a.statut === 'resolue' ? '<span style="font-size:10px;font-weight:700;background:#E6FAF5;color:#00C48C;padding:3px 10px;border-radius:100px;">RÉSOLUE</span>' : ''}
+          ${a.statut === "resolue" ? '<span style="font-size:10px;font-weight:700;background:#E6FAF5;color:#00C48C;padding:3px 10px;border-radius:100px;">RÉSOLUE</span>' : ""}
         </div>
         <div style="border-top:1px solid #efecea;padding:10px 16px;display:flex;gap:10px;">
           <button onclick="confirmer('${a.id}','${a.user_id}')" style="flex:1;padding:9px;border-radius:8px;border:none;background:#E6FAF5;color:#00C48C;font-size:12px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .2s;">
@@ -303,191 +771,230 @@
           </button>
         </div>
       </div>`;
-    }
-
-    let rechercheActuelle = '';
-
-    function filtrerAlertesRecherche(val) {
-      rechercheActuelle = val.toLowerCase().trim();
-      const clearBtn = document.getElementById('clearSearchBtn');
-      if (clearBtn) {
-        clearBtn.style.display = rechercheActuelle ? 'flex' : 'none';
       }
-      limit = 20; // Réinitialise la pagination
-      afficherAlertes();
-    }
 
-    function calculerNotificationsNonLues(alertes) {
-      if (!user) return;
-      // Utiliser le timestamp serveur en priorité (multi-navigateur)
-      const lastRead = serverLastReadTime || 0;
-      
-      const quartierUser = user.quartier || '';
-      const nonLues = alertes.filter(a => {
-        const time = new Date(a.created_at).getTime();
-        if (time <= lastRead) return false;
-        
-        // Est-ce critique ou dans mon quartier ?
-        const estCritique = a.urgence === 'critique';
-        const estMonQuartier = quartierUser && a.quartier && a.quartier.toLowerCase() === quartierUser.toLowerCase();
-        
-        return estCritique || estMonQuartier;
-      });
-      
-      const badge = document.getElementById('notifBadge');
-      if (badge) {
-        if (nonLues.length > 0) {
-          badge.textContent = nonLues.length > 99 ? '99+' : nonLues.length;
-          badge.style.display = 'block';
-        } else {
-          badge.style.display = 'none';
+      let rechercheActuelle = "";
+
+      function filtrerAlertesRecherche(val) {
+        rechercheActuelle = val.toLowerCase().trim();
+        const clearBtn = document.getElementById("clearSearchBtn");
+        if (clearBtn) {
+          clearBtn.style.display = rechercheActuelle ? "flex" : "none";
         }
-      }
-    }
-
-    function afficherAlertes() {
-      // Filtrer les alertes
-      let liste = toutesAlertes;
-      if (filtreCatActuel !== 'tous') {
-        liste = liste.filter(a => a.categorie === filtreCatActuel);
-      }
-      if (filtreQuartierActuel !== 'tous') {
-        liste = liste.filter(a => a.quartier === filtreQuartierActuel);
-      }
-      if (rechercheActuelle) {
-        liste = liste.filter(a => 
-          (a.titre && a.titre.toLowerCase().includes(rechercheActuelle)) ||
-          (a.description && a.description.toLowerCase().includes(rechercheActuelle)) ||
-          (a.quartier && a.quartier.toLowerCase().includes(rechercheActuelle)) ||
-          (a.categorie && a.categorie.toLowerCase().includes(rechercheActuelle))
-        );
-      }
-
-      const grid = document.getElementById('alertesGrid');
-      const empty = document.getElementById('emptyState');
-      const pag = document.getElementById('paginationContainer');
-      
-      if (!liste.length) {
-        grid.innerHTML = '';
-        empty.style.display = 'block';
-        pag.style.display = 'none';
-        return;
-      }
-
-      empty.style.display = 'none';
-      
-      // Appliquer la pagination sur la liste filtrée
-      const paginee = liste.slice(0, limit);
-      grid.innerHTML = paginee.map((a, idx) => cardHTML(a, idx)).join('');
-
-      // Afficher/Masquer le bouton voir plus
-      if (liste.length > limit) {
-        pag.style.display = 'block';
-      } else {
-        pag.style.display = 'none';
-      }
-    }
-
-    async function chargerAlertes(silencieux = false) {
-      const ind = document.getElementById('refreshIndicator');
-      if (silencieux && ind) {
-        ind.style.display = 'inline-block';
-        ind.style.opacity = '1';
-      }
-      try {
-        const data = await AB.api('alertes');
-        toutesAlertes = data.alertes || [];
-        calculerNotificationsNonLues(toutesAlertes);
+        limit = 20;
         afficherAlertes();
-      } catch(e) {
-        document.getElementById('alertesGrid').innerHTML = '<p style="color:#906f6d;text-align:center;padding:32px;grid-column:1/-1;">Impossible de charger les alertes</p>';
-      } finally {
-        if (ind) {
-          ind.style.opacity = '0';
-          setTimeout(() => { ind.style.display = 'none'; }, 400);
+      }
+
+      function calculerNotificationsNonLues(alertes) {
+        if (!user) return;
+        const lastRead = serverLastReadTime || 0;
+        const quartierUser = user.quartier || "";
+
+        const nonLues = alertes.filter((a) => {
+          const time = new Date(a.created_at).getTime();
+          if (time <= lastRead) return false;
+
+          const estCritique = a.urgence === "critique";
+          const estMonQuartier =
+            quartierUser &&
+            a.quartier &&
+            a.quartier.toLowerCase() === quartierUser.toLowerCase();
+
+          return estCritique || estMonQuartier;
+        });
+
+        const badge = document.getElementById("notifBadge");
+        if (badge) {
+          if (nonLues.length > 0) {
+            badge.textContent = nonLues.length > 99 ? "99+" : nonLues.length;
+            badge.style.display = "block";
+          } else {
+            badge.style.display = "none";
+          }
         }
       }
-    }
 
-    async function confirmer(id, auteurId) {
-      if (user && auteurId === user.id) { showToast('Vous ne pouvez pas confirmer votre propre alerte', 'warning'); return; }
-      try {
-        const data = await AB.api(`alertes/${id}/confirmer`, 'POST');
-        showToast(data.message);
-        chargerAlertes(true);
-      } catch(e) { showToast(e.message, 'error'); }
-    }
+      function afficherAlertes() {
+        let liste = toutesAlertes;
+        if (filtreCatActuel !== "tous") {
+          liste = liste.filter((a) => a.categorie === filtreCatActuel);
+        }
+        if (filtreQuartierActuel !== "tous") {
+          liste = liste.filter((a) => a.quartier === filtreQuartierActuel);
+        }
+        if (rechercheActuelle) {
+          liste = liste.filter(
+            (a) =>
+              (a.titre && a.titre.toLowerCase().includes(rechercheActuelle)) ||
+              (a.description &&
+                a.description.toLowerCase().includes(rechercheActuelle)) ||
+              (a.quartier &&
+                a.quartier.toLowerCase().includes(rechercheActuelle)) ||
+              (a.categorie &&
+                a.categorie.toLowerCase().includes(rechercheActuelle)),
+          );
+        }
 
-    async function signalerFausse(id, auteurId) {
-      if (user && auteurId === user.id) { showToast('Vous ne pouvez pas signaler votre propre alerte', 'warning'); return; }
-      const r = await showConfirm('Signaler cette alerte ?', 'Vous pensez que cette alerte est fausse ? Après 5 signalements, elle sera suspendue.', 'Oui, signaler', 'warning');
-      if (!r.isConfirmed) return;
-      try {
-        const data = await AB.api(`alertes/${id}/signaler`, 'POST');
-        showToast(data.message);
-        chargerAlertes(true);
-      } catch(e) { showToast(e.message, 'error'); }
-    }
+        const grid = document.getElementById("alertesGrid");
+        const empty = document.getElementById("emptyState");
+        const pag = document.getElementById("paginationContainer");
 
-    // Gestion du scroll pour le bouton scroll-to-top
-    window.addEventListener('scroll', () => {
-      const btn = document.getElementById('scrollToTopBtn');
-      if (window.scrollY > 300) {
-        btn.style.display = 'flex';
-      } else {
-        btn.style.display = 'none';
-      }
-    });
-
-    // Charger d'abord le timestamp serveur, puis les alertes
-    chargerLastReadDepuisServeur().then(() => chargerAlertes());
-    
-    // Auto-refresh automatique toutes les 30s avec indicateur visuel silencieux
-    setInterval(() => chargerAlertes(true), 30000);
-    
-    afficherMenuAdmin();
-
-    function toggleHeaderSearch() {
-      const overlay = document.getElementById('headerSearchOverlay');
-      const input = document.getElementById('headerSearchInput');
-      if (!overlay || !input) return;
-      
-      if (overlay.style.display === 'none') {
-        overlay.style.display = 'flex';
-        setTimeout(() => input.focus(), 100);
-      } else {
-        closeHeaderSearch();
-      }
-    }
-
-    function closeHeaderSearch() {
-      const overlay = document.getElementById('headerSearchOverlay');
-      const input = document.getElementById('headerSearchInput');
-      if (overlay) overlay.style.display = 'none';
-      if (input) {
-        input.value = '';
-        filtrerAlertesRecherche('');
-      }
-    }
-
-    // Modal de détails d'une alerte
-    async function voirDetailsAlerte(id) {
-      try {
-        Swal.fire({ title: 'Chargement...', allowOutsideClick: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
-        const data = await AB.api(`alertes/${id}`);
-        Swal.close();
-        
-        if (!data || !data.alerte) {
-          showToast('Impossible de charger cette alerte.', 'error');
+        if (!liste.length) {
+          grid.innerHTML = "";
+          empty.style.display = "block";
+          pag.style.display = "none";
           return;
         }
 
-        const a = data.alerte;
-        const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
-        const urg = URGENCES[a.urgence] || URGENCES.moyen;
-        const statutLabel = a.statut === 'resolue' ? '<span style="color:#00C48C;font-weight:800;">RÉSOLUE</span>' : `<span style="color:${urg.color};font-weight:800;">ACTIVE (${urg.label})</span>`;
+        empty.style.display = "none";
 
-        let html = `
+        const paginee = liste.slice(0, limit);
+        grid.innerHTML = paginee.map((a, idx) => cardHTML(a, idx)).join("");
+
+        if (liste.length > limit) {
+          pag.style.display = "block";
+        } else {
+          pag.style.display = "none";
+        }
+      }
+
+      async function chargerAlertes(silencieux = false) {
+        const ind = document.getElementById("refreshIndicator");
+        if (silencieux && ind) {
+          ind.style.display = "inline-block";
+          ind.style.opacity = "1";
+        }
+        try {
+          const data = await AB.api("alertes");
+          toutesAlertes = data.alertes || [];
+          calculerNotificationsNonLues(toutesAlertes);
+          afficherAlertes();
+        } catch (e) {
+          document.getElementById("alertesGrid").innerHTML =
+            '<p style="color:#906f6d;text-align:center;padding:32px;grid-column:1/-1;">Impossible de charger les alertes</p>';
+        } finally {
+          if (ind) {
+            ind.style.opacity = "0";
+            setTimeout(() => {
+              ind.style.display = "none";
+            }, 400);
+          }
+        }
+      }
+
+      async function confirmer(id, auteurId) {
+        if (user && auteurId === user.id) {
+          showToast(
+            "Vous ne pouvez pas confirmer votre propre alerte",
+            "warning",
+          );
+          return;
+        }
+        try {
+          const data = await AB.api(`alertes/${id}/confirmer`, "POST");
+          showToast(data.message);
+          chargerAlertes(true);
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      }
+
+      async function signalerFausse(id, auteurId) {
+        if (user && auteurId === user.id) {
+          showToast(
+            "Vous ne pouvez pas signaler votre propre alerte",
+            "warning",
+          );
+          return;
+        }
+        const r = await showConfirm(
+          "Signaler cette alerte ?",
+          "Vous pensez que cette alerte est fausse ? Après 5 signalements, elle sera suspendue.",
+          "Oui, signaler",
+          "warning",
+        );
+        if (!r.isConfirmed) return;
+        try {
+          const data = await AB.api(`alertes/${id}/signaler`, "POST");
+          showToast(data.message);
+          chargerAlertes(true);
+        } catch (e) {
+          showToast(e.message, "error");
+        }
+      }
+
+      window.addEventListener("scroll", () => {
+        const btn = document.getElementById("scrollToTopBtn");
+        if (window.scrollY > 300) {
+          btn.style.display = "flex";
+        } else {
+          btn.style.display = "none";
+        }
+      });
+
+      chargerLastReadDepuisServeur().then(() => chargerAlertes());
+
+      AB.connectSSE((nouvelleAlerte) => {
+        if (!toutesAlertes.some((a) => a.id === nouvelleAlerte.id)) {
+          toutesAlertes.unshift(nouvelleAlerte);
+          calculerNotificationsNonLues(toutesAlertes);
+          afficherAlertes();
+          showToast(`Nouvelle alerte : ${nouvelleAlerte.titre}`, "info");
+        }
+      });
+
+      setInterval(() => chargerAlertes(true), 30000);
+
+      afficherMenuAdmin();
+
+      function toggleHeaderSearch() {
+        const overlay = document.getElementById("headerSearchOverlay");
+        const input = document.getElementById("headerSearchInput");
+        if (!overlay || !input) return;
+
+        if (overlay.style.display === "none") {
+          overlay.style.display = "flex";
+          setTimeout(() => input.focus(), 100);
+        } else {
+          closeHeaderSearch();
+        }
+      }
+
+      function closeHeaderSearch() {
+        const overlay = document.getElementById("headerSearchOverlay");
+        const input = document.getElementById("headerSearchInput");
+        if (overlay) overlay.style.display = "none";
+        if (input) {
+          input.value = "";
+          filtrerAlertesRecherche("");
+        }
+      }
+
+      async function voirDetailsAlerte(id) {
+        try {
+          Swal.fire({
+            title: "Chargement...",
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => Swal.showLoading(),
+          });
+          const data = await AB.api(`alertes/${id}`);
+          Swal.close();
+
+          if (!data || !data.alerte) {
+            showToast("Impossible de charger cette alerte.", "error");
+            return;
+          }
+
+          const a = data.alerte;
+          const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
+          const urg = URGENCES[a.urgence] || URGENCES.moyen;
+          const statutLabel =
+            a.statut === "resolue"
+              ? '<span style="color:#00C48C;font-weight:800;">RÉSOLUE</span>'
+              : `<span style="color:${urg.color};font-weight:800;">ACTIVE (${urg.label})</span>`;
+
+          let html = `
           <div style="text-align:left;font-family:'Plus Jakarta Sans',sans-serif;margin-top:12px;">
             <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
               <span style="padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;background:${urg.bg};color:${urg.color};">${urg.label}</span>
@@ -496,165 +1003,263 @@
             <h3 style="font-size:18px;font-weight:800;color:#1a1a1a;margin-bottom:8px;">${escHtml(a.titre)}</h3>
             <p style="font-size:13px;color:#906f6d;margin-bottom:12px;display:flex;align-items:center;gap:4px;">
               <span class="material-symbols-outlined" style="font-size:16px;color:#840015;">location_on</span>
-              Quartier <strong>${escHtml(a.quartier || 'Bukavu')}</strong>
+              Quartier <strong>${escHtml(a.quartier || "Bukavu")}</strong>
             </p>
             <p style="font-size:14px;color:#5b403e;line-height:1.6;background:#faf8f7;padding:12px;border-radius:8px;border-left:3px solid #ddb8b6;margin-bottom:16px;">
               ${escHtml(a.description)}
             </p>
-            ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.1);" />` : ''}
+            ${a.photo_url ? `<img src="${escHtml(a.photo_url)}" style="width:100%;max-height:220px;object-fit:cover;border-radius:8px;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.1);" />` : ""}
             
-            ${(a.lat && a.lng) ? `
+            ${
+              a.lat && a.lng
+                ? `
             <div style="margin-bottom:16px;border-radius:8px;overflow:hidden;border:1px solid #ddb8b6;">
               <iframe width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy" src="https://maps.google.com/maps?q=${a.lat},${a.lng}&z=15&output=embed"></iframe>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
 
             <div style="border-top:1px solid #efecea;padding-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#906f6d;">
               <div style="flex:1;min-width:0;">
-                <p>Publié par <strong>${escHtml(a.auteur_nom || 'Habitant')}</strong></p>
-                <p style="margin-top:2px;">Le ${new Date(a.created_at).toLocaleString('fr-FR')}</p>
+                <p>Publié par <strong>${escHtml(a.auteur_nom || "Habitant")}</strong></p>
+                <p style="margin-top:2px;">Le ${new Date(a.created_at).toLocaleString("fr-FR")}</p>
               </div>
               <div style="text-align:right;flex-shrink:0;">
                 <p>Statut: ${statutLabel}</p>
                 <p style="margin-top:2px;">${a.nb_confirmations || 0} confirmation(s)</p>
               </div>
             </div>
+
+            <div style="border-top:1px solid #efecea; margin-top:16px; padding-top:12px;">
+              <h4 style="font-size:13px; font-weight:800; color:#1a1a1a; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                <span class="material-symbols-outlined" style="font-size:16px; color:#840015;">chat_bubble</span>
+                Espace d'échange et commentaires
+              </h4>
+              
+              <div id="commentsList" style="max-height:160px; overflow-y:auto; margin-bottom:12px; padding:6px; display:flex; flex-direction:column; gap:8px;" class="no-scrollbar">
+                <p style="font-size:11px; color:#906f6d; text-align:center; padding:10px 0;">Chargement des commentaires...</p>
+              </div>
+              
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input id="newCommentInput" type="text" placeholder="Ajouter un commentaire..." maxlength="500" style="flex:1; height:38px; padding:0 12px; border:1px solid #ddb8b6; border-radius:6px; font-size:12px; font-family:'Plus Jakarta Sans',sans-serif; outline:none;" />
+                <button id="btnSendComment" style="height:38px; padding:0 14px; background:#840015; color:white; border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;">Envoyer</button>
+              </div>
+            </div>
           </div>
         `;
 
-        Swal.fire({
-          html: html,
-          showCancelButton: true,
-          confirmButtonText: 'Confirmer cet incident',
-          cancelButtonText: 'Fermer',
-          confirmButtonColor: '#00C48C',
-          cancelButtonColor: '#efecea',
-          customClass: {
-            cancelButton: 'swal2-cancel-custom'
-          }
-        }).then((result) => {
-          if (result.isConfirmed) {
-            confirmer(a.id, a.user_id);
-          }
-        });
+          Swal.fire({
+            html: html,
+            showCancelButton: true,
+            confirmButtonText: "Confirmer cet incident",
+            cancelButtonText: "Fermer",
+            confirmButtonColor: "#00C48C",
+            cancelButtonColor: "#efecea",
+            customClass: {
+              cancelButton: "swal2-cancel-custom",
+            },
+            didOpen: () => {
+              chargerCommentairesDetails(a.id);
 
-      } catch (e) {
-        Swal.close();
-        showToast('Erreur : ' + e.message, 'error');
-      }
-    }
-
-    // Gestion du tiroir de notifications
-    let notifsOpen = false;
-    function toggleNotifications(event) {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      const drawer = document.getElementById('notifDrawer');
-      const overlay = document.getElementById('drawerOverlay');
-      if (!drawer || !overlay) return;
-      
-      if (!notifsOpen) {
-        drawer.style.display = 'flex';
-        overlay.style.display = 'block';
-        // force layout trigger for transition
-        drawer.offsetHeight;
-        drawer.classList.add('open');
-        overlay.style.opacity = '1';
-        notifsOpen = true;
-        
-        // Effacer le compteur immédiatement (en prenant la date maximale pour pallier la dérive d'horloge)
-        let maxTime = Date.now();
-        if (toutesAlertes && toutesAlertes.length > 0) {
-          const times = toutesAlertes.map(a => new Date(a.created_at).getTime());
-          maxTime = Math.max(...times, maxTime);
+              const sendBtn = document.getElementById("btnSendComment");
+              const input = document.getElementById("newCommentInput");
+              if (sendBtn && input) {
+                sendBtn.onclick = () => soumettreCommentaire(a.id);
+                input.onkeydown = (e) => {
+                  if (e.key === "Enter") {
+                    soumettreCommentaire(a.id);
+                  }
+                };
+              }
+            },
+          }).then((result) => {
+            if (result.isConfirmed) {
+              confirmer(a.id, a.user_id);
+            }
+          });
+        } catch (e) {
+          Swal.close();
+          showToast("Erreur : " + e.message, "error");
         }
-        const nowStr = new Date(maxTime).toISOString();
-        localStorage.setItem('ab_last_read_notifs', nowStr);
-        serverLastReadTime = maxTime;
-        const badge = document.getElementById('notifBadge');
-        if (badge) badge.style.display = 'none';
-        // Persister en base (multi-navigateur)
-        AB.api('auth/notifications/mark-read', 'PUT').catch(() => {});
-        
-        // Charger les notifications dans le tiroir
-        chargerNotificationsDrawer();
-      } else {
-        drawer.classList.remove('open');
-        overlay.style.opacity = '0';
-        setTimeout(() => {
-          drawer.style.display = 'none';
-          overlay.style.display = 'none';
-        }, 350);
-        notifsOpen = false;
       }
-    }
 
-    async function chargerNotificationsDrawer() {
-      const container = document.getElementById('notifDrawerContent');
-      if (!container) return;
-      
-      container.innerHTML = `
+      async function chargerCommentairesDetails(alertId) {
+        const container = document.getElementById("commentsList");
+        if (!container) return;
+        try {
+          const data = await AB.api(`alertes/${alertId}/commentaires`);
+          const list = data.commentaires || [];
+          if (list.length === 0) {
+            container.innerHTML = `<p style="font-size:11px; color:#906f6d; text-align:center; padding:10px 0;">Aucun commentaire. Soyez le premier à réagir !</p>`;
+            return;
+          }
+
+          container.innerHTML = list
+            .map((c) => {
+              const photo = getPhotoUrl(
+                { photoUrl: c.photo_auteur, nom: c.auteur_nom },
+                24,
+              );
+              return `
+            <div style="display:flex; gap:8px; text-align:left; background:#faf8f7; padding:8px; border-radius:6px; border:1px solid #efecea;">
+              <img src="${photo}" style="width:24px; height:24px; border-radius:50%; object-fit:cover;" onerror="this.src='${genererAvatar(c.auteur_nom || "U", 24)}'" />
+              <div style="flex:1; min-width:0;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:2px;">
+                  <span style="font-weight:700; color:#1a1a1a;">${escHtml(c.auteur_nom)}</span>
+                  <span style="color:#906f6d;">${tempsRelatif(c.created_at)}</span>
+                </div>
+                <p style="font-size:11.5px; color:#5b403e; line-height:1.4; margin:0; word-break:break-word;">${escHtml(c.contenu)}</p>
+              </div>
+            </div>
+          `;
+            })
+            .join("");
+
+          container.scrollTop = container.scrollHeight;
+        } catch (err) {
+          container.innerHTML = `<p style="font-size:11px; color:#FF3D71; text-align:center;">Erreur de chargement des commentaires</p>`;
+        }
+      }
+
+      async function soumettreCommentaire(alertId) {
+        const input = document.getElementById("newCommentInput");
+        const btn = document.getElementById("btnSendComment");
+        if (!input || !btn) return;
+
+        const val = input.value.trim();
+        if (!val) return;
+
+        btn.disabled = true;
+        btn.textContent = "...";
+        try {
+          await AB.api(`alertes/${alertId}/commentaires`, "POST", {
+            contenu: val,
+          });
+          input.value = "";
+          chargerCommentairesDetails(alertId);
+        } catch (err) {
+          showToast(err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Envoyer";
+        }
+      }
+
+      let notifsOpen = false;
+      function toggleNotifications(event) {
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        const drawer = document.getElementById("notifDrawer");
+        const overlay = document.getElementById("drawerOverlay");
+        if (!drawer || !overlay) return;
+
+        if (!notifsOpen) {
+          drawer.style.display = "flex";
+          overlay.style.display = "block";
+          drawer.offsetHeight;
+          drawer.classList.add("open");
+          overlay.style.opacity = "1";
+          notifsOpen = true;
+
+          let maxTime = Date.now();
+          if (toutesAlertes && toutesAlertes.length > 0) {
+            const times = toutesAlertes.map((a) =>
+              new Date(a.created_at).getTime(),
+            );
+            maxTime = Math.max(...times, maxTime);
+          }
+          const nowStr = new Date(maxTime).toISOString();
+          localStorage.setItem("ab_last_read_notifs", nowStr);
+          serverLastReadTime = maxTime;
+          const badge = document.getElementById("notifBadge");
+          if (badge) badge.style.display = "none";
+          AB.api("auth/notifications/mark-read", "PUT").catch(() => {});
+
+          chargerNotificationsDrawer();
+        } else {
+          drawer.classList.remove("open");
+          overlay.style.opacity = "0";
+          setTimeout(() => {
+            drawer.style.display = "none";
+            overlay.style.display = "none";
+          }, 350);
+          notifsOpen = false;
+        }
+      }
+
+      async function chargerNotificationsDrawer() {
+        const container = document.getElementById("notifDrawerContent");
+        if (!container) return;
+
+        container.innerHTML = `
         <div style="text-align:center;padding:40px 0;">
           <span class="spinner" style="border-top-color:#840015;"></span>
           <p style="color:#906f6d;font-size:13px;margin-top:8px;">Chargement...</p>
         </div>`;
-        
-      try {
-        const data = await AB.api('alertes');
-        const alertes = data.alertes || [];
-        const quartierUser = user?.quartier || '';
-        
-        // Filtrer les alertes critiques et du quartier de l'utilisateur
-        const critiques = alertes.filter(a => a.urgence === 'critique');
-        const quartierAlertes = alertes.filter(a => 
-          quartierUser && 
-          a.quartier && 
-          a.quartier.toLowerCase() === quartierUser.toLowerCase() && 
-          a.urgence !== 'critique'
-        );
-        
-        if (critiques.length === 0 && quartierAlertes.length === 0) {
-          container.innerHTML = `
+
+        try {
+          const data = await AB.api("alertes");
+          const alertes = data.alertes || [];
+          const quartierUser = user?.quartier || "";
+
+          const critiques = alertes.filter((a) => a.urgence === "critique");
+          const quartierAlertes = alertes.filter(
+            (a) =>
+              quartierUser &&
+              a.quartier &&
+              a.quartier.toLowerCase() === quartierUser.toLowerCase() &&
+              a.urgence !== "critique",
+          );
+
+          if (critiques.length === 0 && quartierAlertes.length === 0) {
+            container.innerHTML = `
             <div style="text-align:center;padding:40px 20px;">
               <span class="material-symbols-outlined" style="font-size:48px;color:#ddb8b6;">notifications_off</span>
               <p style="color:#1a1a1a;font-weight:700;margin-top:12px;margin-bottom:4px;">Aucune notification</p>
               <p style="color:#906f6d;font-size:13px;margin:0;">Aucune alerte critique récente ou alerte dans votre quartier.</p>
             </div>`;
-          return;
-        }
-        
-        let html = '';
-        
-        if (critiques.length > 0) {
-          html += `<div style="font-weight:800;font-size:11px;color:#ba1a1a;margin:12px 0 8px;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:16px;">campaign</span>Alertes Critiques</div>`;
-          html += critiques.slice(0, 5).map(a => renderNotifRow(a)).join('');
-        }
-        
-        if (quartierAlertes.length > 0) {
-          html += `<div style="font-weight:800;font-size:11px;color:#840015;margin:18px 0 8px;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:16px;">location_on</span>Dans votre quartier (${escHtml(quartierUser)})</div>`;
-          html += quartierAlertes.slice(0, 8).map(a => renderNotifRow(a)).join('');
-        }
-        
-        container.innerHTML = html;
-      } catch (e) {
-        container.innerHTML = `<p style="color:#906f6d;font-size:13px;text-align:center;padding:20px 0;">Erreur de chargement des notifications.</p>`;
-      }
-    }
+            return;
+          }
 
-    function renderNotifRow(a) {
-      const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
-      const urg = URGENCES[a.urgence] || URGENCES.moyen;
-      const lastReadStr = localStorage.getItem('ab_last_read_notifs');
-      // Pour afficher le style non-lu de manière réaliste, on vérifie la date du clic d'avant
-      // (on soustrait 1.5s pour que la notif qui vient de déclencher l'ouverture apparaisse comme non-lue si elle l'était)
-      const lastReadTime = lastReadStr ? new Date(lastReadStr).getTime() - 1500 : 0;
-      const createdTime = new Date(a.created_at).getTime();
-      const estNouveau = createdTime > lastReadTime;
-      const unreadClass = estNouveau ? 'unread' : '';
-      
-      return `
+          let html = "";
+
+          if (critiques.length > 0) {
+            html += `<div style="font-weight:800;font-size:11px;color:#ba1a1a;margin:12px 0 8px;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:16px;">campaign</span>Alertes Critiques</div>`;
+            html += critiques
+              .slice(0, 5)
+              .map((a) => renderNotifRow(a))
+              .join("");
+          }
+
+          if (quartierAlertes.length > 0) {
+            html += `<div style="font-weight:800;font-size:11px;color:#840015;margin:18px 0 8px;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:16px;">location_on</span>Dans votre quartier (${escHtml(quartierUser)})</div>`;
+            html += quartierAlertes
+              .slice(0, 8)
+              .map((a) => renderNotifRow(a))
+              .join("");
+          }
+
+          container.innerHTML = html;
+        } catch (e) {
+          container.innerHTML = `<p style="color:#906f6d;font-size:13px;text-align:center;padding:20px 0;">Erreur de chargement des notifications.</p>`;
+        }
+      }
+
+      function renderNotifRow(a) {
+        const cat = CATEGORIES[a.categorie] || CATEGORIES.autre;
+        const urg = URGENCES[a.urgence] || URGENCES.moyen;
+        const lastReadStr = localStorage.getItem("ab_last_read_notifs");
+        const lastReadTime = lastReadStr
+          ? new Date(lastReadStr).getTime() - 1500
+          : 0;
+        const createdTime = new Date(a.created_at).getTime();
+        const estNouveau = createdTime > lastReadTime;
+        const unreadClass = estNouveau ? "unread" : "";
+
+        return `
         <div class="notif-row ${unreadClass}" onclick="toggleNotifications(); voirDetailsAlerte('${a.id}')" style="margin-bottom:8px;">
           <div style="width:8px;height:8px;border-radius:50%;background:${urg.color};margin-top:6px;flex-shrink:0;"></div>
           <div style="flex:1;min-width:0;text-align:left;">
@@ -667,12 +1272,12 @@
               <span style="font-size:9px;font-weight:700;background:${cat.bg};color:${cat.color};padding:2px 6px;border-radius:4px;">${cat.label}</span>
               <span style="font-size:10px;color:#906f6d;display:flex;align-items:center;gap:2px;">
                 <span class="material-symbols-outlined" style="font-size:11px;color:#840015;">location_on</span>
-                ${escHtml(a.quartier || 'Bukavu')}
+                ${escHtml(a.quartier || "Bukavu")}
               </span>
             </div>
           </div>
         </div>`;
-    }
-  </script>
-</body>
+      }
+    </script>
+  </body>
 </html>
