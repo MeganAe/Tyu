@@ -414,61 +414,6 @@
         style="margin-bottom: 24px; padding: 12px; display: block"
         id="mapSection"
       >
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-          "
-        >
-          <h3
-            style="
-              font-size: 14px;
-              font-weight: 800;
-              color: #1a1a1a;
-              display: flex;
-              align-items: center;
-              gap: 6px;
-              margin: 0;
-            "
-          >
-            <span
-              class="material-symbols-outlined"
-              style="color: #840015; font-size: 20px"
-              >map</span
-            >
-            Carte de vigilance
-          </h3>
-          <button
-            onclick="toggleMapVisibility()"
-            id="btnToggleMap"
-            style="
-              background: none;
-              border: none;
-              color: #840015;
-              font-size: 12px;
-              font-weight: 700;
-              cursor: pointer;
-              font-family: &quot;Plus Jakarta Sans&quot;, sans-serif;
-            "
-          >
-            Afficher la carte
-          </button>
-        </div>
-        <div
-          id="map"
-          style="
-            height: 300px;
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid #ddb8b6;
-            position: relative;
-            display: none;
-          "
-        ></div>
-      </div>
-
       <div
         id="alertesGrid"
         style="
@@ -811,23 +756,6 @@
             markerGroup.addLayer(marker);
           }
         });
-      }
-
-      function toggleMapVisibility() {
-        const btn = document.getElementById("btnToggleMap");
-        const mapContainer = document.getElementById("map");
-
-        const isClosed = getComputedStyle(mapContainer).display === "none";
-        if (isClosed) {
-          mapContainer.style.display = "block";
-          btn.textContent = "Masquer la carte";
-          if (map) {
-            setTimeout(() => map.invalidateSize(), 150);
-          }
-        } else {
-          mapContainer.style.display = "none";
-          btn.textContent = "Afficher la carte";
-        }
       }
 
       function filtrerParQuartier(quartier) {
