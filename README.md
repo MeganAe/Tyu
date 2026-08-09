@@ -1,6 +1,6 @@
 # ALERT BUKAVU
 
-<h1>Membres : </h1>
+<h3>Membres : </h3>
 <a>
     <li> Fataki Byambese Marie Anne </li>
     <li>Fataki ilonge </li>
