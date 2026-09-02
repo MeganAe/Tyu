@@ -466,47 +466,63 @@ function buildNeighborhoodNotificationHTML(alert) {
   `;
 }
 
-function buildForgotPasswordHTML(user, tempPassword) {
+function buildRevocationEmailHTML(alert, reason = "Signalée comme non fondée / fausse alerte") {
+  const formattedDate = new Date().toLocaleDateString("fr-FR", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return `
     <div style="background-color: #f8fafc; padding: 40px 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-      <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;">
-        <div style="height: 6px; background-color: #840015;"></div>
+      <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #fee2e2;">
+        <div style="height: 6px; background-color: #dc2626;"></div>
         <div style="padding: 36px;">
-          <div style="margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between;">
+          <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
             <span style="font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">
               AlertBukavu
             </span>
-            <span style="background-color: #fee2e2; color: #840015; border: 1px solid #fecdd3; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
-              Securité
+            <span style="background-color: #fee2e2; color: #dc2626; border: 1px solid #fecdd3; padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">
+              Avis d'Annulation
             </span>
           </div>
-          <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; line-height: 1.3; margin: 0 0 16px 0; letter-spacing: -0.01em;">
-            Réinitialisation de votre mot de passe
+          <h2 style="font-size: 20px; font-weight: 800; color: #dc2626; line-height: 1.3; margin: 0 0 16px 0;">
+            ANNULATION : Incident suspendu (Fausse alerte)
           </h2>
-          <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 16px 0;">
-            Bonjour ${escHtml(user.nom)},
-          </p>
-          <p style="font-size: 14px; line-height: 1.6; color: #334155; margin: 0 0 20px 0;">
-            Comme demandé, vous trouverez ci-dessous votre mot de passe temporaire pour vous connecter à la plateforme AlertBukavu.
-          </p>
-          <div style="text-align: center; margin: 24px 0;">
-            <div style="background-color: #f1f5f9; border: 1px dashed #cbd5e1; padding: 16px 24px; border-radius: 12px; font-family: 'Courier New', Courier, monospace; font-size: 22px; color: #0f172a; display: inline-block; letter-spacing: 2px; font-weight: 800; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
-              ${tempPassword}
-            </div>
+          <div style="background-color: #fef2f2; border: 1px solid #fee2e2; border-radius: 12px; padding: 16px; margin-bottom: 20px; color: #991b1b; font-size: 13px; line-height: 1.5;">
+            L'incident préalablement transmis a été <strong>suspendu</strong> par le système de vigilance suite aux signalements concordants de riverains ou à une modération. Aucune intervention n'est requise.
           </div>
-          <div style="background-color: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 16px; margin: 24px 0; color: #b45309; font-size: 13px; font-weight: 500; line-height: 1.5;">
-            Information importante : Veuillez utiliser ce code de secours pour votre prochaine authentification, puis modifiez immédiatement votre mot de passe dans l'onglet Profil afin de préserver l'accès à votre compte.
+          <div style="background-color: #f8fafc; border: 1px solid #f1f5f9; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td width="50%" style="padding-bottom: 8px;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase;">Titre initial</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155;">${escHtml(alert.titre)}</span>
+                </td>
+                <td width="50%" style="padding-bottom: 8px;">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase;">Quartier</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155;">${escHtml(alert.quartier)}</span>
+                </td>
+              </tr>
+              <tr>
+                <td width="50%">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase;">Statut</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #dc2626;">Suspendue / Annulée</span>
+                </td>
+                <td width="50%">
+                  <span style="display: block; font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase;">Date d'annulation</span>
+                  <span style="font-size: 13px; font-weight: 700; color: #334155;">${formattedDate}</span>
+                </td>
+              </tr>
+            </table>
           </div>
-          <p style="font-size: 13px; line-height: 1.6; color: #64748b; margin: 0;">
-            Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer ce message de sécurité.
-          </p>
         </div>
-        <div style="background-color: #f8fafc; border-top: 1px solid #f1f5f9; padding: 24px 36px; text-align: center;">
-          <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0 0 8px 0;">
-            Ce message de sécurité est envoyé automatiquement à la demande de l'utilisateur.
-          </p>
-          <p style="font-size: 10px; color: #cbd5e1; margin: 0; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">
-            AlertBukavu — Bukavu, RDC
+        <div style="background-color: #f8fafc; border-top: 1px solid #f1f5f9; padding: 20px 36px; text-align: center;">
+          <p style="font-size: 11px; line-height: 1.5; color: #94a3b8; margin: 0;">
+            Ce message rectificatif est transmis automatiquement par AlertBukavu pour éviter tout déplacement inutile des services de secours.
           </p>
         </div>
       </div>
@@ -906,52 +922,6 @@ app.put("/api/auth/notifications/mark-read", verifyToken, async (req, res) => {
   }
 });
 
-app.post("/api/auth/forgot-password", async (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ error: "Email requis" });
-
-  try {
-    const { data: user, error } = await dbQuery(
-      supabase
-        .from("users")
-        .select("id, nom")
-        .eq("email", email.toLowerCase())
-        .maybeSingle(),
-    );
-
-    if (error || !user) {
-      return res.json({
-        message:
-          "Si cet email est enregistré, vous recevrez un mot de passe temporaire sous peu.",
-      });
-    }
-
-    const tempPassword =
-      Math.random().toString(36).slice(-8) +
-      "AB" +
-      Math.floor(Math.random() * 100);
-    const password_hash = await bcrypt.hash(tempPassword, 12);
-
-    await dbQuery(
-      supabase.from("users").update({ password_hash }).eq("id", user.id),
-    );
-
-    await getTransporter().sendMail({
-      from: `"AlertBukavu" <${MAIL_USER}>`,
-      to: email.toLowerCase(),
-      subject: `Mot de passe temporaire — AlertBukavu`,
-      html: buildForgotPasswordHTML(user, tempPassword),
-    });
-
-    return res.json({
-      message:
-        "Si cet email est enregistré, vous recevrez un mot de passe temporaire sous peu.",
-    });
-  } catch (err) {
-    return handleError(res, err, "Erreur de réinitialisation de mot de passe");
-  }
-});
-
 app.get("/api/alertes", verifyToken, async (req, res) => {
   try {
     let baseQuery = supabase
@@ -1027,53 +997,44 @@ app.get("/api/alertes/:id", verifyToken, async (req, res) => {
   }
 });
 
-app.get("/api/alertes/quartier/:quartier", verifyToken, async (req, res) => {
-  try {
-    const { quartier } = req.params;
-    if (!ALLOWED_QUARTIERS.includes(quartier))
-      return res.status(400).json({ error: "Quartier invalide" });
-
-    const { data: alertes, error } = await dbQuery(
-      supabase
-        .from("alertes")
-        .select("*, users(nom, username, quartier, photo_url)")
-        .eq("quartier", quartier)
-        .neq("statut", "suspendue")
-        .order("created_at", { ascending: false }),
-    );
-
-    if (error) throw error;
-
-    const formatted = (alertes || []).map((a) => ({
-      ...a,
-      auteur_nom: a.users?.nom || "Habitant",
-      auteur_username: a.users?.username || null,
-      auteur_quartier: a.users?.quartier || "",
-      photo_auteur: a.users?.photo_url || null,
-    }));
-    return res.json({ alertes: formatted });
-  } catch (err) {
-    return handleError(res, err, "Impossible de filtrer par quartier");
-  }
-});
-
 let clientsSSE = [];
 
 app.get("/api/alertes/flux", verifyToken, (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
   res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+
+  if (typeof res.flushHeaders === "function") {
+    res.flushHeaders();
+  }
+
+  res.write("event: init\ndata: connected\n\n");
 
   clientsSSE.push(res);
 
+  const heartbeat = setInterval(() => {
+    try {
+      res.write(": keep-alive\n\n");
+    } catch {
+      clearInterval(heartbeat);
+    }
+  }, 25000);
+
   req.on("close", () => {
+    clearInterval(heartbeat);
     clientsSSE = clientsSSE.filter((client) => client !== res);
   });
 });
 
 function diffuserNouvelleAlerte(alerte) {
+  const payload = `data: ${JSON.stringify({ alerte })}\n\n`;
   clientsSSE.forEach((client) => {
-    client.write(`data: ${JSON.stringify({ alerte })}\n\n`);
+    try {
+      client.write(payload);
+    } catch (e) {
+      console.warn("Erreur envoi SSE:", e.message);
+    }
   });
 }
 
@@ -1219,15 +1180,17 @@ app.post("/api/alertes", verifyToken, alertPublishLimiter, async (req, res) => {
 
     diffuserNouvelleAlerte(outputAlerte);
 
-    try {
-      await getTransporter().sendMail({
-        from: `"AlertBukavu" <${MAIL_USER}>`,
-        to: AUTHORITY_EMAILS,
-        subject: `[VIGILANCE] ${categorie.toUpperCase()} — ${titre}`,
-        html: buildEmailHTML(alerte, req.user.nom),
-      });
-    } catch (e) {
-      console.error(e.message);
+    if (alerte.urgence === "critique") {
+      try {
+        await getTransporter().sendMail({
+          from: `"AlertBukavu" <${MAIL_USER}>`,
+          to: AUTHORITY_EMAILS,
+          subject: `🚨 [URGENCE CRITIQUE] ${categorie.toUpperCase()} — ${titre}`,
+          html: buildEmailHTML(alerte, req.user.nom),
+        });
+      } catch (e) {
+        console.error("Erreur envoi email autorite critique:", e.message);
+      }
     }
 
     return res
@@ -1235,76 +1198,6 @@ app.post("/api/alertes", verifyToken, alertPublishLimiter, async (req, res) => {
       .json({ alerte: outputAlerte, message: "Alerte publiée avec succès" });
   } catch (err) {
     return handleError(res, err, "Erreur lors de la publication de l'alerte");
-  }
-});
-
-app.put("/api/alertes/:id", verifyToken, async (req, res) => {
-  try {
-    const { titre, description, categorie, quartier, urgence } = req.body;
-
-    if (!titre || !description || !categorie || !quartier) {
-      return res.status(400).json({ error: "Champs requis manquants" });
-    }
-
-    if (titre.length > 80)
-      return res.status(400).json({ error: "Le titre dépasse 80 caractères." });
-    if (description.length > 500)
-      return res
-        .status(400)
-        .json({ error: "La description dépasse 500 caractères." });
-    if (!ALLOWED_CATEGORIES.includes(categorie))
-      return res.status(400).json({ error: "Catégorie invalide" });
-    if (!ALLOWED_QUARTIERS.includes(quartier))
-      return res.status(400).json({ error: "Quartier invalide" });
-
-    const { data: alerte, error: fetchErr } = await dbQuery(
-      supabase
-        .from("alertes")
-        .select("*")
-        .eq("id", req.params.id)
-        .maybeSingle(),
-    );
-    if (fetchErr || !alerte)
-      return res.status(404).json({ error: "Alerte introuvable" });
-
-    if (alerte.user_id !== req.user.id) {
-      return res
-        .status(403)
-        .json({ error: "Vous n'êtes pas l'auteur de cette alerte." });
-    }
-
-    const ageMs = Date.now() - new Date(alerte.created_at).getTime();
-    if (ageMs > 15 * 60 * 1000) {
-      return res
-        .status(400)
-        .json({
-          error: "La limite de modification de 15 minutes est dépassée.",
-        });
-    }
-
-    const { data: updated, error: updateErr } = await dbQuery(
-      supabase
-        .from("alertes")
-        .update({
-          titre,
-          description,
-          categorie,
-          quartier,
-          urgence: urgence || alerte.urgence,
-        })
-        .eq("id", req.params.id)
-        .select()
-        .single(),
-    );
-
-    if (updateErr || !updated)
-      return res.status(500).json({ error: "Erreur lors de la modification" });
-    return res.json({
-      alerte: updated,
-      message: "Alerte modifiée avec succès",
-    });
-  } catch (err) {
-    return handleError(res, err, "Erreur de modification");
   }
 });
 
@@ -1363,7 +1256,7 @@ app.post("/api/alertes/:id/confirmer", verifyToken, async (req, res) => {
     const { data: alerte, error: fetchErr } = await dbQuery(
       supabase
         .from("alertes")
-        .select("user_id, nb_confirmations")
+        .select("*")
         .eq("id", alertId)
         .maybeSingle(),
     );
@@ -1395,12 +1288,26 @@ app.post("/api/alertes/:id/confirmer", verifyToken, async (req, res) => {
         .insert([{ alerte_id: alertId, user_id: req.user.id }]),
     );
 
+    const nouveauNbConf = (alerte.nb_confirmations || 0) + 1;
     await dbQuery(
       supabase
         .from("alertes")
-        .update({ nb_confirmations: (alerte.nb_confirmations || 0) + 1 })
+        .update({ nb_confirmations: nouveauNbConf })
         .eq("id", alertId),
     );
+
+    if (nouveauNbConf === 2 && alerte.urgence !== "critique" && alerte.statut !== "suspendue") {
+      try {
+        await getTransporter().sendMail({
+          from: `"AlertBukavu" <${MAIL_USER}>`,
+          to: AUTHORITY_EMAILS,
+          subject: `[CONFIRMÉ PAR RIVERAINS] ${alerte.categorie.toUpperCase()} — ${alerte.titre} (${alerte.quartier})`,
+          html: buildEmailHTML(alerte, "Citoyens vérifiés de " + alerte.quartier),
+        });
+      } catch (e) {
+        console.error("Erreur envoi email autorite confirme:", e.message);
+      }
+    }
 
     return res.json({ message: "Confirmation enregistrée" });
   } catch (err) {
@@ -1411,10 +1318,28 @@ app.post("/api/alertes/:id/confirmer", verifyToken, async (req, res) => {
 app.post("/api/alertes/:id/signaler", verifyToken, async (req, res) => {
   const alertId = req.params.id;
   try {
+    const { data: userVotant } = await dbQuery(
+      supabase
+        .from("users")
+        .select("created_at")
+        .eq("id", req.user.id)
+        .single(),
+    );
+
+    if (userVotant && userVotant.created_at) {
+      const ageCompteMs = Date.now() - new Date(userVotant.created_at).getTime();
+      if (ageCompteMs < 10 * 60 * 1000) {
+        return res.status(403).json({
+          error:
+            "Votre compte doit avoir au moins 10 minutes d'ancienneté pour pouvoir signaler une alerte.",
+        });
+      }
+    }
+
     const { data: alerte, error: fetchErr } = await dbQuery(
       supabase
         .from("alertes")
-        .select("user_id, nb_signalements")
+        .select("*")
         .eq("id", alertId)
         .maybeSingle(),
     );
@@ -1447,9 +1372,12 @@ app.post("/api/alertes/:id/signaler", verifyToken, async (req, res) => {
     );
 
     const nouveauNb = (alerte.nb_signalements || 0) + 1;
+    const nbConfirmations = alerte.nb_confirmations || 0;
     const update = { nb_signalements: nouveauNb };
 
-    if (nouveauNb >= 5) {
+    const doitSuspendre = nouveauNb >= 5 && nouveauNb > 2 * nbConfirmations;
+
+    if (doitSuspendre) {
       update.statut = "suspendue";
       const { data: auteur } = await dbQuery(
         supabase
@@ -1465,15 +1393,34 @@ app.post("/api/alertes/:id/signaler", verifyToken, async (req, res) => {
           .update({ nb_fausses_alertes: nbFausses, est_bloque: nbFausses >= 3 })
           .eq("id", alerte.user_id),
       );
+
+      if (alerte.urgence === "critique" || nbConfirmations >= 2) {
+        try {
+          await getTransporter().sendMail({
+            from: `"AlertBukavu" <${MAIL_USER}>`,
+            to: AUTHORITY_EMAILS,
+            subject: `[ANNULATION] Fausse alerte suspendue — ${alerte.titre}`,
+            html: buildRevocationEmailHTML(
+              alerte,
+              "Suspendue suite à des signalements de riverains",
+            ),
+          });
+        } catch (e) {
+          console.error("Erreur envoi révocation email:", e.message);
+        }
+      }
     }
 
     await dbQuery(supabase.from("alertes").update(update).eq("id", alertId));
 
+    if (doitSuspendre) {
+      return res.json({
+        message: "Alerte suspendue après signalements concordants.",
+      });
+    }
+
     return res.json({
-      message:
-        nouveauNb >= 5
-          ? "Alerte suspendue après 5 signalements"
-          : `Signalement enregistré (${nouveauNb}/5)`,
+      message: `Signalement enregistré (${nouveauNb} signalement(s) / ${nbConfirmations} confirmation(s))`,
     });
   } catch (err) {
     return handleError(res, err, "Erreur lors du signalement");
@@ -1500,10 +1447,30 @@ app.put(
         }
       }
 
+      const { data: alerteExistante } = await dbQuery(
+        supabase.from("alertes").select("*").eq("id", req.params.id).maybeSingle(),
+      );
+
       const { error } = await dbQuery(
         supabase.from("alertes").update(updateObj).eq("id", req.params.id),
       );
       if (error) throw error;
+
+      if (statut === "suspendue" && alerteExistante) {
+        if (alerteExistante.urgence === "critique" || (alerteExistante.nb_confirmations || 0) >= 2) {
+          try {
+            await getTransporter().sendMail({
+              from: `"AlertBukavu" <${MAIL_USER}>`,
+              to: AUTHORITY_EMAILS,
+              subject: `[ANNULATION] Fausse alerte suspendue par la modération — ${alerteExistante.titre}`,
+              html: buildRevocationEmailHTML(alerteExistante, "Suspendue manuellement par l'administration après vérification"),
+            });
+          } catch (e) {
+            console.error("Erreur envoi révocation admin:", e.message);
+          }
+        }
+      }
+
       return res.json({ message: "Statut mis à jour" });
     } catch (err) {
       return handleError(res, err, "Erreur de mise à jour du statut");
@@ -1760,34 +1727,6 @@ app.delete(
       return res.json({ message: "Utilisateur supprimé avec succès" });
     } catch (err) {
       return handleError(res, err, "Erreur de suppression de l'utilisateur");
-    }
-  },
-);
-
-app.get(
-  "/api/admin/alertes/:id/preview-email",
-  verifyToken,
-  requireAdmin,
-  async (req, res) => {
-    try {
-      const { data: alerte, error: fetchErr } = await dbQuery(
-        supabase
-          .from("alertes")
-          .select("*")
-          .eq("id", req.params.id)
-          .maybeSingle(),
-      );
-      if (fetchErr || !alerte)
-        return res.status(404).json({ error: "Alerte introuvable" });
-
-      const html = buildNeighborhoodNotificationHTML(alerte);
-      return res.json({ html });
-    } catch (err) {
-      return handleError(
-        res,
-        err,
-        "Erreur de prévisualisation de la notification",
-      );
     }
   },
 );
