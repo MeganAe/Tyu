@@ -80,3 +80,48 @@ self.addEventListener("fetch", (event) => {
       }),
   );
 });
+
+self.addEventListener("push", (event) => {
+  let data = {};
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch {
+      data = { title: "AlertBukavu", body: event.data.text() };
+    }
+  }
+  const title = data.title || "AlertBukavu";
+  const options = {
+    body: data.body || "Nouvelle notification de sécurité",
+    icon: "/logo.png",
+    badge: "/logo.png",
+    data: data.data || {},
+    tag: data.tag || "alertbukavu-notif",
+    vibrate: [200, 100, 200],
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const alertId = event.notification.data && event.notification.data.id;
+  const targetPath = alertId ? `/index.html?alerte=${alertId}` : "/index.html";
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        for (const client of clientList) {
+          if (client.url && "focus" in client) {
+            if (alertId && client.postMessage) {
+              client.postMessage({ type: "OPEN_ALERT", alertId });
+            }
+            return client.focus();
+          }
+        }
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(targetPath);
+        }
+      }),
+  );
+});

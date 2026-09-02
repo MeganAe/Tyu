@@ -788,19 +788,12 @@
       function calculerNotificationsNonLues(alertes) {
         if (!user) return;
         const lastRead = serverLastReadTime || 0;
-        const quartierUser = user.quartier || "";
+        const quartierUser = (user.quartier || "").toLowerCase();
 
         const nonLues = alertes.filter((a) => {
           const time = new Date(a.created_at).getTime();
           if (time <= lastRead) return false;
-
-          const estCritique = a.urgence === "critique";
-          const estMonQuartier =
-            quartierUser &&
-            a.quartier &&
-            a.quartier.toLowerCase() === quartierUser.toLowerCase();
-
-          return estCritique || estMonQuartier;
+          return true;
         });
 
         const badge = document.getElementById("notifBadge");
@@ -869,6 +862,9 @@
           toutesAlertes = data.alertes || [];
           calculerNotificationsNonLues(toutesAlertes);
           afficherAlertes();
+          if (notifsOpen) {
+            chargerNotificationsDrawer();
+          }
         } catch (e) {
           document.getElementById("alertesGrid").innerHTML =
             '<p style="color:#906f6d;text-align:center;padding:32px;grid-column:1/-1;">Impossible de charger les alertes</p>';
@@ -932,14 +928,25 @@
         }
       });
 
-      chargerLastReadDepuisServeur().then(() => chargerAlertes());
+      chargerLastReadDepuisServeur().then(() => {
+        chargerAlertes().then(() => {
+          const urlParams = new URLSearchParams(window.location.search);
+          const alerteIdParam = urlParams.get("alerte");
+          if (alerteIdParam) {
+            voirDetailsAlerte(alerteIdParam);
+          }
+        });
+      });
 
       AB.connectSSE((nouvelleAlerte) => {
         if (!toutesAlertes.some((a) => a.id === nouvelleAlerte.id)) {
           toutesAlertes.unshift(nouvelleAlerte);
           calculerNotificationsNonLues(toutesAlertes);
           afficherAlertes();
-          showToast(`Nouvelle alerte : ${nouvelleAlerte.titre}`, "info");
+          if (notifsOpen) {
+            chargerNotificationsDrawer();
+          }
+          showToast(`🔔 Nouvelle alerte : ${nouvelleAlerte.titre}`, "info");
         }
       });
 
@@ -1020,30 +1027,36 @@
                 : ""
             }
 
-            <div style="border-top:1px solid #efecea;padding-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:#906f6d;">
-              <div style="flex:1;min-width:0;">
-                <p>Publié par <strong>${escHtml(a.auteur_nom || "Habitant")}</strong></p>
-                <p style="margin-top:2px;">Le ${new Date(a.created_at).toLocaleString("fr-FR")}</p>
-              </div>
-              <div style="text-align:right;flex-shrink:0;">
-                <p>Statut: ${statutLabel}</p>
-                <p style="margin-top:2px;">${a.nb_confirmations || 0} confirmation(s)</p>
+            <div style="display:flex;gap:10px;margin-bottom:16px;">
+              <button onclick="confirmerDepuisModal('${a.id}','${a.user_id}')" style="flex:1;padding:10px;border-radius:8px;border:none;background:#E6FAF5;color:#00C48C;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span>Confirmer (${a.nb_confirmations || 0})
+              </button>
+              <button onclick="signalerDepuisModal('${a.id}','${a.user_id}')" style="flex:1;padding:10px;border-radius:8px;border:none;background:#ffdad8;color:#840015;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+                <span class="material-symbols-outlined" style="font-size:16px;">flag</span>Signaler (${a.nb_signalements || 0})
+              </button>
+            </div>
+
+            <div style="border-top:1px solid #efecea;padding-top:12px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+              <img src="${getPhotoUrl({ photoUrl: a.photo_auteur, nom: a.auteur_nom }, 40)}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;" onerror="this.src='${genererAvatar(a.auteur_nom || "U", 40)}'" />
+              <div>
+                <p style="font-size:13px;font-weight:700;color:#1a1a1a;margin:0;">${escHtml(a.auteur_nom || "Habitant")}</p>
+                <p style="font-size:11px;color:#906f6d;margin:2px 0 0 0;">${a.auteur_username ? "@" + escHtml(a.auteur_username) : escHtml(a.auteur_quartier || "Bukavu")} • ${new Date(a.created_at).toLocaleString("fr-FR")}</p>
               </div>
             </div>
 
-            <div style="border-top:1px solid #efecea; margin-top:16px; padding-top:12px;">
-              <h4 style="font-size:13px; font-weight:800; color:#1a1a1a; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
-                <span class="material-symbols-outlined" style="font-size:16px; color:#840015;">chat_bubble</span>
-                Espace d'échange et commentaires
+            <div style="border-top:1px solid #efecea;padding-top:16px;">
+              <h4 style="font-size:14px;font-weight:800;color:#1a1a1a;margin:0 0 12px 0;display:flex;align-items:center;gap:6px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#840015;">chat_bubble</span>
+                Commentaires (<span id="modalCommentCount">0</span>)
               </h4>
-              
-              <div id="commentsList" style="max-height:160px; overflow-y:auto; margin-bottom:12px; padding:6px; display:flex; flex-direction:column; gap:8px;" class="no-scrollbar">
-                <p style="font-size:11px; color:#906f6d; text-align:center; padding:10px 0;">Chargement des commentaires...</p>
+              <div id="modalCommentsList" style="max-height:180px;overflow-y:auto;margin-bottom:12px;" class="no-scrollbar">
+                <p style="color:#906f6d;font-size:12px;text-align:center;">Chargement des commentaires...</p>
               </div>
-              
-              <div style="display:flex; gap:8px; align-items:center;">
-                <input id="newCommentInput" type="text" placeholder="Ajouter un commentaire..." maxlength="500" style="flex:1; height:38px; padding:0 12px; border:1px solid #ddb8b6; border-radius:6px; font-size:12px; font-family:'Plus Jakarta Sans',sans-serif; outline:none;" />
-                <button id="btnSendComment" style="height:38px; padding:0 14px; background:#840015; color:white; border:none; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Plus Jakarta Sans',sans-serif;">Envoyer</button>
+              <div style="display:flex;gap:8px;">
+                <input id="modalCommentInput" type="text" placeholder="Ajouter un commentaire..." maxlength="500" style="flex:1;padding:8px 12px;border:1px solid #ddb8b6;border-radius:8px;font-size:13px;outline:none;" onkeypress="if(event.key==='Enter') publierCommentaire('${a.id}')"/>
+                <button onclick="publierCommentaire('${a.id}')" style="background:#840015;color:white;border:none;border-radius:8px;padding:0 14px;font-size:13px;font-weight:700;cursor:pointer;">
+                  <span class="material-symbols-outlined" style="font-size:16px;">send</span>
+                </button>
               </div>
             </div>
           </div>
@@ -1051,32 +1064,12 @@
 
           Swal.fire({
             html: html,
-            showCancelButton: true,
-            confirmButtonText: "Confirmer cet incident",
-            cancelButtonText: "Fermer",
-            confirmButtonColor: "#00C48C",
-            cancelButtonColor: "#efecea",
-            customClass: {
-              cancelButton: "swal2-cancel-custom",
-            },
+            showConfirmButton: false,
+            showCloseButton: true,
+            customClass: { popup: "swal-modal-custom" },
             didOpen: () => {
-              chargerCommentairesDetails(a.id);
-
-              const sendBtn = document.getElementById("btnSendComment");
-              const input = document.getElementById("newCommentInput");
-              if (sendBtn && input) {
-                sendBtn.onclick = () => soumettreCommentaire(a.id);
-                input.onkeydown = (e) => {
-                  if (e.key === "Enter") {
-                    soumettreCommentaire(a.id);
-                  }
-                };
-              }
+              chargerCommentaires(a.id);
             },
-          }).then((result) => {
-            if (result.isConfirmed) {
-              confirmer(a.id, a.user_id);
-            }
           });
         } catch (e) {
           Swal.close();
@@ -1084,65 +1077,73 @@
         }
       }
 
-      async function chargerCommentairesDetails(alertId) {
-        const container = document.getElementById("commentsList");
-        if (!container) return;
+      async function confirmerDepuisModal(id, auteurId) {
+        await confirmer(id, auteurId);
+        voirDetailsAlerte(id);
+      }
+
+      async function signalerDepuisModal(id, auteurId) {
+        await signalerFausse(id, auteurId);
+        voirDetailsAlerte(id);
+      }
+
+      async function chargerCommentaires(alertId) {
         try {
           const data = await AB.api(`alertes/${alertId}/commentaires`);
-          const list = data.commentaires || [];
-          if (list.length === 0) {
-            container.innerHTML = `<p style="font-size:11px; color:#906f6d; text-align:center; padding:10px 0;">Aucun commentaire. Soyez le premier à réagir !</p>`;
+          const comments = data.commentaires || [];
+          const countSpan = document.getElementById("modalCommentCount");
+          const listDiv = document.getElementById("modalCommentsList");
+
+          if (countSpan) countSpan.textContent = comments.length;
+          if (!listDiv) return;
+
+          if (!comments.length) {
+            listDiv.innerHTML =
+              '<p style="color:#906f6d;font-size:12px;text-align:center;padding:8px 0;">Aucun commentaire pour le moment. Soyez le premier à réagir !</p>';
             return;
           }
 
-          container.innerHTML = list
-            .map((c) => {
-              const photo = getPhotoUrl(
-                { photoUrl: c.photo_auteur, nom: c.auteur_nom },
-                24,
-              );
-              return `
-            <div style="display:flex; gap:8px; text-align:left; background:#faf8f7; padding:8px; border-radius:6px; border:1px solid #efecea;">
-              <img src="${photo}" style="width:24px; height:24px; border-radius:50%; object-fit:cover;" onerror="this.src='${genererAvatar(c.auteur_nom || "U", 24)}'" />
-              <div style="flex:1; min-width:0;">
-                <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:2px;">
-                  <span style="font-weight:700; color:#1a1a1a;">${escHtml(c.auteur_nom)}</span>
-                  <span style="color:#906f6d;">${tempsRelatif(c.created_at)}</span>
-                </div>
-                <p style="font-size:11.5px; color:#5b403e; line-height:1.4; margin:0; word-break:break-word;">${escHtml(c.contenu)}</p>
+          listDiv.innerHTML = comments
+            .map(
+              (c) => `
+          <div style="display:flex;gap:8px;margin-bottom:10px;background:#faf8f7;padding:8px 10px;border-radius:8px;">
+            <img src="${getPhotoUrl({ photoUrl: c.photo_auteur, nom: c.auteur_nom }, 28)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" onerror="this.src='${genererAvatar(c.auteur_nom || "U", 28)}'" />
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                <span style="font-size:12px;font-weight:700;color:#1a1a1a;">${escHtml(c.auteur_nom || "Habitant")}</span>
+                <span style="font-size:10px;color:#906f6d;">${tempsRelatif(c.created_at)}</span>
               </div>
+              <p style="font-size:12px;color:#5b403e;margin:0;line-height:1.4;">${escHtml(c.contenu)}</p>
             </div>
-          `;
-            })
+          </div>
+        `,
+            )
             .join("");
-
-          container.scrollTop = container.scrollHeight;
-        } catch (err) {
-          container.innerHTML = `<p style="font-size:11px; color:#FF3D71; text-align:center;">Erreur de chargement des commentaires</p>`;
+        } catch (e) {
+          const listDiv = document.getElementById("modalCommentsList");
+          if (listDiv)
+            listDiv.innerHTML =
+              '<p style="color:#ba1a1a;font-size:12px;text-align:center;">Impossible de charger les commentaires</p>';
         }
       }
 
-      async function soumettreCommentaire(alertId) {
-        const input = document.getElementById("newCommentInput");
-        const btn = document.getElementById("btnSendComment");
-        if (!input || !btn) return;
-
+      async function publierCommentaire(alertId) {
+        const input = document.getElementById("modalCommentInput");
+        if (!input) return;
         const val = input.value.trim();
         if (!val) return;
 
-        btn.disabled = true;
-        btn.textContent = "...";
+        input.disabled = true;
         try {
           await AB.api(`alertes/${alertId}/commentaires`, "POST", {
             contenu: val,
           });
           input.value = "";
-          chargerCommentairesDetails(alertId);
-        } catch (err) {
-          showToast(err.message, "error");
-        } finally {
-          btn.disabled = false;
-          btn.textContent = "Envoyer";
+          input.disabled = false;
+          chargerCommentaires(alertId);
+        } catch (e) {
+          input.disabled = false;
+          showToast(e.message, "error");
         }
       }
 
@@ -1155,6 +1156,8 @@
         const drawer = document.getElementById("notifDrawer");
         const overlay = document.getElementById("drawerOverlay");
         if (!drawer || !overlay) return;
+
+        AB.requestNotificationPermission();
 
         if (!notifsOpen) {
           drawer.style.display = "flex";
@@ -1201,25 +1204,29 @@
         </div>`;
 
         try {
-          const data = await AB.api("alertes");
-          const alertes = data.alertes || [];
-          const quartierUser = user?.quartier || "";
+          const alertes = toutesAlertes.length > 0 ? toutesAlertes : (await AB.api("alertes")).alertes || [];
+          const quartierUser = (user?.quartier || "").toLowerCase();
 
           const critiques = alertes.filter((a) => a.urgence === "critique");
           const quartierAlertes = alertes.filter(
             (a) =>
               quartierUser &&
               a.quartier &&
-              a.quartier.toLowerCase() === quartierUser.toLowerCase() &&
+              a.quartier.toLowerCase() === quartierUser &&
               a.urgence !== "critique",
           );
+          const autresAlertes = alertes.filter(
+            (a) =>
+              a.urgence !== "critique" &&
+              (!quartierUser || !a.quartier || a.quartier.toLowerCase() !== quartierUser),
+          );
 
-          if (critiques.length === 0 && quartierAlertes.length === 0) {
+          if (alertes.length === 0) {
             container.innerHTML = `
             <div style="text-align:center;padding:40px 20px;">
               <span class="material-symbols-outlined" style="font-size:48px;color:#ddb8b6;">notifications_off</span>
               <p style="color:#1a1a1a;font-weight:700;margin-top:12px;margin-bottom:4px;">Aucune notification</p>
-              <p style="color:#906f6d;font-size:13px;margin:0;">Aucune alerte critique récente ou alerte dans votre quartier.</p>
+              <p style="color:#906f6d;font-size:13px;margin:0;">Aucun incident récent signalé dans la ville.</p>
             </div>`;
             return;
           }
@@ -1227,20 +1234,27 @@
           let html = "";
 
           if (critiques.length > 0) {
-            html += `<div style="font-weight:800;font-size:11px;color:#ba1a1a;margin:12px 0 8px;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:16px;">campaign</span>Alertes Critiques</div>`;
-            html += critiques
-              .slice(0, 5)
-              .map((a) => renderNotifRow(a))
-              .join("");
+            html += `<div style="font-weight:800;font-size:11px;color:#ba1a1a;margin:8px 0;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:16px;">campaign</span>Alertes Critiques</div>`;
+            html += critiques.slice(0, 4).map((a) => renderNotifRow(a)).join("");
           }
 
           if (quartierAlertes.length > 0) {
-            html += `<div style="font-weight:800;font-size:11px;color:#840015;margin:18px 0 8px;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:16px;">location_on</span>Dans votre quartier (${escHtml(quartierUser)})</div>`;
-            html += quartierAlertes
-              .slice(0, 8)
-              .map((a) => renderNotifRow(a))
-              .join("");
+            html += `<div style="font-weight:800;font-size:11px;color:#840015;margin:14px 0 8px;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:16px;">location_on</span>Dans votre quartier (${escHtml(user?.quartier || "Bukavu")})</div>`;
+            html += quartierAlertes.slice(0, 5).map((a) => renderNotifRow(a)).join("");
           }
+
+          if (autresAlertes.length > 0) {
+            html += `<div style="font-weight:800;font-size:11px;color:#5b403e;margin:14px 0 8px;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;"><span class="material-symbols-outlined" style="font-size:16px;">public</span>Autres alertes récentes à Bukavu</div>`;
+            html += autresAlertes.slice(0, 5).map((a) => renderNotifRow(a)).join("");
+          }
+
+          html += `
+          <div style="padding:16px 0 8px;text-align:center;">
+            <a href="notifications.html" style="display:inline-flex;align-items:center;gap:6px;background:#840015;color:white;text-decoration:none;padding:10px 16px;border-radius:10px;font-size:12px;font-weight:700;box-shadow:0 2px 6px rgba(132,0,21,0.2);">
+              <span class="material-symbols-outlined" style="font-size:16px;">notifications</span>
+              Voir toute la page Notifications
+            </a>
+          </div>`;
 
           container.innerHTML = html;
         } catch (e) {

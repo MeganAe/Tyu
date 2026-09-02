@@ -137,18 +137,36 @@ const AB = {
     }
   },
 
+  requestNotificationPermission: async () => {
+    if (!("Notification" in window)) return false;
+    if (Notification.permission === "granted") return true;
+    if (Notification.permission !== "denied") {
+      try {
+        const perm = await Notification.requestPermission();
+        return perm === "granted";
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  },
+
   connectSSE: (onNewAlert) => {
     const token = localStorage.getItem("ab_token");
-    if (!token) return;
+    if (!token) return null;
 
-    if ("Notification" in window && Notification.permission === "default") {
-      Notification.requestPermission();
+    if (window._abSSE) {
+      try {
+        window._abSSE.close();
+      } catch {}
     }
 
-    const source = new EventSource(`/api/alertes/flux?token=${token}`);
+    const source = new EventSource(`/api/alertes/flux?token=${encodeURIComponent(token)}`);
+    window._abSSE = source;
 
     source.onmessage = (event) => {
       try {
+        if (!event.data || event.data === "connected") return;
         const parsed = JSON.parse(event.data);
         if (parsed && parsed.alerte) {
           if (onNewAlert) {
@@ -157,14 +175,20 @@ const AB = {
           AB.triggerSystemNotification(parsed.alerte);
         }
       } catch (e) {
-        console.error(e);
+        console.warn("Erreur parsing SSE message:", e);
       }
     };
 
     source.onerror = () => {
       source.close();
-      setTimeout(() => AB.connectSSE(onNewAlert), 5000);
+      window._abSSERetry = setTimeout(() => {
+        if (localStorage.getItem("ab_token")) {
+          AB.connectSSE(onNewAlert);
+        }
+      }, 5000);
     };
+
+    return source;
   },
 
   triggerSystemNotification: (alert) => {
@@ -178,25 +202,68 @@ const AB = {
       alert.quartier &&
       alert.quartier.toLowerCase() === myQuartier.toLowerCase();
 
-    if (!isCritical && !isMyQuartier) return;
+    const isOwnAlert = alert.user_id && alert.user_id === user.id;
+    if (isOwnAlert) return;
+
+    try {
+      if (typeof AudioContext !== "undefined" || typeof webkitAudioContext !== "undefined") {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(isCritical ? 880 : 587.33, ctx.currentTime);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.3);
+      }
+    } catch {}
 
     if ("Notification" in window && Notification.permission === "granted") {
       const title = isCritical
-        ? `[URGENT] ${alert.titre}`
-        : `Vigilance Quartier: ${alert.titre}`;
-      const body = `Incident à ${alert.quartier} : ${alert.description}`;
-      const notification = new Notification(title, {
-        body: body,
-        icon: "/logo.png",
-        tag: alert.id,
-      });
+        ? `🚨 [URGENT] ${alert.titre}`
+        : `🔔 [${(alert.quartier || "Bukavu").toUpperCase()}] ${alert.titre}`;
+      const body = `${alert.description ? alert.description.substring(0, 120) : "Nouvelle alerte signalée"}...`;
 
-      notification.onclick = () => {
-        window.focus();
-        if (window.voirDetailsAlerte) {
-          window.voirDetailsAlerte(alert.id);
-        }
-      };
+      if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready.then((reg) => {
+          reg.showNotification(title, {
+            body: body,
+            icon: "/logo.png",
+            badge: "/logo.png",
+            tag: `alert-${alert.id}`,
+            data: { id: alert.id, url: `/index.html?alerte=${alert.id}` },
+            vibrate: isCritical ? [300, 100, 300, 100, 300] : [200, 100, 200],
+          });
+        }).catch(() => {
+          fallbackNotification(title, body, alert.id);
+        });
+      } else {
+        fallbackNotification(title, body, alert.id);
+      }
+    }
+
+    function fallbackNotification(title, body, id) {
+      try {
+        const notif = new Notification(title, {
+          body: body,
+          icon: "/logo.png",
+          tag: `alert-${id}`,
+        });
+        notif.onclick = () => {
+          window.focus();
+          if (window.voirDetailsAlerte) {
+            window.voirDetailsAlerte(id);
+          } else {
+            window.location.href = `index.html?alerte=${id}`;
+          }
+        };
+      } catch (err) {
+        console.warn("Fallback notification error:", err);
+      }
     }
   },
 };
@@ -508,3 +575,26 @@ function afficherMenuAdmin() {
 window.addEventListener("online", () => {
   AB.syncOfflineQueue();
 });
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("/sw.js")
+      .then((reg) => {
+        console.log("[Service Worker] Prêt", reg.scope);
+      })
+      .catch((err) => {
+        console.warn("[Service Worker] Échec:", err);
+      });
+  });
+
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "OPEN_ALERT" && event.data.alertId) {
+      if (typeof window.voirDetailsAlerte === "function") {
+        window.voirDetailsAlerte(event.data.alertId);
+      } else {
+        window.location.href = `/index.html?alerte=${event.data.alertId}`;
+      }
+    }
+  });
+}
